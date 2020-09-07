@@ -1,0 +1,30 @@
+#setbg &			# set the background with the `setbg` script
+
+# set wallpaper
+#xwallpaper --center Images/wallpapers/i2gb4m7j7cb41.png
+
+# below loads correct monitor profile
+#autorandr --load mobile
+setxkbmap gb &
+numlockx &
+#$HOME/.screenlayout/home_triple_setup.sh
+
+# Configure multihead. if statement that check if there's more than one montitor, then checks if DP-2 is connected and applies the relevent randr .sh
+
+if [ "$(xrandr -q | awk '/ connected / {print $1}' | wc -l)" -eq 1 ];
+then
+    $HOME/.screenlayout/laptop_only.sh
+elif [[ "$(xrandr -q | awk '/ connected / {print $1}')" != *DP-2* ]];
+then
+    $HOME/.screenlayout/home_triple_setup.sh
+else
+    $HOME/.screenlayout/rjah-temp.sh
+fi
+
+nitrogen --restore &
+picom -CGbf &
+
+#teams
+#pcloud
+#TogglDesktop
+
