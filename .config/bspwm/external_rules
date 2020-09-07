@@ -1,0 +1,37 @@
+#!/bin/sh
+
+wid=$1
+class=$2
+instance=$3
+title=$(xdotool getwindowname $wid)
+
+case $class in
+  [Rr]edshift-*|[Tt]int2|[Pp]inentry-*|[Mm]pv|[Mm]u[Pp][Dd][Ff]|[Mm]Player|[Tt]hunar|[Ff]im|[Gg]picview|[Nn]itrogen|[Aa]randr|[Gg]alculator|[Ff]ont-manager|[Oo]blogout|[Pp]eek|[Ss]kype|[Xx]fce4-appfinder|[Xx]fce4-about|[Gg]pick|[Gg]mrun|[Xx][Cc]alc|[Pp]avucontrol|[Vv]lc|[Ee]o[mg]|[Ff]eh|[Rr]istretto|[Ss]xiv|[Pp]qiv|[Aa]tril|[Ee]vince|[Zz]athura|scratchpad|fzfmenu|[Gg]itk|[Gg]it-gui|[Pp]cloud|[Tt]imeshift|[Tt]ogglDesktop|[Ll]eafpad)
+  echo "state = floating"
+  echo "center = on"
+  ;;
+  Chromium)
+    echo "desktop = ^2"
+    ;;
+  firefox)
+    echo "desktop = ^2"
+    ;;
+  Opera)
+    echo "desktop = ^3"
+    ;;
+  Gimp)
+   echo "desktop = ^5"
+   ;;
+ Anydesk)
+   echo "desktop = ^4"
+   echo "follow = on"
+   ;;
+ Docky)
+   echo "layer = above"
+   echo "manage = on"
+   echo "border = off"
+   echo "focus = off"
+   echo "locked = on"
+   ;;
+esac
+
