@@ -1,2 +1,2 @@
-# dotfiles_yadm
-Personal dotfiles
+# Personal dotfiles
+
