@@ -19,7 +19,8 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "monospace" :size 15))
+(setq doom-font (font-spec :family "monospace" :size 15)
+      projectile-project-search-path '("~/git_work/"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -28,11 +29,168 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/Documents/org/")
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
+
+; set keymap to escape intert mode
+(setq-default evil-escape-key-sequence "ii")
+(setq-default evil-escape-delay 0.2)
+
+; have org-mode show greek letters in place of their latex code
+(setq org-pretty-entities t)
+; make org_notes and zot_bib avialable in the file.
+(setq
+   org_notes "~/Documents/org-roam"
+   zot_bib "~/Documents/masterLib.bib"
+   org-directory org_notes
+   deft-directory org_notes
+   org-roam-directory org_notes
+   org-default-notes-file (concat org_notes "/inbox.org")
+   +biblio-pdf-library-dir (concat org_notes "/pdfs/")
+   +biblio-default-bibliography-files '("Documents/masterLib.bib")
+   +biblio-notes-path "Documents/org-roam/"
+   )
+
+;; Org Roam
+(after! org-roam
+  (setq org-roam-graph-viewer "/usr/bin/open")
+  (setq org-roam-ref-capture-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point)
+           "%?"
+           :file-name "websites/${slug}"
+           :head "#+title: ${title}
+#+roam_key: ${ref}
+- source :: ${ref}"
+           :unnarrowed t)))
+  (setq org-roam-capture-templates
+        '(("d" "default" plain (function org-roam--capture-get-point)
+           "%?"
+           :file-name "${slug}"
+           :head "#+title: ${title}\n
+#+roam_tags:"
+           :unnarrowed t))))
+
+(use-package deft
+      :after org
+      :bind
+      ("C-c n d" . deft)
+      :custom
+      (deft-recursive t)
+      (deft-use-filter-string-for-filename t)
+      (deft-default-extension "org")
+      (deft-directory "~/Documents/org-roam/"))
+
+; org roam bibtex
+(use-package org-roam-bibtex
+  :after (org-roam)
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (setq orb-preformat-keywords
+   '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point)
+           ""
+           :file-name "${slug}"
+           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+- tags ::
+- keywords :: ${keywords}
+\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+           :unnarrowed t))))
+
+(use-package! org-noter
+:after (:any org pdf-view)
+    :config
+    (setq
+        ;; The WM can handle splits
+        org-noter-notes-window-location 'other-frame
+         ;; Please stop opening frames
+         org-noter-always-create-frame nil
+         ;; I want to see the whole file
+         org-noter-hide-other nil
+         ;; Everything is relative to the main notes file
+         org-noter-notes-search-path (list org_notes)
+       )
+      )
+
+(use-package org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions#'org-noter-pdftools-jump-to-note)))
+
+; Helm Bibtex config
+(setq
+ bibtex-completion-notes-path org_notes
+ bibtex-completion-bibliography zot_bib
+ bibtex-completion-pdf-field "file"
+ bibtex-completion-notes-template-multiple-files
+ (concat
+  "#+TITLE: ${title}\n"
+  "#+ROAM_KEY: cite:${=key=}\n"
+  "* TODO Notes\n"
+  ":PROPERTIES:\n"
+  ":Custom_ID: ${=key=}\n"
+  ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+  ":AUTHOR: ${author-abbrev}\n"
+  ":JOURNAL: ${journaltitle}\n"
+  ":DATE: ${date}\n"
+  ":YEAR: ${year}\n"
+  ":DOI: ${doi}\n"
+  ":URL: ${url}\n"
+  ":END:\n\n"
+  )
+ )
+
+; helm-bibtex keybindings
+(after! org
+  (map! :leader
+        :prefix "n"
+        :desc "helm-bibtex" "b" #'helm-bibtex))
+; set up org ref
+(use-package! org-ref
+    :config
+    (setq
+         org-ref-completion-library 'org-ref-ivy-cite
+         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+         org-ref-default-bibliography (list zot_bib)
+         org-ref-bibliography-notes (concat org_notes "/bibnotes.org")
+         org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+         org-ref-notes-directory org_notes
+         org-ref-notes-function 'orb-edit-notes
+    ))
+
+(use-package org-journal
+      :bind
+      ("C-c n j" . org-journal-new-entry)
+      :custom
+      (org-journal-dir "~/Documents/org-roam/")
+      (org-journal-date-prefix "#+TITLE: ")
+      (org-journal-file-format "%Y-%m-%d.org")
+      (org-journal-date-format "%A, %d %B %Y"))
+    (setq org-journal-enable-agenda-integration t)
+
+(after! org-journal
+  (set-company-backend! 'org-journal-mode 'company-org-roam))
+
+; wrap highlighed text in * when the key is used
+;(sp-with-modes '(org-mode)
+ ;   (sp-local-pair "*" "*"))
+
+(after! org
+  (map! :map org-mode-map
+        :n "M-j" #'org-metadown
+        :n "M-k" #'org-metaup))
+
+
+(use-package org-roam-server
+    :ensure t)
+
+(add-hook 'org-roam-server-mode (lambda () (browse-url-chrome "http://localhost:8080")))
 
 (require 'org-mime)
 
@@ -224,6 +382,7 @@
               company-yasnippet))
 ;; Plain Text:1 ends here
 
+
 ;; [[file:config.org::*Flyspell][Flyspell:1]]
 (after! flyspell (require 'flyspell-lazy) (flyspell-lazy-mode 1))
 ;; Flyspell:1 ends here
@@ -254,10 +413,6 @@
 (set-company-backend! 'ess-r-mode '(company-R-args company-R-objects company-dabbrev-code :separate))
 ;; ESS:1 ends here
 
-;; [[file:config.org::*Flyspell][Flyspell:1]]
-(after! flyspell (require 'flyspell-lazy) (flyspell-lazy-mode 1))
-;; Flyspell:1 ends here
-
 ;; [[file:config.org::*Configuration][Configuration:1]]
 (setq ispell-dictionary "en-custom")
 ;; Configuration:1 ends here
@@ -265,3 +420,8 @@
 ;; [[file:config.org::*Configuration][Configuration:2]]
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 ;; Configuration:2 ends here
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom
+ '(org-roam-bibtex-mode t)
+ '(org-roam-server-mode t))

@@ -55,4 +55,12 @@
 (package! polymode)
 (package! poly-R)
 (package! org-mime)
+(package! org-bullets)
+(package! org-ref)
+(package! org-noter-pdftools)
+(package! org-roam-bibtex)
+(unpin! org-roam
+        org-roam-server
+        company-org-roam)
+
 (use-package flyspell)

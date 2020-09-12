@@ -11,7 +11,7 @@ export SHELL=/usr/bin/zsh
 # If you come from bash you might have to change your $PATH.
 export NODE_PATH=$NODE_PATH:$HOME/.npm-global/lib/node_modules
 export JAVA_HOME=/usr/java/latest
-export PATH=$JAVA_HOME/bin:~/.npm-global/bin:$HOME/bin:/usr/local/bin:$PATH
+export PATH=$JAVA_HOME/bin:~/.npm-global/bin:$HOME/bin:/usr/local/bin:$HOME/.emacs.d/bin:$PATH
 
 # Add exports from your profile
 #source ~/.profile
