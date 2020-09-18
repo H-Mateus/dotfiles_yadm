@@ -56,6 +56,63 @@
    +biblio-notes-path "Documents/org-roam/"
    )
 
+;; Org agenda
+;(setq org-agenda-files (quote ("~/Documents/org")))
+
+;; I use C-c c to start capture mode
+(global-set-key (kbd "C-c c") 'org-capture)
+
+;; todo config
+;; todo keywords
+(setq org-todo-keywords
+      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+;; allow toggle of todo state with: C-c C-t KEY where KEY is one the keys defined
+;; in the sequence above
+(setq org-use-fast-todo-selection t)
+
+;; Allow quick switching of task state with S-left or S-right without notes
+;; or timestamps
+(setq org-treat-S-cursor-todo-selection-as-state-change nil)
+
+;; todo state triggers
+(setq org-todo-state-tags-triggers
+      (quote (("CANCELLED" ("CANCELLED" . t))
+              ("WAITING" ("WAITING" . t))
+              ("HOLD" ("WAITING") ("HOLD" . t))
+              (done ("WAITING") ("HOLD"))
+              ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+              ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+              ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+
+;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protoco
+(after! org
+  (setq org-capture-templates
+        (quote (("t" "todo" entry (file "~/Documents/org-roam/todo.org")
+                 "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
+                ("r" "respond" entry (file "~/Documents/org-roam/todo.org")
+                 "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n%a\n" :clock-in t :clock-resume t :immediate-finish t)
+                ("n" "note" entry (file "~/Documents/org-roam/todo.org/notes")
+                 "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+                ("w" "org-protocol" entry (file "~/Documents/org-roam/todo.org")
+                 "* TODO Review %c\n%U\n" :immediate-finish t)
+                ("m" "Meeting" entry (file "~/Documents/org-roam/todo.org")
+                 "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+                ("p" "Phone call" entry (file "~/Documents/org-roam/todo.org")
+                 "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
+                ("h" "Habit" entry (file "~/Documents/org-roam/todo.org")
+                 "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))))
+
+;; Remove empty LOGBOOK drawers on clock out
+(defun bh/remove-empty-drawer-on-clock-out ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line 0)
+    (org-remove-empty-drawer-at "LOGBOOK" (point))))
+
+(add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
+
+
 ;; Org Roam
 (after! org-roam
   (setq org-roam-graph-viewer "/usr/bin/open")
@@ -389,7 +446,7 @@
 
 ;; [[file:config.org::*Company][Company:1]]
 (after! company
-  (setq company-idle-delay 0.5
+  (setq company-idle-delay 0.1
         company-minimum-prefix-length 2)
   (setq company-show-numbers t)
 (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
