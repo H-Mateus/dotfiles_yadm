@@ -59,8 +59,24 @@
 (package! org-ref)
 (package! org-noter-pdftools)
 (package! org-roam-bibtex)
+(package! ox-reveal)
+(package! citeproc-org)
 (unpin! org-roam
         org-roam-server
         company-org-roam)
+;; View data frames better with
+(package! ess-view :pin "d4e5a340b7...")
+;; info-colors: this makes manual pages nicer to look at :) Variable pitch fontification + colouring
+(package! info-colors :pin "47ee73cc19...")
+
+;; Language packages
+
+;;; LaTeX
+;;For mathematical convenience, WIP
+(package! auto-activating-snippets :recipe
+  (:host github :repo "ymarco/auto-activating-snippets")
+  :pin "0927bb5e85...")
+(package! latex-auto-activating-snippets
+  :recipe (:local-repo "lisp/LaTeX-auto-activating-snippets"))
 
 (use-package flyspell)

@@ -19,10 +19,13 @@
        ;;japanese
 
        :completion
-       company           ; the ultimate code completion backend
+       (company           ; the ultimate code completion backend
+        +childframe)                ; ... when your children are better than you
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       ivy               ; a search engine for love and life
+       (ivy               ; a search engine for love and life
+        +icons                      ; ... icons are nice
+        +prescient)                 ; ... I know what I want(ed)
 
        :ui
        deft              ; notational velocity for Emacs
@@ -32,7 +35,8 @@
        ;;fill-column       ; a `fill-column' indicator
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
-       indent-guides     ; highlighted indent columns
+       ;;indent-guides     ; highlighted indent columns
+       ligatures         ; ligatures and symbols to make your code pretty again
        modeline          ; snazzy, Atom-inspired modeline, plus API
        nav-flash         ; blink the current line after jumping
        neotree           ; a project drawer, like NERDTree for vim
@@ -52,7 +56,7 @@
        (evil +everywhere); come to the dark side, we have cookies
        file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
-       ;;(format +onsave)  ; automated prettiness
+       (format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors  ; editing in many places at once
@@ -63,10 +67,11 @@
        ;;word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       dired             ; making dired pretty [functional]
-       electric          ; smarter, keyword-based electric-indent
-       ;;ibuffer         ; interactive buffer management
-       vc                ; version-control and Emacs, sitting in a tree
+       (dired +icons)               ; making dired pretty [functional]
+       electric                     ; smarter, keyword-based electric-indent
+       (ibuffer +icons)             ; interactive buffer management
+       (undo +tree)                 ; persistent, smarter undo for your inevitable mistakes
+       vc                           ; version-control and Emacs, sitting in a tree
 
        :term
        ;;eshell            ; a consistent, cross-platform shell (WIP)
@@ -81,10 +86,10 @@
 
        :tools
        ;;ansible
-       ;;debugger          ; FIXME stepping through code, to help you add bugs
+       debugger          ; FIXME stepping through code, to help you add bugs
        ;;direnv
        ;;docker
-       ;;editorconfig      ; let someone else argue about tabs vs spaces
+       editorconfig      ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        ;;gist              ; interacting with github gists
@@ -102,6 +107,9 @@
        ;;terraform         ; infrastructure as code
        ;;tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
+
+       :os
+       tty                          ; improve the terminal Emacs experience
 
        :lang
        ;;agda              ; types of types of types of types...
@@ -129,7 +137,10 @@
        ;;javascript        ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
        ;;kotlin            ; a better, slicker Java(Script)
-       latex             ; writing papers in Emacs has never been so fun
+       (latex                       ; writing papers in Emacs has never been so fun
+        +latexmk                    ; what else would you use?
+        +cdlatex                    ; quick maths symbols
+        +fold)                      ; fold the clutter away nicities
        ;;lean
        ;;factor
        ;;ledger            ; an accounting system in Emacs
@@ -166,6 +177,7 @@
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
        ;;web               ; the tubes
+       yaml                ; JSON, but readable
 
        :email
        (mu4e +gmail)

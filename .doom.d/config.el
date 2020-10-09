@@ -7,7 +7,23 @@
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "Gabriel Mateus Bernardo Harrington"
-      user-mail-address "mateus.harrington@gmail.com")
+      user-mail-address "g.m.bernardo.harrington@keele.ac.uk")
+
+;; some nice defaults
+(setq-default
+ delete-by-moving-to-trash t                      ; Delete files to trash
+ window-combination-resize t                      ; take new window space from all other windows (not just current)
+ x-stretch-cursor t)                              ; Stretch cursor to the glyph width
+
+(setq undo-limit 80000000                         ; Raise undo-limit to 80Mb
+      evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
+      auto-save-default t                         ; Nobody likes to loose work, I certainly don't
+      truncate-string-ellipsis "…")               ; Unicode ellispis are nicer than "...", and also save /precious/ space
+
+(display-time-mode 1)                             ; Enable time in the mode-line
+(unless (equal "Battery status not available"
+               (battery))
+  (display-battery-mode 1))                       ; On laptops it's nice to know how much power you have
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -25,7 +41,22 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-vibrant)
+(delq! t custom-theme-load-path)
+
+;; Change modline text from red to orange
+(custom-set-faces!
+  '(doom-modeline-buffer-modified :foreground "orange"))
+
+;; LF UTF-8 is the default file encoding so hide it in modeline unless this
+;; isn't the case
+(defun doom-modeline-conditional-buffer-encoding ()
+  "We expect the encoding to be LF UTF-8, so only show the modeline when this is not the case"
+  (setq-local doom-modeline-buffer-encoding
+              (unless (or (eq buffer-file-coding-system 'utf-8-unix)
+                          (eq buffer-file-coding-system 'utf-8)))))
+
+(add-hook 'after-change-major-mode-hook #'doom-modeline-conditional-buffer-encoding)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -56,8 +87,13 @@
    +biblio-notes-path "Documents/org-roam/"
    )
 
+;; Presentations
+;; Reveal.js + Org mode
+(require 'ox-reveal)
+(setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
+
 ;; Org agenda
-;(setq org-agenda-files (quote ("~/Documents/org")))
+(setq org-agenda-files '("~/Documents/org-roam"))
 
 ;; I use C-c c to start capture mode
 (global-set-key (kbd "C-c c") 'org-capture)
@@ -220,6 +256,9 @@
          org-ref-notes-directory org_notes
          org-ref-notes-function 'orb-edit-notes
     ))
+
+; set up citeproc-org for use of csl files
+(citeproc-org-setup)
 
 (use-package org-journal
       :bind

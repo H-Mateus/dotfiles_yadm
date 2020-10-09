@@ -16,13 +16,13 @@ then
     $HOME/.screenlayout/laptop_only.sh
 elif [[ "$(xrandr -q | awk '/ connected / {print $1}')" != *DP-2* ]];
 then
-    $HOME/.screenlayout/home_triple_setup.sh
+    $HOME/.screenlayout/home_double_setup.sh
 else
-    $HOME/.screenlayout/rjah-temp.sh
+    $HOME/.screenlayout/rjah-dual-external.sh
 fi
 
 nitrogen --restore &
-picom -CGbf &
+picom &
 
 #teams
 #pcloud
