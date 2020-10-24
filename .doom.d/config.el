@@ -1,6 +1,6 @@
 ;;; config.el -*- lexical-binding: t; -*-
 
-;; [[file:/tmp/config.org.0EmoiE::*Simple settings][Simple settings:1]]
+;; [[file:/tmp/config.org.alqrYt::*Simple settings][Simple settings:1]]
 (setq-default
  delete-by-moving-to-trash t                      ; Delete files to trash
  window-combination-resize t                      ; take new window space from all other windows (not just current)
@@ -18,28 +18,28 @@
 (global-subword-mode 1)                           ; Iterate through CamelCase words
 ;; Simple settings:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Auto-customisations][Auto-customisations:1]]
+;; [[file:/tmp/config.org.alqrYt::*Auto-customisations][Auto-customisations:1]]
 (setq-default custom-file (expand-file-name ".custom.el" doom-private-dir))
 (when (file-exists-p custom-file)
   (load custom-file))
 ;; Auto-customisations:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Windows][Windows:1]]
+;; [[file:/tmp/config.org.alqrYt::*Windows][Windows:1]]
 (setq evil-vsplit-window-right t
       evil-split-window-below t)
 ;; Windows:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Windows][Windows:2]]
+;; [[file:/tmp/config.org.alqrYt::*Windows][Windows:2]]
 (defadvice! prompt-for-buffer (&rest _)
   :after '(evil-window-split evil-window-vsplit)
   (+ivy/switch-buffer))
 ;; Windows:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Windows][Windows:3]]
+;; [[file:/tmp/config.org.alqrYt::*Windows][Windows:3]]
 (setq +ivy-buffer-preview t)
 ;; Windows:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Windows][Windows:4]]
+;; [[file:/tmp/config.org.alqrYt::*Windows][Windows:4]]
 (map! :map evil-window-map
       "SPC" #'rotate-layout
       ;; Navigation
@@ -54,26 +54,26 @@
       "C-<right>"      #'+evil/window-move-right)
 ;; Windows:4 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Buffer defaults][Buffer defaults:1]]
+;; [[file:/tmp/config.org.alqrYt::*Buffer defaults][Buffer defaults:1]]
 ;; (setq-default major-mode 'org-mode)
 ;; Buffer defaults:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Font Face][Font Face:1]]
+;; [[file:/tmp/config.org.alqrYt::*Font Face][Font Face:1]]
 (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 18)
       doom-big-font (font-spec :family "JetBrainsMono Nerd Font" :size 26)
       doom-variable-pitch-font (font-spec :family "Overpass Nerd Font" :size 18))
 ;; Font Face:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Theme and modeline][Theme and modeline:1]]
+;; [[file:/tmp/config.org.alqrYt::*Theme and modeline][Theme and modeline:1]]
 (setq doom-theme 'doom-one)
 ;; Theme and modeline:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Theme and modeline][Theme and modeline:2]]
+;; [[file:/tmp/config.org.alqrYt::*Theme and modeline][Theme and modeline:2]]
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
 ;; Theme and modeline:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Theme and modeline][Theme and modeline:3]]
+;; [[file:/tmp/config.org.alqrYt::*Theme and modeline][Theme and modeline:3]]
 (defun doom-modeline-conditional-buffer-encoding ()
   "We expect the encoding to be LF UTF-8, so only show the modeline when this is not the case"
   (setq-local doom-modeline-buffer-encoding
@@ -83,25 +83,25 @@
 (add-hook 'after-change-major-mode-hook #'doom-modeline-conditional-buffer-encoding)
 ;; Theme and modeline:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Miscellaneous][Miscellaneous:1]]
+;; [[file:/tmp/config.org.alqrYt::*Miscellaneous][Miscellaneous:1]]
 (setq display-line-numbers-type 'relative)
 ;; Miscellaneous:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Miscellaneous][Miscellaneous:2]]
+;; [[file:/tmp/config.org.alqrYt::*Miscellaneous][Miscellaneous:2]]
 (setq doom-fallback-buffer-name "► Doom"
       +doom-dashboard-name "► Doom")
 ;; Miscellaneous:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Miscellaneous][Miscellaneous:3]]
+;; [[file:/tmp/config.org.alqrYt::*Miscellaneous][Miscellaneous:3]]
 (custom-set-faces! '(doom-modeline-evil-insert-state :weight bold :foreground "#339CDB"))
 ;; Miscellaneous:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Mouse buttons][Mouse buttons:1]]
+;; [[file:/tmp/config.org.alqrYt::*Mouse buttons][Mouse buttons:1]]
 (map! :n [mouse-8] #'better-jumper-jump-backward
       :n [mouse-9] #'better-jumper-jump-forward)
 ;; Mouse buttons:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Window title][Window title:1]]
+;; [[file:/tmp/config.org.alqrYt::*Window title][Window title:1]]
 (setq frame-title-format
       '(""
         (:eval
@@ -114,7 +114,7 @@
              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 ;; Window title:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Systemd daemon][Systemd daemon:4]]
+;; [[file:/tmp/config.org.alqrYt::*Systemd daemon][Systemd daemon:4]]
 (defun greedily-do-daemon-setup ()
   (when (daemonp)
     (require 'org)
@@ -131,7 +131,7 @@
 (add-hook 'emacs-startup-hook #'greedily-do-daemon-setup)
 ;; Systemd daemon:4 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Fun][Fun:5]]
+;; [[file:/tmp/config.org.alqrYt::*Fun][Fun:5]]
 (use-package! keycast
   :commands keycast-mode
   :config
@@ -152,7 +152,7 @@
                   :weight bold)))
 ;; Fun:5 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Fun][Fun:7]]
+;; [[file:/tmp/config.org.alqrYt::*Fun][Fun:7]]
 (use-package! gif-screencast
   :commands gif-screencast-mode
   :config
@@ -176,17 +176,17 @@
   (add-hook 'doom-load-theme-hook #'gif-screencast-write-colormap))
 ;; Fun:7 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Large files][Large files:2]]
+;; [[file:/tmp/config.org.alqrYt::*Large files][Large files:2]]
 (use-package! vlf-setup
   :defer-incrementally vlf-tune vlf-base vlf-write vlf-search vlf-occur vlf-follow vlf-ediff vlf)
 ;; Large files:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Extra functionality][Extra functionality:6]]
+;; [[file:/tmp/config.org.alqrYt::*Extra functionality][Extra functionality:6]]
 (use-package! org-pandoc-import
   :after org)
 ;; Extra functionality:6 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Extra functionality][Extra functionality:8]]
+;; [[file:/tmp/config.org.alqrYt::*Extra functionality][Extra functionality:8]]
 (use-package org-roam-server
   :after org-roam
   :config
@@ -204,7 +204,7 @@
     (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))))
 ;; Extra functionality:8 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Abbrev mode][Abbrev mode:1]]
+;; [[file:/tmp/config.org.alqrYt::*Abbrev mode][Abbrev mode:1]]
 (use-package abbrev
   :init
   (setq-default abbrev-mode t)
@@ -221,11 +221,11 @@
   (setq save-abbrevs 'silently))
 ;; Abbrev mode:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Calc][Calc:1]]
+;; [[file:/tmp/config.org.alqrYt::*Calc][Calc:1]]
 (add-hook 'calc-mode-hook #'calctex-mode)
 ;; Calc:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Centaur Tabs][Centaur Tabs:1]]
+;; [[file:/tmp/config.org.alqrYt::*Centaur Tabs][Centaur Tabs:1]]
 (after! centaur-tabs
   (centaur-tabs-mode -1)
   (setq centaur-tabs-height 36
@@ -238,7 +238,7 @@
 ;; (setq x-underline-at-descent-line t)
 ;; Centaur Tabs:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Company][Company:1]]
+;; [[file:/tmp/config.org.alqrYt::*Company][Company:1]]
 (after! company
   (setq company-idle-delay 0.5
         company-minimum-prefix-length 2)
@@ -246,12 +246,12 @@
   (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
 ;; Company:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Company][Company:2]]
+;; [[file:/tmp/config.org.alqrYt::*Company][Company:2]]
 (setq-default history-length 1000)
 (setq-default prescient-history-length 1000)
 ;; Company:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Plain Text][Plain Text:1]]
+;; [[file:/tmp/config.org.alqrYt::*Plain Text][Plain Text:1]]
 (set-company-backend!
   '(text-mode
     markdown-mode
@@ -262,11 +262,11 @@
     company-yasnippet))
 ;; Plain Text:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*ESS][ESS:1]]
+;; [[file:/tmp/config.org.alqrYt::*ESS][ESS:1]]
 (set-company-backend! 'ess-r-mode '(company-R-args company-R-objects company-dabbrev-code :separate))
 ;; ESS:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Keybindings][Keybindings:1]]
+;; [[file:/tmp/config.org.alqrYt::*Keybindings][Keybindings:1]]
 (map! :map elfeed-search-mode-map
       :after elfeed-search
       [remap kill-this-buffer] "q"
@@ -301,7 +301,7 @@
       :nm "y" #'elfeed-show-yank)
 ;; Keybindings:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Usability enhancements][Usability enhancements:1]]
+;; [[file:/tmp/config.org.alqrYt::*Usability enhancements][Usability enhancements:1]]
 (after! elfeed-search
   (set-evil-initial-state! 'elfeed-search-mode 'normal))
 (after! elfeed-show-mode
@@ -312,8 +312,28 @@
   (push 'elfeed-search-mode evil-snipe-disabled-modes))
 ;; Usability enhancements:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Visual enhancements][Visual enhancements:1]]
+;; [[file:/tmp/config.org.alqrYt::*Visual enhancements][Visual enhancements:1]]
+;; Add elfeed org directory
+(setq elfeed-db-directory "~/Documents/org/elfeed/elfeeddb")
+
+;;functions to support syncing .elfeed between machines
+;;makes sure elfeed reads index from disk before launching
+(defun bjm/elfeed-load-db-and-open ()
+"Wrapper to load the elfeed db from disk before opening"
+(interactive)
+(elfeed-db-load)
+(elfeed)
+(elfeed-search-update--force))
+
+;;write to disk when quiting
+(defun bjm/elfeed-save-db-and-bury ()
+"Wrapper to save the elfeed db to disk before burying buffer"
+(interactive)
+(elfeed-db-save)
+(quit-window))
+
 (after! elfeed
+
 
   (elfeed-org)
   (use-package! elfeed-link)
@@ -428,7 +448,7 @@
   )
 ;; Visual enhancements:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Functionality enhancements][Functionality enhancements:1]]
+;; [[file:/tmp/config.org.alqrYt::*Functionality enhancements][Functionality enhancements:1]]
 (after! elfeed-show
   (require 'url)
 
@@ -473,18 +493,89 @@
             (funcall file-view-function file))))))
 
   )
+
+(use-package elfeed-org
+:ensure t
+:config
+(elfeed-org)
+(setq rmh-elfeed-org-files (list "~/Documents/org/elfeed/elfeed.org")))
+
+    (use-package elfeed
+      :ensure t
+      :bind (:map elfeed-search-mode-map
+		  ("q" . bjm/elfeed-save-db-and-bury)
+		  ("Q" . bjm/elfeed-save-db-and-bury)
+		  ("m" . elfeed-toggle-star)
+		  ("M" . elfeed-toggle-star)
+		  ("i" . mz/make-and-run-elfeed-hydra)
+		  ("I" . mz/make-and-run-elfeed-hydra)
+		  )
+:config
+    (defalias 'elfeed-toggle-star
+      (elfeed-expose #'elfeed-search-toggle-all 'star))
+
+      )
+
+  (defun z/hasCap (s) ""
+	 (let ((case-fold-search nil))
+	 (string-match-p "[[:upper:]]" s)
+	 ))
+
+
+  (defun z/get-hydra-option-key (s)
+    "returns single upper case letter (converted to lower) or first"
+    (interactive)
+    (let ( (loc (z/hasCap s)))
+      (if loc
+	  (downcase (substring s loc (+ loc 1)))
+	(substring s 0 1)
+      )))
+
+  ;;  (active blogs cs eDucation emacs local misc sports star tech unread webcomics)
+  (defun mz/make-elfeed-cats (tags)
+    "Returns a list of lists. Each one is line for the hydra configuratio in the form
+       (c function hint)"
+    (interactive)
+    (mapcar (lambda (tag)
+	      (let* (
+		     (tagstring (symbol-name tag))
+		     (c (z/get-hydra-option-key tagstring))
+		     )
+		(list c (append '(elfeed-search-set-filter) (list (format "@6-months-ago +%s" tagstring) ))tagstring  )))
+	    tags))
+
+  (defmacro mz/make-elfeed-hydra ()
+    `(defhydra mz/hydra-elfeed ()
+       "filter"
+       ,@(mz/make-elfeed-cats (elfeed-db-get-all-tags))
+       ("*" (elfeed-search-set-filter "@6-months-ago +star") "Starred")
+       ("M" elfeed-toggle-star "Mark")
+       ("A" (elfeed-search-set-filter "@6-months-ago") "All")
+       ("T" (elfeed-search-set-filter "@1-day-ago") "Today")
+       ("Q" bjm/elfeed-save-db-and-bury "Quit Elfeed" :color blue)
+       ("q" nil "quit" :color blue)
+       ))
+
+
+
+
+    (defun mz/make-and-run-elfeed-hydra ()
+      ""
+      (interactive)
+      (mz/make-elfeed-hydra)
+      (mz/hydra-elfeed/body))
 ;; Functionality enhancements:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Eros-eval][Eros-eval:1]]
+;; [[file:/tmp/config.org.alqrYt::*Eros-eval][Eros-eval:1]]
 (setq eros-eval-result-prefix "⟹ ")
 ;; Eros-eval:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Evil escape][Evil escape:1]]
+;; [[file:/tmp/config.org.alqrYt::*Evil escape][Evil escape:1]]
 (setq-default evil-escape-key-sequence "ii")
 (setq-default evil-escape-delay 0.2)
 ;; Evil escape:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Info colors][Info colors:1]]
+;; [[file:/tmp/config.org.alqrYt::*Info colors][Info colors:1]]
 (use-package! info-colors
   :commands (info-colors-fontify-node))
 
@@ -493,35 +584,35 @@
 (add-hook 'Info-mode-hook #'mixed-pitch-mode)
 ;; Info colors:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Configuration][Configuration:1]]
+;; [[file:/tmp/config.org.alqrYt::*Configuration][Configuration:1]]
 (setq ispell-dictionary "en-custom")
 ;; Configuration:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Configuration][Configuration:2]]
+;; [[file:/tmp/config.org.alqrYt::*Configuration][Configuration:2]]
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 ;; Configuration:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Ivy][Ivy:1]]
+;; [[file:/tmp/config.org.alqrYt::*Ivy][Ivy:1]]
 (setq ivy-read-action-function #'ivy-hydra-read-action)
 ;; Ivy:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Ivy][Ivy:2]]
+;; [[file:/tmp/config.org.alqrYt::*Ivy][Ivy:2]]
 (setq ivy-sort-max-size 50000)
 ;; Ivy:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Org Chef][Org Chef:1]]
+;; [[file:/tmp/config.org.alqrYt::*Org Chef][Org Chef:1]]
 (use-package! org-chef
   :commands (org-chef-insert-recipe org-chef-get-recipe-from-url))
 ;; Org Chef:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Projectile][Projectile:1]]
+;; [[file:/tmp/config.org.alqrYt::*Projectile][Projectile:1]]
 (setq projectile-ignored-projects '("~/" "/tmp" "~/.emacs.d/.local/straight/repos/"))
 (defun projectile-ignored-project-function (filepath)
   "Return t if FILEPATH is within any of `projectile-ignored-projects'"
   (or (mapcar (lambda (p) (s-starts-with-p p filepath)) projectile-ignored-projects)))
 ;; Projectile:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Lexic][Lexic:1]]
+;; [[file:/tmp/config.org.alqrYt::*Lexic][Lexic:1]]
 (use-package! lexic
   :commands lexic-search lexic-list-dictionary
   :config
@@ -544,7 +635,7 @@
         :n "/" (cmd! (call-interactively #'lexic-search))))
 ;; Lexic:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Lexic][Lexic:2]]
+;; [[file:/tmp/config.org.alqrYt::*Lexic][Lexic:2]]
 (defadvice! +lookup/dictionary-definition-lexic (identifier &optional arg)
   "Look up the definition of the word at point (or selection) using `lexic-search'."
   :override #'+lookup/dictionary-definition
@@ -555,29 +646,29 @@
   (lexic-search identifier nil nil t))
 ;; Lexic:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Smart Parentheses][Smart Parentheses:1]]
+;; [[file:/tmp/config.org.alqrYt::*Smart Parentheses][Smart Parentheses:1]]
 (sp-local-pair
  '(org-mode)
  "<<" ">>"
  :actions '(insert))
 ;; Smart Parentheses:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Theme magic][Theme magic:1]]
+;; [[file:/tmp/config.org.alqrYt::*Theme magic][Theme magic:1]]
 (add-hook 'doom-load-theme-hook 'theme-magic-from-emacs)
 ;; Theme magic:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Tramp][Tramp:1]]
+;; [[file:/tmp/config.org.alqrYt::*Tramp][Tramp:1]]
 (after! tramp
   (setenv "SHELL" "/bin/bash")
   (setq tramp-shell-prompt-pattern "\\(?:^\\|
 \\)[^]#$%>\n]*#?[]#$%>] *\\(\\[[0-9;]*[a-zA-Z] *\\)*")) ;; default + 
 ;; Tramp:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Which-key][Which-key:1]]
+;; [[file:/tmp/config.org.alqrYt::*Which-key][Which-key:1]]
 (setq which-key-idle-delay 0.5) ;; I need the help, I really do
 ;; Which-key:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Which-key][Which-key:2]]
+;; [[file:/tmp/config.org.alqrYt::*Which-key][Which-key:2]]
 (setq which-key-allow-multiple-replacements t)
 (after! which-key
   (pushnew!
@@ -587,11 +678,11 @@
    ))
 ;; Which-key:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Writeroom][Writeroom:1]]
+;; [[file:/tmp/config.org.alqrYt::*Writeroom][Writeroom:1]]
 (setq +zen-text-scale 0.6)
 ;; Writeroom:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Writeroom][Writeroom:2]]
+;; [[file:/tmp/config.org.alqrYt::*Writeroom][Writeroom:2]]
 (after! writeroom-mode
   (add-hook 'writeroom-mode-hook
             (defun +zen-cleaner-org ()
@@ -619,7 +710,7 @@
                   (org-superstar-restart))))))
 ;; Writeroom:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*xkcd][xkcd:1]]
+;; [[file:/tmp/config.org.alqrYt::*xkcd][xkcd:1]]
 (use-package! xkcd
   :commands (xkcd-get-json
              xkcd-download xkcd-get
@@ -646,7 +737,7 @@
             "y"       #'+xkcd-copy))
 ;; xkcd:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*xkcd][xkcd:2]]
+;; [[file:/tmp/config.org.alqrYt::*xkcd][xkcd:2]]
 (after! xkcd
   (require 'emacsql-sqlite)
 
@@ -896,15 +987,15 @@ SQL can be either the emacsql vector representation, or a string."
                            )))))
 ;; xkcd:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*YASnippet][YASnippet:1]]
+;; [[file:/tmp/config.org.alqrYt::*YASnippet][YASnippet:1]]
 (setq yas-triggers-in-field t)
 ;; YASnippet:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*File Templates][File Templates:1]]
+;; [[file:/tmp/config.org.alqrYt::*File Templates][File Templates:1]]
 (set-file-template! "\\.tex$" :trigger "__" :mode 'latex-mode)
 ;; File Templates:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Plaintext][Plaintext:1]]
+;; [[file:/tmp/config.org.alqrYt::*Plaintext][Plaintext:1]]
 (after! text-mode
   (add-hook! 'text-mode-hook
              ;; Apply ANSI color codes
@@ -912,7 +1003,7 @@ SQL can be either the emacsql vector representation, or a string."
                (ansi-color-apply-on-region (point-min) (point-max)))))
 ;; Plaintext:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Tweaking defaults][Tweaking defaults:1]]
+;; [[file:/tmp/config.org.alqrYt::*Tweaking defaults][Tweaking defaults:1]]
 (setq org-directory "~/Documents/org"            ; let's put files here
       org-use-property-inheritance t              ; it's convenient to have properties inherited
       org-log-done 'time                          ; having the time a item is done sounds convininet
@@ -922,7 +1013,7 @@ SQL can be either the emacsql vector representation, or a string."
       org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 ;; Tweaking defaults:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Tweaking defaults][Tweaking defaults:2]]
+;; [[file:/tmp/config.org.alqrYt::*Tweaking defaults][Tweaking defaults:2]]
 (setq org-babel-default-header-args
       '((:session . "none")
         (:results . "replace")
@@ -934,12 +1025,12 @@ SQL can be either the emacsql vector representation, or a string."
         (:comments . "link")))
 ;; Tweaking defaults:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Tweaking defaults][Tweaking defaults:3]]
+;; [[file:/tmp/config.org.alqrYt::*Tweaking defaults][Tweaking defaults:3]]
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
 ;; Tweaking defaults:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Tweaking defaults][Tweaking defaults:4]]
+;; [[file:/tmp/config.org.alqrYt::*Tweaking defaults][Tweaking defaults:4]]
 (map! :map evil-org-mode-map
       :after evil-org
       :n "g <up>" #'org-backward-heading-same-level
@@ -948,7 +1039,7 @@ SQL can be either the emacsql vector representation, or a string."
       :n "g <right>" #'org-down-element)
 ;; Tweaking defaults:4 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Org buffer creation][Org buffer creation:1]]
+;; [[file:/tmp/config.org.alqrYt::*Org buffer creation][Org buffer creation:1]]
 (evil-define-command evil-buffer-org-new (count file)
   "Creates a new ORG buffer replacing the current window, optionally
    editing a certain FILE"
@@ -965,26 +1056,26 @@ SQL can be either the emacsql vector representation, or a string."
        :desc "New empty ORG buffer" "o" #'evil-buffer-org-new))
 ;; Org buffer creation:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*List bullet sequence][List bullet sequence:1]]
+;; [[file:/tmp/config.org.alqrYt::*List bullet sequence][List bullet sequence:1]]
 (setq org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+") ("1." . "a.")))
 ;; List bullet sequence:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*cdlatex][cdlatex:1]]
+;; [[file:/tmp/config.org.alqrYt::*cdlatex][cdlatex:1]]
 (after! org (add-hook 'org-mode-hook 'turn-on-org-cdlatex))
 ;; cdlatex:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*cdlatex][cdlatex:2]]
+;; [[file:/tmp/config.org.alqrYt::*cdlatex][cdlatex:2]]
 (after! org
   (defadvice! org-edit-latex-emv-after-insert ()
     :after #'org-cdlatex-environment-indent
     (org-edit-latex-environment)))
 ;; cdlatex:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Spellcheck][Spellcheck:1]]
+;; [[file:/tmp/config.org.alqrYt::*Spellcheck][Spellcheck:1]]
 (after! org (add-hook 'org-mode-hook 'turn-on-flyspell))
 ;; Spellcheck:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*LSP support in ~src~ blocks][LSP support in ~src~ blocks:1]]
+;; [[file:/tmp/config.org.alqrYt::*LSP support in ~src~ blocks][LSP support in ~src~ blocks:1]]
 (cl-defmacro lsp-org-babel-enable (lang)
   "Support LANG in org source code block."
   (setq centaur-lsp 'lsp-mode)
@@ -1015,7 +1106,7 @@ SQL can be either the emacsql vector representation, or a string."
   (eval `(lsp-org-babel-enable ,lang)))
 ;; LSP support in ~src~ blocks:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*View exported file][View exported file:1]]
+;; [[file:/tmp/config.org.alqrYt::*View exported file][View exported file:1]]
 (after! org
   (map! :map org-mode-map
         :localleader
@@ -1046,7 +1137,7 @@ SQL can be either the emacsql vector representation, or a string."
   "File formats that should be opened externally.")
 ;; View exported file:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Super agenda][Super agenda:1]]
+;; [[file:/tmp/config.org.alqrYt::*Super agenda][Super agenda:1]]
 (use-package! org-super-agenda
   :commands (org-super-agenda-mode))
 (after! org-agenda
@@ -1120,7 +1211,7 @@ SQL can be either the emacsql vector representation, or a string."
                           (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
 ;; Super agenda:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Capture][Capture:1]]
+;; [[file:/tmp/config.org.alqrYt::*Capture][Capture:1]]
 (use-package! doct
   :commands (doct))
 
@@ -1416,7 +1507,7 @@ SQL can be either the emacsql vector representation, or a string."
                    ))))))
 ;; Capture:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Capture][Capture:3]]
+;; [[file:/tmp/config.org.alqrYt::*Capture][Capture:3]]
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
 ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
 (setq +org-capture-fn
@@ -1426,7 +1517,7 @@ SQL can be either the emacsql vector representation, or a string."
         (org-capture)))
 ;; Capture:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Basic settings][Basic settings:1]]
+;; [[file:/tmp/config.org.alqrYt::*Basic settings][Basic settings:1]]
 (setq
    org_notes "~/Documents/org-roam"
    zot_bib "~/Documents/masterLib.bib"
@@ -1438,21 +1529,73 @@ SQL can be either the emacsql vector representation, or a string."
    )
 ;; Basic settings:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Citation][Citation:1]]
+;; [[file:/tmp/config.org.alqrYt::*Citation][Citation:1]]
+;; (use-package! org-ref
+;;     :config
+;;     (setq
+;;          org-ref-completion-library 'org-ref-ivy-cite
+;;          org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+;;          org-ref-default-bibliography (list zot_bib)
+;;          org-ref-bibliography-notes (concat org_notes "/bibnotes.org")
+;;          org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+;;          org-ref-notes-directory org_notes
+;;          org-ref-notes-function 'orb-edit-notes
+;;     ))
+;; Try sunnyhasji config
 (use-package! org-ref
+    :after org
+    :init
+    ; code to run before loading org-ref
     :config
-    (setq
-         org-ref-completion-library 'org-ref-ivy-cite
-         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-         org-ref-default-bibliography (list zot_bib)
-         org-ref-bibliography-notes (concat org_notes "/bibnotes.org")
-         org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
-         org-ref-notes-directory org_notes
-         org-ref-notes-function 'orb-edit-notes
-    ))
+    ; code to run after loading org-ref
+    )
+(setq org-ref-notes-directory "~/Documents/org-roam"
+     ; org-ref-bibliography-notes "~/Dropbox/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
+      org-ref-default-bibliography '("~/Documents/masterLib.bib")
+      org-ref-pdf-directory "~/Zotero/")
+
+(after! org
+  (add-to-list 'org-capture-templates
+               '(("a"               ; key
+                  "Article"         ; name
+                  entry             ; type
+                  (file+headline "~/Documents/org/phd.org" "Article")  ; target
+                  "\* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?"  ; template
+
+                  :prepend t        ; properties
+                  :empty-lines 1    ; properties
+                  :created t        ; properties
+))) )
+
+;; Helm-bibtex
+(use-package! helm-bibtex
+  :after org
+  :init
+  ; blah blah
+  :config
+  ;blah blah
+  )
+
+(setq bibtex-format-citation-functions
+      '((org-mode . (lambda (x) (insert (concat
+                                         "\\cite{"
+                                         (mapconcat 'identity x ",")
+                                         "}")) ""))))
+(setq
+      bibtex-completion-pdf-field "file"
+      bibtex-completion-bibliography
+      '("~/Documents/masterLib.bib")
+      bibtex-completion-library-path '("~/Zotero/")
+     ; bibtex-completion-notes-path "~/Dropbox/Org/references/articles.org"  ;; not needed anymore as I take notes in org-roam
+      )
+
+;; Zotxt
+(use-package! zotxt
+  :after org)
+;(add-to-list 'load-path (expand-file-name "ox-pandoc" starter-kit-dir))
 ;; Citation:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Graph Behaviour][Graph Behaviour:2]]
+;; [[file:/tmp/config.org.alqrYt::*Graph Behaviour][Graph Behaviour:2]]
 (after! org-roam
   (setq org-roam-graph-node-extra-config
         '(("shape"      . "underline")
@@ -1494,40 +1637,78 @@ SQL can be either the emacsql vector representation, or a string."
                        (when callback
                          (funcall callback temp-html))))))))
 
-  (setq org-roam-ref-capture-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "websites/${slug}"
-           :head "#+title: ${title}
-#+roam_key: ${ref}
-- source :: ${ref}"
-           :unnarrowed t)))
+(setq org-roam-ref-capture-templates
+            '(("r" "ref" plain (function org-roam-capture--get-point)
+               "%?"
+               :file-name "websites/${slug}"
+               :head "#+TITLE: ${title}
+    #+ROAM_KEY: ${ref}
+    - source :: ${ref}"
+               :unnarrowed t))))  ; capture template to grab websites. Requires org-roam protocol.
 
-  (setq org-roam-capture-templates
-        '(("d" "default" plain (function org-roam--capture-get-point)
-           "%?"
-           :file-name "${slug}"
-           :head "#+title: ${title}\n
-#+roam_tags:"
-           :unnarrowed t))))
+;;   (setq org-roam-ref-capture-templates
+;;         '(("r" "ref" plain (function org-roam-capture--get-point)
+;;            "%?"
+;;            :file-name "websites/${slug}"
+;;            :head "#+title: ${title}
+;; ,#+roam_key: ${ref}
+;; - source :: ${ref}"
+;;            :unnarrowed t)))
+
+;;   (setq org-roam-capture-templates
+;;         '(("d" "default" plain (function org-roam--capture-get-point)
+;;            "%?"
+;;            :file-name "${slug}"
+;;            :head "#+title: ${title}\n
+;; ,#+roam_tags:"
+;;            :unnarrowed t)))
 
 
 ; org roam bibtex
-(use-package org-roam-bibtex
-  :after (org-roam)
+;; (use-package org-roam-bibtex
+;;   :after (org-roam)
+;;   :hook (org-roam-mode . org-roam-bibtex-mode)
+;;   :config
+;;   (setq orb-preformat-keywords
+;;    '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+;;   (setq orb-templates
+;;         '(("r" "ref" plain (function org-roam-capture--get-point)
+;;            ""
+;;            :file-name "${slug}"
+;;            :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+;; - tags ::
+;; - keywords :: ${keywords}
+;; \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+;;            :unnarrowed t))))
+
+(use-package! org-roam-bibtex
+  :load-path "~/Documents/masterLib.bib" ;Modify with your own path
   :hook (org-roam-mode . org-roam-bibtex-mode)
-  :config
-  (setq orb-preformat-keywords
-   '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
-  (setq orb-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point)
-           ""
-           :file-name "${slug}"
-           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+  :bind (:map org-mode-map
+         (("C-c n a" . orb-note-actions))))
+(setq orb-templates
+      '(("r" "ref" plain (function org-roam-capture--get-point) ""
+         :file-name "${citekey}"
+         :head "#+TITLE: ${citekey}: ${title}\n#+ROAM_KEY: ${ref}\n" ; <--
+         :unnarrowed t)))
+(setq orb-preformat-keywords   '(("citekey" . "=key=") "title" "url" "file" "author-or-editor" "keywords"))
+
+(setq orb-templates
+      '(("n" "ref+noter" plain (function org-roam-capture--get-point)
+         ""
+         :file-name "${slug}"
+         :head "#+TITLE: ${citekey}: ${title}\n#+ROAM_KEY: ${ref}\n#+ROAM_TAGS:
+
 - tags ::
 - keywords :: ${keywords}
-\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
-           :unnarrowed t))))
+\* ${title}
+:PROPERTIES:
+:Custom_ID: ${citekey}
+:URL: ${url}
+:AUTHOR: ${author-or-editor}
+:NOTER_DOCUMENT: %(orb-process-file-field \"${citekey}\")
+:NOTER_PAGE:
+:END:")))
 
 (use-package! org-noter
 :after (:any org pdf-view)
@@ -1578,12 +1759,13 @@ SQL can be either the emacsql vector representation, or a string."
   (map! :leader
         :prefix "n"
         :desc "helm-bibtex" "b" #'helm-bibtex))
+(map! :leader "o n"#'org-noter)    ; "org noter"  : opens up org noter in a headline
 
 ; set up citeproc-org for use of csl files
 (citeproc-org-setup)
 ;; Graph Behaviour:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Modeline file name][Modeline file name:1]]
+;; [[file:/tmp/config.org.alqrYt::*Modeline file name][Modeline file name:1]]
 (defadvice! doom-modeline--reformat-roam (orig-fun)
   :around #'doom-modeline-buffer-file-name
   (message "Reformat?")
@@ -1596,7 +1778,7 @@ SQL can be either the emacsql vector representation, or a string."
     (funcall orig-fun)))
 ;; Modeline file name:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Nicer generated heading IDs][Nicer generated heading IDs:1]]
+;; [[file:/tmp/config.org.alqrYt::*Nicer generated heading IDs][Nicer generated heading IDs:1]]
 (defvar org-heading-contraction-max-words 3
   "Maximum number of words in a heading")
 (defvar org-heading-contraction-max-length 35
@@ -1652,7 +1834,7 @@ truncated to fit within the limit"
     (string-join heading-words "-")))
 ;; Nicer generated heading IDs:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Nicer generated heading IDs][Nicer generated heading IDs:2]]
+;; [[file:/tmp/config.org.alqrYt::*Nicer generated heading IDs][Nicer generated heading IDs:2]]
 (define-minor-mode unpackaged/org-export-html-with-useful-ids-mode
   "Attempt to export Org as HTML with useful link IDs.
 Instead of random IDs like \"#orga1b2c3\", use heading titles,
@@ -1762,7 +1944,7 @@ made unique when necessary."
 (add-hook 'org-load-hook #'unpackaged/org-export-html-with-useful-ids-mode)
 ;; Nicer generated heading IDs:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Nicer ~org-return~][Nicer ~org-return~:1]]
+;; [[file:/tmp/config.org.alqrYt::*Nicer ~org-return~][Nicer ~org-return~:1]]
 (after! org
   (defun unpackaged/org-element-descendant-of (type element)
     "Return non-nil if ELEMENT is a descendant of TYPE.
@@ -1867,7 +2049,7 @@ appropriate.  In tables, insert a new row or end the table."
  :i [return] #'unpackaged/org-return-dwim)
 ;; Nicer ~org-return~:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Snippet Helper][Snippet Helper:1]]
+;; [[file:/tmp/config.org.alqrYt::*Snippet Helper][Snippet Helper:1]]
 (defun +yas/org-src-lang ()
   "Try to find the current language of the src/header at point.
 Return nil otherwise."
@@ -1917,7 +2099,7 @@ Return nil otherwise."
     (car (set-difference src-langs header-langs :test #'string=))))
 ;; Snippet Helper:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*xkcd][xkcd:1]]
+;; [[file:/tmp/config.org.alqrYt::*xkcd][xkcd:1]]
 (after! org
   (org-link-set-parameters "xkcd"
                            :image-data-fun #'+org-xkcd-image-fn
@@ -1961,7 +2143,7 @@ Return nil otherwise."
     (format "xkcd:%d" (+xkcd-select))))
 ;; xkcd:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Music][Music:1]]
+;; [[file:/tmp/config.org.alqrYt::*Music][Music:1]]
 (after! org
   (defvar org-music-player 'mpris
     "Music player type. Curretly only supports mpris.")
@@ -2151,7 +2333,7 @@ This action is reversed by `org-music-time-to-seconds'."
       (car tracks))))
 ;; Music:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Music][Music:2]]
+;; [[file:/tmp/config.org.alqrYt::*Music][Music:2]]
 (after! org
   (org-link-set-parameters "music"
                            :follow #'org-music-open-fn
@@ -2232,7 +2414,7 @@ This action is reversed by `org-music-time-to-seconds'."
             (t text)))))
 ;; Music:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*YouTube][YouTube:1]]
+;; [[file:/tmp/config.org.alqrYt::*YouTube][YouTube:1]]
 (after! org
   (org-link-set-parameters "yt" :export #'+org-export-yt)
   (defun +org-export-yt (path desc backend _com)
@@ -2247,15 +2429,15 @@ allowfullscreen>%s</iframe>" path (or "" desc)))
           (t (format "https://youtu.be/%s" path)))))
 ;; YouTube:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Font Display][Font Display:1]]
+;; [[file:/tmp/config.org.alqrYt::*Font Display][Font Display:1]]
 (add-hook! 'org-mode-hook #'+org-pretty-mode #'mixed-pitch-mode)
 ;; Font Display:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Font Display][Font Display:2]]
+;; [[file:/tmp/config.org.alqrYt::*Font Display][Font Display:2]]
 (setq global-org-pretty-table-mode t)
 ;; Font Display:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Font Display][Font Display:3]]
+;; [[file:/tmp/config.org.alqrYt::*Font Display][Font Display:3]]
 (custom-set-faces!
   '(outline-1 :weight extra-bold :height 1.25)
   '(outline-2 :weight bold :height 1.15)
@@ -2267,13 +2449,13 @@ allowfullscreen>%s</iframe>" path (or "" desc)))
   '(outline-9 :weight semi-bold))
 ;; Font Display:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Font Display][Font Display:4]]
+;; [[file:/tmp/config.org.alqrYt::*Font Display][Font Display:4]]
 (after! org
   (custom-set-faces!
     '(org-document-title :height 1.2)))
 ;; Font Display:4 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Symbols][Symbols:1]]
+;; [[file:/tmp/config.org.alqrYt::*Symbols][Symbols:1]]
 ;; (after! org
 ;;   (use-package org-pretty-tags
 ;;   :config
@@ -2310,7 +2492,7 @@ allowfullscreen>%s</iframe>" path (or "" desc)))
           (?E . 'all-the-icons-blue))))
 ;; Symbols:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Symbols][Symbols:2]]
+;; [[file:/tmp/config.org.alqrYt::*Symbols][Symbols:2]]
 (after! org
   (appendq! +ligatures-extra-symbols
             `(:checkbox      "☐"
@@ -2370,16 +2552,16 @@ allowfullscreen>%s</iframe>" path (or "" desc)))
 (plist-put +ligatures-extra-symbols :name "⁍") ; or › could be good?
 ;; Symbols:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Symbols][Symbols:3]]
+;; [[file:/tmp/config.org.alqrYt::*Symbols][Symbols:3]]
 (add-hook 'org-mode-hook 'org-fragtog-mode)
 ;; Symbols:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*LaTeX Fragments][LaTeX Fragments:1]]
+;; [[file:/tmp/config.org.alqrYt::*LaTeX Fragments][LaTeX Fragments:1]]
 (after! org
   (setq org-highlight-latex-and-related '(native script entities)))
 ;; LaTeX Fragments:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*LaTeX Fragments][LaTeX Fragments:2]]
+;; [[file:/tmp/config.org.alqrYt::*LaTeX Fragments][LaTeX Fragments:2]]
 (setq org-format-latex-header "\\documentclass{article}
 \\usepackage[usenames]{color}
 
@@ -2409,7 +2591,7 @@ allowfullscreen>%s</iframe>" path (or "" desc)))
 \\usepackage{arevmath}")
 ;; LaTeX Fragments:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*LaTeX Fragments][LaTeX Fragments:3]]
+;; [[file:/tmp/config.org.alqrYt::*LaTeX Fragments][LaTeX Fragments:3]]
 (after! org
   ;; make background of fragments transparent
   ;; (let ((dvipng--plist (alist-get 'dvipng org-preview-latex-process-alist)))
@@ -2425,12 +2607,12 @@ allowfullscreen>%s</iframe>" path (or "" desc)))
   )
 ;; LaTeX Fragments:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*LaTeX Fragments][LaTeX Fragments:4]]
+;; [[file:/tmp/config.org.alqrYt::*LaTeX Fragments][LaTeX Fragments:4]]
 (after! org
   (add-to-list 'org-latex-regexps '("\\ce" "^\\\\ce{\\(?:[^\000{}]\\|{[^\000}]+?}\\)}" 0 nil)))
 ;; LaTeX Fragments:4 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Stolen from [[https://github.com/jkitchin/scimax\][scimax\]] (semi-working right now)][Stolen from [[https://github.com/jkitchin/scimax][scimax]] (semi-working right now):1]]
+;; [[file:/tmp/config.org.alqrYt::*Stolen from [[https://github.com/jkitchin/scimax\][scimax\]] (semi-working right now)][Stolen from [[https://github.com/jkitchin/scimax][scimax]] (semi-working right now):1]]
 (after! org
   (defun scimax-org-latex-fragment-justify (justification)
     "Justify the latex fragment at point with JUSTIFICATION.
@@ -2483,7 +2665,7 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
       (message "Latex fragment justification disabled"))))
 ;; Stolen from [[https://github.com/jkitchin/scimax][scimax]] (semi-working right now):1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Stolen from [[https://github.com/jkitchin/scimax\][scimax\]] (semi-working right now)][Stolen from [[https://github.com/jkitchin/scimax][scimax]] (semi-working right now):2]]
+;; [[file:/tmp/config.org.alqrYt::*Stolen from [[https://github.com/jkitchin/scimax\][scimax\]] (semi-working right now)][Stolen from [[https://github.com/jkitchin/scimax][scimax]] (semi-working right now):2]]
 ;; Numbered equations all have (1) as the number for fragments with vanilla
 ;; org-mode. This code injects the correct numbers into the previews so they
 ;; look good.
@@ -2545,17 +2727,17 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   (put 'scimax-org-renumber-environment 'enabled t))
 ;; Stolen from [[https://github.com/jkitchin/scimax][scimax]] (semi-working right now):2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting (general)][Exporting (general):1]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting (general)][Exporting (general):1]]
 (after! org (setq org-export-headline-levels 5)) ; I like nesting
 ;; Exporting (general):1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting (general)][Exporting (general):2]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting (general)][Exporting (general):2]]
 (after! org
   (require 'ox-extra)
   (ox-extras-activate '(ignore-headlines)))
 ;; Exporting (general):2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting to HTML][Exporting to HTML:1]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting to HTML][Exporting to HTML:1]]
 (define-minor-mode org-fancy-html-export-mode
   "Toggle my fabulous org export tweaks. While this mode itself does a little bit,
 the vast majority of the change in behaviour comes from switch statements in:
@@ -2576,7 +2758,7 @@ the vast majority of the change in behaviour comes from switch statements in:
           org-html-checkbox-type 'html)))
 ;; Exporting to HTML:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Extra header content][Extra header content:1]]
+;; [[file:/tmp/config.org.alqrYt::*Extra header content][Extra header content:1]]
 (defadvice! org-html-template-fancier (orig-fn contents info)
   "Return complete document string after HTML conversion.
 CONTENTS is the transcoded contents string.  INFO is a plist
@@ -2662,7 +2844,7 @@ compared to the default implementation."
      "</div>\n</body>\n</html>")))
 ;; Extra header content:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Extra header content][Extra header content:2]]
+;; [[file:/tmp/config.org.alqrYt::*Extra header content][Extra header content:2]]
 (setq org-html-meta-tags
       '((lambda (_title author _info)
           (when (org-string-nw-p author)
@@ -2690,7 +2872,7 @@ compared to the default implementation."
             (list "property" "og:description" (plist-get info :subtitle))))))
 ;; Extra header content:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Custom CSS/JS][Custom CSS/JS:2]]
+;; [[file:/tmp/config.org.alqrYt::*Custom CSS/JS][Custom CSS/JS:2]]
 (after! org
   (setq org-html-style-fancy
         (concat (f-read-text (expand-file-name "misc/org-export-header.html" doom-private-dir))
@@ -2706,7 +2888,7 @@ compared to the default implementation."
         org-html-html5-fancy t))
 ;; Custom CSS/JS:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::Src blocks][Src blocks]]
+;; [[file:/tmp/config.org.alqrYt::Src blocks][Src blocks]]
 (defadvice! org-html-src-block-collapsable (orig-fn src-block contents info)
   "Wrap the usual <pre> block in a <details>"
   :around #'org-html-src-block
@@ -2824,7 +3006,7 @@ compared to the default implementation."
       mode))
 ;; Src blocks ends here
 
-;; [[file:/tmp/config.org.0EmoiE::Example, fixed width, and property blocks][Example, fixed width, and property blocks]]
+;; [[file:/tmp/config.org.alqrYt::Example, fixed width, and property blocks][Example, fixed width, and property blocks]]
 (after! org
   (defun org-html-block-collapsable (orig-fn block contents info)
     "Wrap the usual block in a <details>"
@@ -2860,7 +3042,7 @@ compared to the default implementation."
   (advice-add 'org-html-property-drawer :around #'org-html-block-collapsable))
 ;; Example, fixed width, and property blocks ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Handle table overflow][Handle table overflow:1]]
+;; [[file:/tmp/config.org.alqrYt::*Handle table overflow][Handle table overflow:1]]
 (defadvice! org-html-table-wrapped (orig-fn table contents info)
   "Wrap the usual <table> in a <div>"
   :around #'org-html-table
@@ -2881,7 +3063,7 @@ compared to the default implementation."
                 (funcall orig-fn table contents info))))))
 ;; Handle table overflow:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*TOC as a collapsable tree][TOC as a collapsable tree:1]]
+;; [[file:/tmp/config.org.alqrYt::*TOC as a collapsable tree][TOC as a collapsable tree:1]]
 (defadvice! org-html--format-toc-headline-colapseable (orig-fn headline info)
   "Add a label and checkbox to `org-html--format-toc-headline's usual output,
 to allow the TOC to be a collapseable tree."
@@ -2894,7 +3076,7 @@ to allow the TOC to be a collapseable tree."
               id id (funcall orig-fn headline info)))))
 ;; TOC as a collapsable tree:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*TOC as a collapsable tree][TOC as a collapsable tree:2]]
+;; [[file:/tmp/config.org.alqrYt::*TOC as a collapsable tree][TOC as a collapsable tree:2]]
 (defadvice! org-html--toc-text-stripped-leaves (orig-fn toc-entries)
   "Remove label"
   :around #'org-html--toc-text
@@ -2904,7 +3086,7 @@ to allow the TOC to be a collapseable tree."
                               (funcall orig-fn toc-entries))))
 ;; TOC as a collapsable tree:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Make verbatim different to code][Make verbatim different to code:1]]
+;; [[file:/tmp/config.org.alqrYt::*Make verbatim different to code][Make verbatim different to code:1]]
 (setq org-html-text-markup-alist
       '((bold . "<b>%s</b>")
         (code . "<code>%s</code>")
@@ -2914,7 +3096,7 @@ to allow the TOC to be a collapseable tree."
         (verbatim . "<kbd>%s</kbd>")))
 ;; Make verbatim different to code:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Change checkbox type][Change checkbox type:1]]
+;; [[file:/tmp/config.org.alqrYt::*Change checkbox type][Change checkbox type:1]]
 (after! org
   (appendq! org-html-checkbox-types
             '((html-span
@@ -2924,7 +3106,7 @@ to allow the TOC to be a collapseable tree."
   (setq org-html-checkbox-type 'html-span))
 ;; Change checkbox type:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Header anchors][Header anchors:1]]
+;; [[file:/tmp/config.org.alqrYt::*Header anchors][Header anchors:1]]
 (after! org
   (defun org-export-html-headline-anchor (text backend info)
     (when (and (org-export-derived-backend-p backend 'html)
@@ -2939,11 +3121,11 @@ to allow the TOC to be a collapseable tree."
                'org-export-html-headline-anchor))
 ;; Header anchors:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Pre-rendered][Pre-rendered:1]]
+;; [[file:/tmp/config.org.alqrYt::*Pre-rendered][Pre-rendered:1]]
 ;; (setq-default org-html-with-latex `dvisvgm)
 ;; Pre-rendered:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*MathJax][MathJax:1]]
+;; [[file:/tmp/config.org.alqrYt::*MathJax][MathJax:1]]
 (after! org
   (setq org-html-mathjax-options
         '((path "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" )
@@ -2975,7 +3157,7 @@ MathJax = {
         src=\"%PATH\"></script>"))
 ;; MathJax:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Acronyms][Acronyms:1]]
+;; [[file:/tmp/config.org.alqrYt::*Acronyms][Acronyms:1]]
 (after! org
   (defun tec/org-export-latex-filter-acronym (text backend info)
     (let ((the-backend
@@ -3013,7 +3195,7 @@ MathJax = {
   )
 ;; Acronyms:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Nicer checkboxes][Nicer checkboxes:1]]
+;; [[file:/tmp/config.org.alqrYt::*Nicer checkboxes][Nicer checkboxes:1]]
 (after! org
   (defun tec/org-export-latex-fancy-item-checkboxes (text backend info)
     (when (org-export-derived-backend-p backend 'latex)
@@ -3031,7 +3213,7 @@ MathJax = {
                'tec/org-export-latex-fancy-item-checkboxes))
 ;; Nicer checkboxes:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Class templates][Class templates:1]]
+;; [[file:/tmp/config.org.alqrYt::*Class templates][Class templates:1]]
 (after! ox-latex
   (add-to-list 'org-latex-classes
                '("fancy-article"
@@ -3203,7 +3385,7 @@ MathJax = {
         '("latexmk -shell-escape -interaction=nonstopmode -f -pdf -output-directory=%o %f")))
 ;; Class templates:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Chameleon --- aka. match theme][Chameleon --- aka. match theme:1]]
+;; [[file:/tmp/config.org.alqrYt::*Chameleon --- aka. match theme][Chameleon --- aka. match theme:1]]
 (after! ox
   (defvar ox-chameleon-base-class "fancy-article"
     "The base class that chameleon builds on")
@@ -3341,7 +3523,7 @@ MathJax = {
   )
 ;; Chameleon --- aka. match theme:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Make verbatim different to code][Make verbatim different to code:1]]
+;; [[file:/tmp/config.org.alqrYt::*Make verbatim different to code][Make verbatim different to code:1]]
 (setq org-latex-text-markup-alist
       '((bold . "\\textbf{%s}")
         (code . protectedtexttt)
@@ -3351,28 +3533,28 @@ MathJax = {
         (verbatim . verb)))
 ;; Make verbatim different to code:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting to Beamer][Exporting to Beamer:1]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting to Beamer][Exporting to Beamer:1]]
 (setq org-beamer-theme "[progressbar=foot]metropolis")
 ;; Exporting to Beamer:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting to Beamer][Exporting to Beamer:2]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting to Beamer][Exporting to Beamer:2]]
 
 ;; Exporting to Beamer:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting to Beamer][Exporting to Beamer:3]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting to Beamer][Exporting to Beamer:3]]
 (setq org-beamer-frame-level 2)
 ;; Exporting to Beamer:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Exporting to GFM][Exporting to GFM:1]]
+;; [[file:/tmp/config.org.alqrYt::*Exporting to GFM][Exporting to GFM:1]]
 (eval-after-load "org"
   '(require 'ox-gfm nil t))
 ;; Exporting to GFM:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Babel][Babel:1]]
+;; [[file:/tmp/config.org.alqrYt::*Babel][Babel:1]]
 (setq org-babel-python-command "python3")
 ;; Babel:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Babel][Babel:2]]
+;; [[file:/tmp/config.org.alqrYt::*Babel][Babel:2]]
 (defun tec-org-python ()
   (if (eq major-mode 'python-mode)
       (progn (anaconda-mode t)
@@ -3380,11 +3562,11 @@ MathJax = {
 (add-hook 'org-src-mode-hook 'tec-org-python)
 ;; Babel:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*ESS][ESS:1]]
+;; [[file:/tmp/config.org.alqrYt::*ESS][ESS:1]]
 (setq ess-eval-visibly 'nowait)
 ;; ESS:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*ESS][ESS:2]]
+;; [[file:/tmp/config.org.alqrYt::*ESS][ESS:2]]
 (setq ess-R-font-lock-keywords
       '((ess-R-fl-keyword:keywords . t)
         (ess-R-fl-keyword:constants . t)
@@ -3400,7 +3582,7 @@ MathJax = {
         (ess-R-fl-keyword:F&T . t)))
 ;; ESS:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Compilation][Compilation:1]]
+;; [[file:/tmp/config.org.alqrYt::*Compilation][Compilation:1]]
 (setq TeX-save-query nil
       TeX-show-compilation t
       TeX-command-extra-options "-shell-escape")
@@ -3408,11 +3590,11 @@ MathJax = {
   (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t)))
 ;; Compilation:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Compilation][Compilation:2]]
+;; [[file:/tmp/config.org.alqrYt::*Compilation][Compilation:2]]
 (setq +latex-viewers '(pdf-tools evince zathura okular skim sumatrapdf))
 ;; Compilation:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Template][Template:2]]
+;; [[file:/tmp/config.org.alqrYt::*Template][Template:2]]
 (setq tec/yas-latex-template-preamble "
 \\usepackage[pdfa,unicode=true,hidelinks]{hyperref}
 
@@ -3448,7 +3630,7 @@ MathJax = {
     (eq (read-char-choice "Include default preamble? [Type y/n]" '(?y ?n)) ?y)))
 ;; Template:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Deliminators][Deliminators:1]]
+;; [[file:/tmp/config.org.alqrYt::*Deliminators][Deliminators:1]]
 (after! tex
   (defvar tec/tex-last-delim-char nil
     "Last open delim expanded in a tex document")
@@ -3508,11 +3690,11 @@ MathJax = {
     (yas-expand-snippet (yas-lookup-snippet "_deliminators" 'latex-mode) (point) (+ (point) (if (tec/tex-next-char-smart-close-delim open-char) 2 1)))))
 ;; Deliminators:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Editor visuals][Editor visuals:1]]
+;; [[file:/tmp/config.org.alqrYt::*Editor visuals][Editor visuals:1]]
 (add-hook 'LaTeX-mode-hook #'mixed-pitch-mode)
 ;; Editor visuals:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Editor visuals][Editor visuals:2]]
+;; [[file:/tmp/config.org.alqrYt::*Editor visuals][Editor visuals:2]]
 (after! latex
   (setcar (assoc "⋆" LaTeX-fold-math-spec-list) "★")) ;; make \star bigger
 
@@ -3604,7 +3786,7 @@ MathJax = {
   (if (string-match-p "^\\\\?\\w+$" teststring) t nil))
 ;; Editor visuals:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Editor visuals][Editor visuals:3]]
+;; [[file:/tmp/config.org.alqrYt::*Editor visuals][Editor visuals:3]]
 (after! tex
   (map!
    :map LaTeX-mode-map
@@ -3616,7 +3798,7 @@ MathJax = {
   (setq TeX-electric-math '("\\(" . "")))
 ;; Editor visuals:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Editor visuals][Editor visuals:4]]
+;; [[file:/tmp/config.org.alqrYt::*Editor visuals][Editor visuals:4]]
 ;; Making \( \) less visible
 (defface unimportant-latex-face
   '((t
@@ -3635,14 +3817,14 @@ MathJax = {
  'end)
 ;; Editor visuals:4 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Editor visuals][Editor visuals:5]]
+;; [[file:/tmp/config.org.alqrYt::*Editor visuals][Editor visuals:5]]
 (setq preview-LaTeX-command '("%`%l \"\\nonstopmode\\nofiles\
 \\PassOptionsToPackage{" ("," . preview-required-option-list) "}{preview}\
 \\AtBeginDocument{\\ifx\\ifPreview\\undefined"
 preview-default-preamble "\\fi}\"%' \"\\detokenize{\" %t \"}\""))
 ;; Editor visuals:5 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*CDLaTeX][CDLaTeX:1]]
+;; [[file:/tmp/config.org.alqrYt::*CDLaTeX][CDLaTeX:1]]
 (after! cdlatex
   (setq ;; cdlatex-math-symbol-prefix ?\; ;; doesn't work at the moment :(
    cdlatex-math-symbol-alist
@@ -3668,23 +3850,23 @@ preview-default-preamble "\\fi}\"%' \"\\detokenize{\" %t \"}\""))
      (?a    "\\abs"           nil          t    nil  nil))))
 ;; CDLaTeX:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*SyncTeX][SyncTeX:1]]
+;; [[file:/tmp/config.org.alqrYt::*SyncTeX][SyncTeX:1]]
 (after! tex
   (add-to-list 'TeX-view-program-list '("Evince" "evince %o"))
   (add-to-list 'TeX-view-program-selection '(output-pdf "Evince")))
 ;; SyncTeX:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Fixes][Fixes:1]]
+;; [[file:/tmp/config.org.alqrYt::*Fixes][Fixes:1]]
 (when EMACS28+
   (add-hook 'latex-mode-hook #'TeX-latex-mode))
 ;; Fixes:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Python][Python:1]]
+;; [[file:/tmp/config.org.alqrYt::*Python][Python:1]]
 (after! lsp-python-ms
   (set-lsp-priority! 'mspyls 1))
 ;; Python:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Editor Visuals][Editor Visuals:1]]
+;; [[file:/tmp/config.org.alqrYt::*Editor Visuals][Editor Visuals:1]]
 (after! ess-r-mode
   (appendq! +ligatures-extra-symbols
             '(:assign "⟵"
@@ -3710,7 +3892,7 @@ preview-default-preamble "\\fi}\"%' \"\\detokenize{\" %t \"}\""))
     :multiply "%*%"))
 ;; Editor Visuals:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Graphviz][Graphviz:1]]
+;; [[file:/tmp/config.org.alqrYt::*Graphviz][Graphviz:1]]
 (use-package! graphviz-dot-mode
   :mode ("\\.dot\\'" "\\.gz\\'")
   :config
@@ -3720,21 +3902,21 @@ preview-default-preamble "\\fi}\"%' \"\\detokenize{\" %t \"}\""))
   :after graphviz-dot-mode)
 ;; Graphviz:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*hledger][hledger:1]]
+;; [[file:/tmp/config.org.alqrYt::*hledger][hledger:1]]
 (setq ledger-mode-should-check-version nil
       ledger-report-links-in-register nil
       ledger-binary-path "hledger")
 ;; hledger:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Markdown][Markdown:1]]
+;; [[file:/tmp/config.org.alqrYt::*Markdown][Markdown:1]]
 (add-hook! (gfm-mode markdown-mode) #'mixed-pitch-mode)
 ;; Markdown:1 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Markdown][Markdown:2]]
+;; [[file:/tmp/config.org.alqrYt::*Markdown][Markdown:2]]
 (add-hook! (gfm-mode markdown-mode) #'visual-line-mode #'turn-off-auto-fill)
 ;; Markdown:2 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Markdown][Markdown:3]]
+;; [[file:/tmp/config.org.alqrYt::*Markdown][Markdown:3]]
 (custom-set-faces!
   '(markdown-header-face-1 :height 1.25 :weight extra-bold :inherit markdown-header-face)
   '(markdown-header-face-2 :height 1.15 :weight bold       :inherit markdown-header-face)
@@ -3744,7 +3926,7 @@ preview-default-preamble "\\fi}\"%' \"\\detokenize{\" %t \"}\""))
   '(markdown-header-face-6 :height 0.75 :weight extra-bold :inherit markdown-header-face))
 ;; Markdown:3 ends here
 
-;; [[file:/tmp/config.org.0EmoiE::*Authinfo][Authinfo:2]]
+;; [[file:/tmp/config.org.alqrYt::*Authinfo][Authinfo:2]]
 (use-package! authinfo-colour-mode
   :mode ("authinfo\\.gpg\\'" . authinfo-colour-mode)
   :init (advice-add 'authinfo-mode :override #'authinfo-colour-mode))

@@ -14,7 +14,7 @@ numlockx &
 if [ "$(xrandr -q | awk '/ connected / {print $1}' | wc -l)" -eq 1 ];
 then
     $HOME/.screenlayout/laptop_only.sh
-elif [[ "$(xrandr -q | awk '/ connected / {print $1}')" != *DP-2* ]];
+elif [[ "$(xrandr -q | awk '/ connected / {print $0}')" == *1440* ]];
 then
     $HOME/.screenlayout/home_double_setup.sh
 else
