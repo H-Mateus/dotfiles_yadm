@@ -13,7 +13,7 @@
         +prescient)                 ; ... I know what I want(ed)
 
        :ui
-       ;;deft                       ; notational velocity for Emacs
+       deft                       ; notational velocity for Emacs
        doom                         ; what makes DOOM look the way it does
        doom-dashboard               ; a nifty splash screen for Emacs
        doom-quit                    ; DOOM quit-message prompts when you quit Emacs
@@ -53,7 +53,7 @@
        ;;parinfer                   ; turn lisp into python, sort of
        rotate-text                  ; cycle region at point between text candidates
        snippets                     ; my elves. They type so I don't have to
-       ;;word-wrap                  ; soft wrapping with language-aware indent
+       word-wrap                  ; soft wrapping with language-aware indent
 
        :emacs
        (dired +icons)               ; making dired pretty [functional]
@@ -77,7 +77,7 @@
        ansible                      ; a crucible for infrastructure as code
        debugger                     ; FIXME stepping through code, to help you add bugs
        ;;direnv                     ; be direct about your environment
-       ;;docker                     ; port everything to containers
+       docker                     ; port everything to containers
        ;;editorconfig               ; let someone else argue about tabs vs spaces
        ;;ein                        ; tame Jupyter notebooks with emacs
        (eval +overlay)              ; run code, run (also, repls)
@@ -124,7 +124,7 @@
        ;;(haskell +dante)           ; a language that's lazier than I am
        ;;hy                         ; readability of scheme w/ speed of python
        ;;idris                      ;
-       ;;json                       ; At least it ain't XML
+       json                       ; At least it ain't XML
        ;;(java +meghanada)          ; the poster child for carpal tunnel syndrome
        (javascript +lsp)            ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia                      ; a better, faster MATLAB
@@ -144,12 +144,13 @@
        (org                         ; organize your plain life in plain text
         +pretty                     ; yessss my pretties! (nice unicode symbols)
         +dragndrop                  ; drag & drop files/images into org buffers
-        ;;+hugo                     ; use Emacs for hugo blogging
+        +hugo                     ; use Emacs for hugo blogging
         +jupyter                    ; ipython/jupyter support for babel
         +pandoc                     ; export-with-pandoc support
         +gnuplot                    ; who doesn't like pretty pictures
         ;;+pomodoro                 ; be fruitful with the tomato technique
         +present                    ; using org-mode for presentations
+        +journal
         +roam)                      ; wander around notes
        ;;perl                       ; write code no one else can comprehend
        ;;php                        ; perl's insecure younger brother
@@ -178,7 +179,7 @@
        ;;(wanderlust +gmail)
 
        :app
-       ;;calendar
+       calendar
        irc                          ; how neckbeards socialize
        (rss +org)                   ; emacs as an RSS reader
        ;;twitter                    ; twitter client https://twitter.com/vnought
@@ -187,3 +188,5 @@
        literate
        (default +bindings +smartparens)
        )
+;(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+(setq comp-async-env-modifier-form "") ; running GCCemacs.

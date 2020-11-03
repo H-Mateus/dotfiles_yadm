@@ -54,7 +54,7 @@ MENU="$(rofi -no-lazy-grab -sep "|" -dmenu -i -p 'System :' \
 <<< "  Lock|  Logout|  Sleep|  Reboot|  Shutdown")"
 case "$MENU" in
   *Lock) i3lock ;;
-  *Logout) openbox --exit;;
+  *Logout) bspc quit;;
   *Sleep) systemctl suspend ;;
   *Reboot) systemctl reboot ;;
   *Shutdown) systemctl -i poweroff

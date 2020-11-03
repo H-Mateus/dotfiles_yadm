@@ -180,4 +180,4 @@ super + shift + e
 
 # launch emacs
 super + r
-    emacs
+    emacsclient -create-frame --alternate-editor=""

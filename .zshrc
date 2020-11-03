@@ -140,6 +140,9 @@ source $HOME/.aliases
 #   export EDITOR='mvim'
 # fi
 
+export ALTERNATE_EDITOR=""
+export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
+export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
