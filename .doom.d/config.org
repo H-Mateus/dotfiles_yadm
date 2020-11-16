@@ -139,11 +139,15 @@ I also like to see the line numbers. `display-line-numbers-type` controls this f
 #+BEGIN_SRC elisp
 (setq display-line-numbers-type t)
 #+END_SRC
-** Org Directory
+** Org Directory and tweaks
 If you use `org' and don't want your org files in the default location below, change `org-directory'. It must be set before org loads! My org directory lives in dropbox, so that it is accessible from any of my computers. Also helps in backing everything up.
 #+BEGIN_SRC elisp
-(setq org-directory "~/Documents/org/")
-
+(setq org-directory "~/Documents/org/"
+      org-log-done 'time                          ; having the time a item is done sounds convininet
+      org-list-allow-alphabetical t               ; have a. A. a) A) list bullets
+      org-export-in-background t                  ; run export processes in external emacs process
+      org-catch-invisible-edits 'smart            ; try not to accidently do weird stuff in invisible regions
+      org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 #+END_SRC
 
 * Packages
@@ -159,33 +163,47 @@ If you use `org' and don't want your org files in the default location below, ch
  To get information about any of these functions/macros, move the cursor over the highlighted symbol at press 'K' (non-evil users must press 'C-c g k').
  This will open documentation for it, including  demos of how they are used.
  You can also try 'gd' (or 'C-c g d') to jump to their definition and see how  they are implemented.
+** Org
+
+#+begin_src elisp
+(use-package org
+  :config
+  (setq org-babel-default-header-args
+        (cons '(:exports . "both")
+              (assq-delete-all :exports org-babel-default-header-args))
+        org-babel-default-header-args
+        (cons '(:results . "output verbatim replace")
+              (assq-delete-all :results org-babel-default-header-args))
+        )
+  )
+#+end_src
 ** Org-Ref
 I initially started using this package in order to manage my citations. However, I soon found that this package required a lot of manual work for my liking. I still keep it in my config as it allows me to use citations in org-documents, if I am working on them directly. I can output these org-documents later to pdf or .docx later.
 #+BEGIN_SRC elisp
 (use-package! org-ref
-    :after org
-    :init
-    ; code to run before loading org-ref
-    :config
-    ; code to run after loading org-ref
-    )
+  :after org
+  :init
+                                        ; code to run before loading org-ref
+  :config
+                                        ; code to run after loading org-ref
+  )
 (setq org-ref-notes-directory "~/Documents/org"
-     ; org-ref-bibliography-notes "~/Documents/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
+                                        ; org-ref-bibliography-notes "~/Documents/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
       org-ref-default-bibliography '("~/Documents/org/masterLib.bib")
       org-ref-pdf-directory "~/Zotero/")
 
-(after! org
-  (add-to-list 'org-capture-templates
-               '(("a"               ; key
-                  "Article"         ; name
-                  entry             ; type
-                  (file+headline "~/Documents/org/phd.org" "Article")  ; target
-                  "\* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?"  ; template
+;; (after! org
+;;   (add-to-list 'org-capture-templates
+;;                '(("a"               ; key
+;;                   "Article"         ; name
+;;                   entry             ; type
+;;                   (file+headline "org" "Article")  ; target
+;;                   "\* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?"  ; template
 
-                  :prepend t        ; properties
-                  :empty-lines 1    ; properties
-                  :created t        ; properties
-))) )
+;;                   :prepend t        ; properties
+;;                   :empty-lines 1    ; properties
+;;                   :created t        ; properties
+;;                   ))) )
 #+END_SRC
 
 ** Helm-Bibtex
@@ -414,7 +432,6 @@ Makes TODOs look pretty with color coded symbols that can convey information at 
 ** Org Super Agenda
 The agenda gets super cluttered. Org-Super-Agenda is fantastic and allows me to declutter my busy agenda, while not missing anything important.
 #+BEGIN_SRC elisp
-
 (use-package! org-super-agenda
   :commands (org-super-agenda-mode))
 (after! org-agenda
@@ -426,7 +443,7 @@ The agenda gets super cluttered. Org-Super-Agenda is fantastic and allows me to 
       org-agenda-block-separator nil
       org-agenda-tags-column 100 ;; from testing this seems to be a good value
       org-agenda-compact-blocks t)
-(setq org-agenda-files "~/Documents/org/Daily/")
+;;(setq org-agenda-files (quote "~/Documents/org"))
 (setq org-agenda-custom-commands
       '(("o" "Overview"
          ((agenda "" ((org-agenda-span 'day)
@@ -518,6 +535,8 @@ Some custom key bindings I wrote for the most used functions in my workflow.
 (map! :leader "r c i"#'org-clock-in); "routine clock in" : clock in to a habit.
 (map! :leader "c b"#'beacon-blink) ; "cursor blink" : makes the beacon-blink
 (map! :leader "n r t"#'org-roam-tag-add)
+(map! :leader "n r s"#'org-roam-db-build-cache)
+(map! :leader "o a f"#'org-agenda-file-to-front)
 #+END_SRC
 
 * Evil-mode
@@ -554,15 +573,14 @@ For auto-complete and saving those keystrokes.
 #+BEGIN_SRC elisp
 (after! company
   (setq company-idle-delay 0.5
-        company-minimum-prefix-length 2)
+        company-minimum-prefix-length 2
+        company-box-doc-delay 2.0)
   (setq company-show-numbers t)
-(add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
+  (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
 
 (setq-default history-length 1000) ; remembering history from precedent
 (setq-default prescient-history-length 1000)
 #+END_SRC
-
-
 
 * Info Colors
 
@@ -575,3 +593,278 @@ For auto-complete and saving those keystrokes.
 (add-hook 'Info-mode-hook #'mixed-pitch-mode)
 
 #+END_SRC
+
+* Ox-Hugo
+I have recently started using =ox-hugo= to help post on my Hugo based website. The following section sets up an org-capture to enable quick blogging.
+#+BEGIN_SRC elisp
+(defun org-hugo-new-subtree-post-capture-template ()
+  "Returns `org-capture' template string for new Hugo post.
+See `org-capture-templates' for more information."
+  (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+         (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
+         (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+         (fname (org-hugo-slug title)))
+    (mapconcat #'identity
+               `(
+                 ,(concat "* TODO " title)
+                 ":PROPERTIES:"
+                 ,(concat ":EXPORT_FILE_NAME: " fname)
+                 ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                 ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
+                 ":END:"
+                 "%?\n")          ;Place the cursor here
+               "\n")))
+(defvar hugo-org-path "/home/cantos/Dropbox/blog/sunny-website/org-content/"
+  "define the place where we put our org files for hugo")
+;;(defvar org-capture-blog (concat hugo-org-path "blog.org"))
+#+END_SRC
+
+* Capture templates
+Want to figure out how to add hugo blog capture at some point
+#+BEGIN_SRC elisp
+;; (setq org-capture-templates
+;;       '(
+;;         ("h" "Hugo Post"
+;;          entry
+;;          (file+olp "/home/cantos/Dropbox/blog/sunny-website/org-content/blog.org" "Posts")
+;;          (function  org-hugo-new-subtree-post-capture-template)
+;;          )
+;;         ("t" "Personal todo"
+;;          entry
+;;          (file+headline "~/Documents/org/todo.org" "Inbox")
+;;          "* TODO %?\n  %i\n  %a"
+;;          )
+;;         ("n" "Personal note"
+;;          entry
+;;          (file+headline "~/Documents/org/todo.org" "Inbox")
+;;          "* %?\n  %i\n  %a"
+;;          )
+;;         ))
+
+;; define variables for capture
+
+(use-package! org-chef
+  :commands (org-chef-insert-recipe org-chef-get-recipe-from-url))
+
+(use-package! doct
+  :commands (doct))
+
+(setq org-capture-templates
+      (doct '(
+              ("Personal todo" :keys "t"
+               :icon ("checklist" :set "octicon" :color "green")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Inbox"
+               :type entry
+               :template ("* TODO %?"
+                          "%i %a")
+               )
+              ("Personal note" :keys "n"
+               :icon ("sticky-note-o" :set "faicon" :color "green")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Inbox"
+               :type entry
+               :template ("* %?"
+                          "%i %a")
+               )
+              ("University" :keys "u"
+               :icon ("graduation-cap" :set "faicon" :color "purple")
+               :file +org-capture-todo-file
+               :headline "University"
+               :unit-prompt ,(format "%%^{Unit|%s}" (string-join +org-capture-uni-units "|"))
+               :prepend t
+               :type entry
+               :children (("Test" :keys "t"
+                           :icon ("timer" :set "material" :color "red")
+                           :template ("* TODO [#C] %{unit-prompt} %? :uni:tests:"
+                                      "SCHEDULED: %^{Test date:}T"
+                                      "%i %a"))
+                          ("Assignment" :keys "a"
+                           :icon ("library_books" :set "material" :color "orange")
+                           :template ("* TODO [#B] %{unit-prompt} %? :uni:assignments:"
+                                      "DEADLINE: %^{Due date:}T"
+                                      "%i %a"))
+                          ("Lecture" :keys "l"
+                           :icon ("keynote" :set "fileicon" :color "orange")
+                           :template ("* TODO [#C] %{unit-prompt} %? :uni:lecture:"
+                                      "%i %a"))
+                          ("Miscellaneous task" :keys "u"
+                           :icon ("list" :set "faicon" :color "yellow")
+                           :template ("* TODO [#D] %{unit-prompt} %? :uni:"
+                                      "%i %a"))))
+              ("Email" :keys "e"
+               :icon ("envelope" :set "faicon" :color "blue")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Inbox"
+               :type entry
+               :template ("* TODO %^{type|reply to|contact} %\\3 %? :email:"
+                          "Send an email %^{urgancy|soon|ASAP|anon|at some point|eventually} to %^{recipiant}"
+                          "about %^{topic}"
+                          "%U %i %a"))
+              ("Interesting" :keys "i"
+               :icon ("eye" :set "faicon" :color "lcyan")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Interesting"
+               :type entry
+               :template ("* [ ] %{desc}%? :%{i-type}:"
+                          "%i %a")
+               :children (("Webpage" :keys "w"
+                           :icon ("globe" :set "faicon" :color "green")
+                           :desc "%(org-cliplink-capture) "
+                           :i-type "read:web"
+                           )
+                          ("Article" :keys "a"
+                           :icon ("file-text" :set "octicon" :color "yellow")
+                           :desc ""
+                           :i-type "read:reaserch"
+                           )
+                          ("\tRecipie" :keys "r"
+                           :icon ("spoon" :set "faicon" :color "dorange")
+                           :file "~/Documents/org/recipes.org"
+                           :headline "Unsorted"
+                           :template "%(org-chef-get-recipe-from-url)"
+                           )
+                          ("Information" :keys "i"
+                           :icon ("info-circle" :set "faicon" :color "blue")
+                           :desc ""
+                           :i-type "read:info"
+                           )
+                          ("Idea" :keys "I"
+                           :icon ("bubble_chart" :set "material" :color "silver")
+                           :desc ""
+                           :i-type "idea"
+                           )))
+              ("Tasks" :keys "k"
+               :icon ("inbox" :set "octicon" :color "yellow")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Tasks"
+               :type entry
+               :template ("* TODO %? %^G%{extra}"
+                          "%i %a")
+               :children (("General Task" :keys "k"
+                           :icon ("inbox" :set "octicon" :color "yellow")
+                           :extra ""
+                           )
+                          ("Task with deadline" :keys "d"
+                           :icon ("timer" :set "material" :color "orange" :v-adjust -0.1)
+                           :extra "\nDEADLINE: %^{Deadline:}t"
+                           )
+                          ("Scheduled Task" :keys "s"
+                           :icon ("calendar" :set "octicon" :color "orange")
+                           :extra "\nSCHEDULED: %^{Start time:}t"
+                           )
+                          ))
+              ("Project" :keys "p"
+               :icon ("repo" :set "octicon" :color "silver")
+               :prepend t
+               :type entry
+               :headline "Inbox"
+               :template ("* %{time-or-todo} %?"
+                          "%i"
+                          "%a")
+               :file ""
+               :custom (:time-or-todo "")
+               :children (("Project-local todo" :keys "t"
+                           :icon ("checklist" :set "octicon" :color "green")
+                           :time-or-todo "TODO"
+                           :file +org-capture-project-todo-file)
+                          ("Project-local note" :keys "n"
+                           :icon ("sticky-note" :set "faicon" :color "yellow")
+                           :time-or-todo "%U"
+                           :file +org-capture-project-notes-file)
+                          ("Project-local changelog" :keys "c"
+                           :icon ("list" :set "faicon" :color "blue")
+                           :time-or-todo "%U"
+                           :heading "Unreleased"
+                           :file +org-capture-project-changelog-file))
+               )
+              ("\tCentralised project templates"
+               :keys "o"
+               :type entry
+               :prepend t
+               :template ("* %{time-or-todo} %?"
+                          "%i"
+                          "%a")
+               :children (("Project todo"
+                           :keys "t"
+                           :prepend nil
+                           :time-or-todo "TODO"
+                           :heading "Tasks"
+                           :file +org-capture-central-project-todo-file)
+                          ("Project note"
+                           :keys "n"
+                           :time-or-todo "%U"
+                           :heading "Notes"
+                           :file +org-capture-central-project-notes-file)
+                          ("Project changelog"
+                           :keys "c"
+                           :time-or-todo "%U"
+                           :heading "Unreleased"
+                           :file +org-capture-central-project-changelog-file))
+               )
+              )))
+#+END_SRC
+
+* LSP-mode
+Test config with lsp-mode
+#+begin_src emacs-lisp
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . efs/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t))
+#+end_src
+
+** lsp-ui
+
+[[https://emacs-lsp.github.io/lsp-ui/][lsp-ui]] is a set of UI enhancements built on top of lsp-mode which make Emacs feel even more like an IDE.
+Check out the screenshots on the lsp-ui homepage (linked at the beginning of this paragraph) to see examples of what it can do.
+
+#+begin_src emacs-lisp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+#+end_src
+
+** Company with lsp
+[[https://company-mode.github.io/][Company Mode]] provides a nicer in-buffer completion interface than completion-at-point which is more reminiscent of what you would expect from an IDE.
+We add a simple configuration to make the keybindings a little more useful (TAB now completes the selection and initiates completion at the current location if needed).
+
+We also use company-box to further enhance the look of the completions with icons and better overall presentation.
+#+begin_src emacs-lisp
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+#+end_src
+
+** Commenting
+
+Emacs’ built in commenting functionality comment-dwim (usually bound to M-;) doesn’t always comment things in the way you might expect so we use [[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commenter]] to provide a more familiar behavior.
+I’ve bound it to M-/ since other editors sometimes use this binding but you could also replace Emacs’ M-; binding with this command.
+
+#+begin_src emacs-lisp
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src

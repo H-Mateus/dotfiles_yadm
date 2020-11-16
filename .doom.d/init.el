@@ -21,7 +21,7 @@
        hl-todo                      ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra                      ; quick documentation for related commands
        ;;indent-guides              ; highlighted indent columns, notoriously slow
-       ligatures                    ; ligatures and symbols to make your code pretty again
+       (ligatures +extra)                   ; ligatures and symbols to make your code pretty again
        ;;minimap                    ; show a map of the code on the side
        modeline                     ; snazzy, Atom-inspired modeline, plus API
        nav-flash                    ; blink the current line after jumping
@@ -30,7 +30,6 @@
        (popup                       ; tame sudden yet inevitable temporary windows
         +all                        ; catch all popups that start with an asterix
         +defaults)                  ; default popup rules
-       pretty-code                  ; replace bits of code with pretty symbols
        ;;(tabs                      ; an tab bar for Emacs
        ;;  +centaur-tabs)           ; ... with prettier tabs
        treemacs                     ; a project drawer, like neotree but cooler

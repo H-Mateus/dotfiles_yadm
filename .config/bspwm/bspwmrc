@@ -82,4 +82,3 @@ bspc rule -a Emacs state=tiled
 
 teams
 pcloud
-

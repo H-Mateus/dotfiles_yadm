@@ -77,32 +77,48 @@
 
 (setq display-line-numbers-type t)
 
-(setq org-directory "~/Documents/org/")
+(setq org-directory "~/Documents/org/"
+      org-log-done 'time                          ; having the time a item is done sounds convininet
+      org-list-allow-alphabetical t               ; have a. A. a) A) list bullets
+      org-export-in-background t                  ; run export processes in external emacs process
+      org-catch-invisible-edits 'smart            ; try not to accidently do weird stuff in invisible regions
+      org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
+
+(use-package org
+  :config
+  (setq org-babel-default-header-args
+        (cons '(:exports . "both")
+              (assq-delete-all :exports org-babel-default-header-args))
+        org-babel-default-header-args
+        (cons '(:results . "output verbatim replace")
+              (assq-delete-all :results org-babel-default-header-args))
+        )
+  )
 
 (use-package! org-ref
-    :after org
-    :init
-    ; code to run before loading org-ref
-    :config
-    ; code to run after loading org-ref
-    )
+  :after org
+  :init
+                                        ; code to run before loading org-ref
+  :config
+                                        ; code to run after loading org-ref
+  )
 (setq org-ref-notes-directory "~/Documents/org"
-     ; org-ref-bibliography-notes "~/Documents/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
+                                        ; org-ref-bibliography-notes "~/Documents/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
       org-ref-default-bibliography '("~/Documents/org/masterLib.bib")
       org-ref-pdf-directory "~/Zotero/")
 
-(after! org
-  (add-to-list 'org-capture-templates
-               '(("a"               ; key
-                  "Article"         ; name
-                  entry             ; type
-                  (file+headline "~/Documents/org/phd.org" "Article")  ; target
-                  "\* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?"  ; template
+;; (after! org
+;;   (add-to-list 'org-capture-templates
+;;                '(("a"               ; key
+;;                   "Article"         ; name
+;;                   entry             ; type
+;;                   (file+headline "org" "Article")  ; target
+;;                   "\* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?"  ; template
 
-                  :prepend t        ; properties
-                  :empty-lines 1    ; properties
-                  :created t        ; properties
-))) )
+;;                   :prepend t        ; properties
+;;                   :empty-lines 1    ; properties
+;;                   :created t        ; properties
+;;                   ))) )
 
 (use-package! helm-bibtex
   :after org
@@ -289,7 +305,7 @@
       org-agenda-block-separator nil
       org-agenda-tags-column 100 ;; from testing this seems to be a good value
       org-agenda-compact-blocks t)
-(setq org-agenda-files "~/Documents/org/Daily/")
+;;(setq org-agenda-files (quote "~/Documents/org"))
 (setq org-agenda-custom-commands
       '(("o" "Overview"
          ((agenda "" ((org-agenda-span 'day)
@@ -376,6 +392,8 @@
 (map! :leader "r c i"#'org-clock-in); "routine clock in" : clock in to a habit.
 (map! :leader "c b"#'beacon-blink) ; "cursor blink" : makes the beacon-blink
 (map! :leader "n r t"#'org-roam-tag-add)
+(map! :leader "n r s"#'org-roam-db-build-cache)
+(map! :leader "o a f"#'org-agenda-file-to-front)
 
 (setq-default evil-escape-key-sequence "ii")
 (setq-default evil-escape-delay 0.2)
@@ -397,9 +415,10 @@
 
 (after! company
   (setq company-idle-delay 0.5
-        company-minimum-prefix-length 2)
+        company-minimum-prefix-length 2
+        company-box-doc-delay 2.0)
   (setq company-show-numbers t)
-(add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
+  (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
 
 (setq-default history-length 1000) ; remembering history from precedent
 (setq-default prescient-history-length 1000)
@@ -410,3 +429,245 @@
 (add-hook 'Info-selection-hook 'info-colors-fontify-node)
 
 (add-hook 'Info-mode-hook #'mixed-pitch-mode)
+
+(defun org-hugo-new-subtree-post-capture-template ()
+  "Returns `org-capture' template string for new Hugo post.
+See `org-capture-templates' for more information."
+  (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+         (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
+         (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+         (fname (org-hugo-slug title)))
+    (mapconcat #'identity
+               `(
+                 ,(concat "* TODO " title)
+                 ":PROPERTIES:"
+                 ,(concat ":EXPORT_FILE_NAME: " fname)
+                 ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                 ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
+                 ":END:"
+                 "%?\n")          ;Place the cursor here
+               "\n")))
+(defvar hugo-org-path "/home/cantos/Dropbox/blog/sunny-website/org-content/"
+  "define the place where we put our org files for hugo")
+;;(defvar org-capture-blog (concat hugo-org-path "blog.org"))
+
+;; (setq org-capture-templates
+;;       '(
+;;         ("h" "Hugo Post"
+;;          entry
+;;          (file+olp "/home/cantos/Dropbox/blog/sunny-website/org-content/blog.org" "Posts")
+;;          (function  org-hugo-new-subtree-post-capture-template)
+;;          )
+;;         ("t" "Personal todo"
+;;          entry
+;;          (file+headline "~/Documents/org/todo.org" "Inbox")
+;;          "* TODO %?\n  %i\n  %a"
+;;          )
+;;         ("n" "Personal note"
+;;          entry
+;;          (file+headline "~/Documents/org/todo.org" "Inbox")
+;;          "* %?\n  %i\n  %a"
+;;          )
+;;         ))
+
+;; define variables for capture
+
+(use-package! org-chef
+  :commands (org-chef-insert-recipe org-chef-get-recipe-from-url))
+
+(use-package! doct
+  :commands (doct))
+
+(setq org-capture-templates
+      (doct '(
+              ("Personal todo" :keys "t"
+               :icon ("checklist" :set "octicon" :color "green")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Inbox"
+               :type entry
+               :template ("* TODO %?"
+                          "%i %a")
+               )
+              ("Personal note" :keys "n"
+               :icon ("sticky-note-o" :set "faicon" :color "green")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Inbox"
+               :type entry
+               :template ("* %?"
+                          "%i %a")
+               )
+              ("University" :keys "u"
+               :icon ("graduation-cap" :set "faicon" :color "purple")
+               :file +org-capture-todo-file
+               :headline "University"
+               :unit-prompt ,(format "%%^{Unit|%s}" (string-join +org-capture-uni-units "|"))
+               :prepend t
+               :type entry
+               :children (("Test" :keys "t"
+                           :icon ("timer" :set "material" :color "red")
+                           :template ("* TODO [#C] %{unit-prompt} %? :uni:tests:"
+                                      "SCHEDULED: %^{Test date:}T"
+                                      "%i %a"))
+                          ("Assignment" :keys "a"
+                           :icon ("library_books" :set "material" :color "orange")
+                           :template ("* TODO [#B] %{unit-prompt} %? :uni:assignments:"
+                                      "DEADLINE: %^{Due date:}T"
+                                      "%i %a"))
+                          ("Lecture" :keys "l"
+                           :icon ("keynote" :set "fileicon" :color "orange")
+                           :template ("* TODO [#C] %{unit-prompt} %? :uni:lecture:"
+                                      "%i %a"))
+                          ("Miscellaneous task" :keys "u"
+                           :icon ("list" :set "faicon" :color "yellow")
+                           :template ("* TODO [#D] %{unit-prompt} %? :uni:"
+                                      "%i %a"))))
+              ("Email" :keys "e"
+               :icon ("envelope" :set "faicon" :color "blue")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Inbox"
+               :type entry
+               :template ("* TODO %^{type|reply to|contact} %\\3 %? :email:"
+                          "Send an email %^{urgancy|soon|ASAP|anon|at some point|eventually} to %^{recipiant}"
+                          "about %^{topic}"
+                          "%U %i %a"))
+              ("Interesting" :keys "i"
+               :icon ("eye" :set "faicon" :color "lcyan")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Interesting"
+               :type entry
+               :template ("* [ ] %{desc}%? :%{i-type}:"
+                          "%i %a")
+               :children (("Webpage" :keys "w"
+                           :icon ("globe" :set "faicon" :color "green")
+                           :desc "%(org-cliplink-capture) "
+                           :i-type "read:web"
+                           )
+                          ("Article" :keys "a"
+                           :icon ("file-text" :set "octicon" :color "yellow")
+                           :desc ""
+                           :i-type "read:reaserch"
+                           )
+                          ("\tRecipie" :keys "r"
+                           :icon ("spoon" :set "faicon" :color "dorange")
+                           :file "~/Documents/org/recipes.org"
+                           :headline "Unsorted"
+                           :template "%(org-chef-get-recipe-from-url)"
+                           )
+                          ("Information" :keys "i"
+                           :icon ("info-circle" :set "faicon" :color "blue")
+                           :desc ""
+                           :i-type "read:info"
+                           )
+                          ("Idea" :keys "I"
+                           :icon ("bubble_chart" :set "material" :color "silver")
+                           :desc ""
+                           :i-type "idea"
+                           )))
+              ("Tasks" :keys "k"
+               :icon ("inbox" :set "octicon" :color "yellow")
+               :file +org-capture-todo-file
+               :prepend t
+               :headline "Tasks"
+               :type entry
+               :template ("* TODO %? %^G%{extra}"
+                          "%i %a")
+               :children (("General Task" :keys "k"
+                           :icon ("inbox" :set "octicon" :color "yellow")
+                           :extra ""
+                           )
+                          ("Task with deadline" :keys "d"
+                           :icon ("timer" :set "material" :color "orange" :v-adjust -0.1)
+                           :extra "\nDEADLINE: %^{Deadline:}t"
+                           )
+                          ("Scheduled Task" :keys "s"
+                           :icon ("calendar" :set "octicon" :color "orange")
+                           :extra "\nSCHEDULED: %^{Start time:}t"
+                           )
+                          ))
+              ("Project" :keys "p"
+               :icon ("repo" :set "octicon" :color "silver")
+               :prepend t
+               :type entry
+               :headline "Inbox"
+               :template ("* %{time-or-todo} %?"
+                          "%i"
+                          "%a")
+               :file ""
+               :custom (:time-or-todo "")
+               :children (("Project-local todo" :keys "t"
+                           :icon ("checklist" :set "octicon" :color "green")
+                           :time-or-todo "TODO"
+                           :file +org-capture-project-todo-file)
+                          ("Project-local note" :keys "n"
+                           :icon ("sticky-note" :set "faicon" :color "yellow")
+                           :time-or-todo "%U"
+                           :file +org-capture-project-notes-file)
+                          ("Project-local changelog" :keys "c"
+                           :icon ("list" :set "faicon" :color "blue")
+                           :time-or-todo "%U"
+                           :heading "Unreleased"
+                           :file +org-capture-project-changelog-file))
+               )
+              ("\tCentralised project templates"
+               :keys "o"
+               :type entry
+               :prepend t
+               :template ("* %{time-or-todo} %?"
+                          "%i"
+                          "%a")
+               :children (("Project todo"
+                           :keys "t"
+                           :prepend nil
+                           :time-or-todo "TODO"
+                           :heading "Tasks"
+                           :file +org-capture-central-project-todo-file)
+                          ("Project note"
+                           :keys "n"
+                           :time-or-todo "%U"
+                           :heading "Notes"
+                           :file +org-capture-central-project-notes-file)
+                          ("Project changelog"
+                           :keys "c"
+                           :time-or-todo "%U"
+                           :heading "Unreleased"
+                           :file +org-capture-central-project-changelog-file))
+               )
+              )))
+
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . efs/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))

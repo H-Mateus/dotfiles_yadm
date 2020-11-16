@@ -7,6 +7,9 @@
 #autorandr --load mobile
 setxkbmap gb &
 numlockx &
+# set typematic delay and rate
+xset r rate 250 50
+
 #$HOME/.screenlayout/home_triple_setup.sh
 
 # Configure multihead. if statement that check if there's more than one montitor, then checks if DP-2 is connected and applies the relevent randr .sh

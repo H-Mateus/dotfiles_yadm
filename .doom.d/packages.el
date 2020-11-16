@@ -69,11 +69,14 @@
 (package! org-pretty-tags)
 ;(package! centaur-tabs)
 (package! company-org-roam :recipe (:host github :repo "org-roam/company-org-roam"))
+(package! evil-nerd-commenter)
 (package! org-fancy-priorities)
 (package! origami)
+(package! org-chef)
 ;(package! org-journal)     ;DOOM has org-journal built in, enable using +journal flag in init.el
 (package! info-colors ) ; pretty colors
 (package! beacon) ; global minor mode for a blinking highliter to find where the cursor is.
 (package! ess-view)
 (package! polymode)
 (package! poly-R)
+(package! org-pretty-table-mode)
