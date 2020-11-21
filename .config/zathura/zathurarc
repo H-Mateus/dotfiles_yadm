@@ -1,0 +1,15 @@
+set recolor true
+
+set default-bg '#2b263a'
+set default-fg '#dfdfdf'
+
+set recolor-lightcolor '#2b263a'
+set recolor-darkcolor '#dfdfdf'
+
+set font "Fira Code Nerd Font normal 12"
+
+set inputbar-bg '#2b263a'
+set inputbar-fg '#dfdfdf'
+
+set statusbar-bg '#2b263a'
+set statusbar-fg '#dfdfdf'
