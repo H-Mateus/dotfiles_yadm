@@ -80,7 +80,7 @@
 (setq org-directory "~/Documents/org/"
       org-log-done 'time                          ; having the time a item is done sounds convininet
       org-list-allow-alphabetical t               ; have a. A. a) A) list bullets
-      org-export-in-background t                  ; run export processes in external emacs process
+                                        ;org-export-in-background t                  ; run export processes in external emacs process
       org-catch-invisible-edits 'smart            ; try not to accidently do weird stuff in invisible regions
       org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 
@@ -104,7 +104,7 @@
   )
 (setq org-ref-notes-directory "~/Documents/org"
                                         ; org-ref-bibliography-notes "~/Documents/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
-      org-ref-default-bibliography '("~/Documents/org/masterLib.bib")
+      org-ref-default-bibliography '("~/Documents/masterLib.bib")
       org-ref-pdf-directory "~/Zotero/")
 
 ;; (after! org
@@ -136,7 +136,7 @@
 (setq
       bibtex-completion-pdf-field "file"
       bibtex-completion-bibliography
-      '("~/Documents/org/masterLib.bib")
+      '("~/Documents/masterLib.bib")
       bibtex-completion-library-path '("~/Zotero/")
      ; bibtex-completion-notes-path "~/Documents/Org/references/articles.org"  ;; not needed anymore as I take notes in org-roam
       )
@@ -158,7 +158,7 @@
 (setq org-pandoc-format-extensions '(markdown_github+pipe_tables+raw_html))
 
 (use-package! org-roam-bibtex
-  :load-path "~/Documents/org/masterLib.bib" ;Modify with your own path
+  :load-path "~/Documents/masterLib.bib" ;Modify with your own path
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (:map org-mode-map
          (("C-c n a" . orb-note-actions))))
@@ -430,25 +430,25 @@
 
 (add-hook 'Info-mode-hook #'mixed-pitch-mode)
 
-(defun org-hugo-new-subtree-post-capture-template ()
-  "Returns `org-capture' template string for new Hugo post.
-See `org-capture-templates' for more information."
-  (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
-         (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
-         (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
-         (fname (org-hugo-slug title)))
-    (mapconcat #'identity
-               `(
-                 ,(concat "* TODO " title)
-                 ":PROPERTIES:"
-                 ,(concat ":EXPORT_FILE_NAME: " fname)
-                 ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
-                 ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
-                 ":END:"
-                 "%?\n")          ;Place the cursor here
-               "\n")))
-(defvar hugo-org-path "/home/cantos/Dropbox/blog/sunny-website/org-content/"
-  "define the place where we put our org files for hugo")
+;; (defun org-hugo-new-subtree-post-capture-template ()
+;;   "Returns `org-capture' template string for new Hugo post.
+;; See `org-capture-templates' for more information."
+;;   (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+;;          (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
+;;          (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+;;          (fname (org-hugo-slug title)))
+;;     (mapconcat #'identity
+;;                `(
+;;                  ,(concat "* TODO " title)
+;;                  ":PROPERTIES:"
+;;                  ,(concat ":EXPORT_FILE_NAME: " fname)
+;;                  ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+;;                  ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
+;;                  ":END:"
+;;                  "%?\n")          ;Place the cursor here
+;;                "\n")))
+;; (defvar hugo-org-path "/home/cantos/Dropbox/blog/sunny-website/org-content/"
+;;   "define the place where we put our org files for hugo")
 ;;(defvar org-capture-blog (concat hugo-org-path "blog.org"))
 
 ;; (setq org-capture-templates

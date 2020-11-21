@@ -145,7 +145,7 @@ If you use `org' and don't want your org files in the default location below, ch
 (setq org-directory "~/Documents/org/"
       org-log-done 'time                          ; having the time a item is done sounds convininet
       org-list-allow-alphabetical t               ; have a. A. a) A) list bullets
-      org-export-in-background t                  ; run export processes in external emacs process
+                                        ;org-export-in-background t                  ; run export processes in external emacs process
       org-catch-invisible-edits 'smart            ; try not to accidently do weird stuff in invisible regions
       org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 #+END_SRC
@@ -189,7 +189,7 @@ I initially started using this package in order to manage my citations. However,
   )
 (setq org-ref-notes-directory "~/Documents/org"
                                         ; org-ref-bibliography-notes "~/Documents/Org/references/articles.org" ;; not needed anymore. Notes now taken in org-roaM
-      org-ref-default-bibliography '("~/Documents/org/masterLib.bib")
+      org-ref-default-bibliography '("~/Documents/masterLib.bib")
       org-ref-pdf-directory "~/Zotero/")
 
 ;; (after! org
@@ -225,7 +225,7 @@ This is the jumping off point in my workflow inside emacs. The config gives the 
 (setq
       bibtex-completion-pdf-field "file"
       bibtex-completion-bibliography
-      '("~/Documents/org/masterLib.bib")
+      '("~/Documents/masterLib.bib")
       bibtex-completion-library-path '("~/Zotero/")
      ; bibtex-completion-notes-path "~/Documents/Org/references/articles.org"  ;; not needed anymore as I take notes in org-roam
       )
@@ -263,7 +263,7 @@ This is a great package that I use to output org files to different formats.
 This fantastic package allows me to use my bibtex file to create and take notes and store them in a zettlekasten.
 #+BEGIN_SRC elisp
 (use-package! org-roam-bibtex
-  :load-path "~/Documents/org/masterLib.bib" ;Modify with your own path
+  :load-path "~/Documents/masterLib.bib" ;Modify with your own path
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (:map org-mode-map
          (("C-c n a" . orb-note-actions))))
@@ -597,25 +597,25 @@ For auto-complete and saving those keystrokes.
 * Ox-Hugo
 I have recently started using =ox-hugo= to help post on my Hugo based website. The following section sets up an org-capture to enable quick blogging.
 #+BEGIN_SRC elisp
-(defun org-hugo-new-subtree-post-capture-template ()
-  "Returns `org-capture' template string for new Hugo post.
-See `org-capture-templates' for more information."
-  (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
-         (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
-         (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
-         (fname (org-hugo-slug title)))
-    (mapconcat #'identity
-               `(
-                 ,(concat "* TODO " title)
-                 ":PROPERTIES:"
-                 ,(concat ":EXPORT_FILE_NAME: " fname)
-                 ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
-                 ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
-                 ":END:"
-                 "%?\n")          ;Place the cursor here
-               "\n")))
-(defvar hugo-org-path "/home/cantos/Dropbox/blog/sunny-website/org-content/"
-  "define the place where we put our org files for hugo")
+;; (defun org-hugo-new-subtree-post-capture-template ()
+;;   "Returns `org-capture' template string for new Hugo post.
+;; See `org-capture-templates' for more information."
+;;   (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+;;          (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
+;;          (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+;;          (fname (org-hugo-slug title)))
+;;     (mapconcat #'identity
+;;                `(
+;;                  ,(concat "* TODO " title)
+;;                  ":PROPERTIES:"
+;;                  ,(concat ":EXPORT_FILE_NAME: " fname)
+;;                  ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+;;                  ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
+;;                  ":END:"
+;;                  "%?\n")          ;Place the cursor here
+;;                "\n")))
+;; (defvar hugo-org-path "/home/cantos/Dropbox/blog/sunny-website/org-content/"
+;;   "define the place where we put our org files for hugo")
 ;;(defvar org-capture-blog (concat hugo-org-path "blog.org"))
 #+END_SRC
 
