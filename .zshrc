@@ -45,7 +45,7 @@ ex ()
 
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/mateus/.oh-my-zsh"
+export ZSH="/usr/share/oh-my-zsh"
 
 DISABLE_MAGIC_FUNCTIONS=true
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
@@ -119,7 +119,17 @@ typeset -g POWERLEVEL9K_INSTANT_PROMPT=quite
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zsh-autosuggestions git docker docker-compose zsh-syntax-highlighting dnf npm command-not-found zsh-completions)
+plugins=(git
+         docker
+         docker-compose
+         dnf
+         npm
+         command-not-found
+         # extra plugins - note these need to be installed
+         zsh-autosuggestions
+         zsh-completions
+         zsh-syntax-highlighting
+        )
 
 source $ZSH/oh-my-zsh.sh
 
