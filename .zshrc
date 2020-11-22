@@ -126,6 +126,7 @@ plugins=(git
          npm
          command-not-found
          # extra plugins - note these need to be installed
+         auto-notify
          zsh-autosuggestions
          zsh-completions
          zsh-syntax-highlighting
@@ -168,7 +169,7 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-
-source /usr/share/undistract-me/long-running.bash
-notify_when_long_running_commands_finish_install
+# old way of getting notifications on long running commands
+#source /usr/share/undistract-me/long-running.bash
+#notify_when_long_running_commands_finish_install
 
