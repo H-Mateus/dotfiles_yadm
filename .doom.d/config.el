@@ -498,31 +498,6 @@
                :template ("* %?"
                           "%i %a")
                )
-              ("University" :keys "u"
-               :icon ("graduation-cap" :set "faicon" :color "purple")
-               :file +org-capture-todo-file
-               :headline "University"
-               :unit-prompt ,(format "%%^{Unit|%s}" (string-join +org-capture-uni-units "|"))
-               :prepend t
-               :type entry
-               :children (("Test" :keys "t"
-                           :icon ("timer" :set "material" :color "red")
-                           :template ("* TODO [#C] %{unit-prompt} %? :uni:tests:"
-                                      "SCHEDULED: %^{Test date:}T"
-                                      "%i %a"))
-                          ("Assignment" :keys "a"
-                           :icon ("library_books" :set "material" :color "orange")
-                           :template ("* TODO [#B] %{unit-prompt} %? :uni:assignments:"
-                                      "DEADLINE: %^{Due date:}T"
-                                      "%i %a"))
-                          ("Lecture" :keys "l"
-                           :icon ("keynote" :set "fileicon" :color "orange")
-                           :template ("* TODO [#C] %{unit-prompt} %? :uni:lecture:"
-                                      "%i %a"))
-                          ("Miscellaneous task" :keys "u"
-                           :icon ("list" :set "faicon" :color "yellow")
-                           :template ("* TODO [#D] %{unit-prompt} %? :uni:"
-                                      "%i %a"))))
               ("Email" :keys "e"
                :icon ("envelope" :set "faicon" :color "blue")
                :file +org-capture-todo-file
@@ -671,3 +646,7 @@
 
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+
+(setq ispell-dictionary "en-custom")
+
+(setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))

@@ -17,3 +17,12 @@ echo "Bars launched..."
 #polybar main -c $HOME/.config/polybar/config.ini &
 #polybar bottom -c $HOME/.config/polybar/config.ini &
 
+# Launch bar1 and bar2
+# for screen in $(bspc query -M --names)
+# do
+#     echo $screen;
+#     polybar $screen -c ~/.config/polybar/config.ini &
+#     #polybar b1 -c ~/.config/polybar/config.ini &
+#     #polybar b2 -c ~/.config/polybar/config.ini &
+#     #polybar b3 -c ~/.config/polybar/config.ini &
+# done

@@ -11,7 +11,7 @@ export SHELL=/usr/bin/zsh
 # If you come from bash you might have to change your $PATH.
 export NODE_PATH=$NODE_PATH:$HOME/.npm-global/lib/node_modules
 export JAVA_HOME=/usr/java/latest
-export PATH=$JAVA_HOME/bin:~/.npm-global/bin:$HOME/bin:$HOME/.cargo/bin:$HOME/Development/OpenMS-build/bin:/usr/local/bin:$HOME/.emacs.d/bin:$PATH
+export PATH=$JAVA_HOME/bin:~/.npm-global/bin:$HOME/bin:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/Development/OpenMS-build/bin:/usr/local/bin:$HOME/.emacs.d/bin:$PATH
 export LD_LIBRARY_PATH="$HOME/Development/OpenMS-build/OpenMS/lib:$LD_LIBRARY_PATH"
 
 # Add exports from your profile

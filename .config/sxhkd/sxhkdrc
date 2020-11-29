@@ -20,11 +20,11 @@ super + Escape
 
 # restart bspwm
 super + alt + r
-	bspc wm -r}
+	bspc wm -r
 
 # quit bspwm
-super + alt + q
-    $HOME/.config/polybar/scripts/sysmenu
+super + x
+    /usr/local/bin/arcolinux-logout
 
 # close
 super + w
@@ -50,8 +50,16 @@ super + g
 # state/flags
 #
 
+# toggle fullscreen
+super + f
+	bspc node --state \~fullscreen
+
+# Toggle pseudo tiling of window
+super + p
+	bspc node --state \~pseudo_tiled
+
 # set the window state
-super + {t,shift + t,s,f}
+super + space
 	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
 
 # set the node flags
@@ -152,7 +160,7 @@ XF86AudioMute
 
 # lockscreen
 super + q
-    multilockscreen --lock blur
+    betterlockscreen --lock blur
 
 # reload sxkhd
 super + Escape
@@ -174,9 +182,13 @@ super + v
 super + shift + v
     bspc node --to-monitor next --follow
 
-# launch nemo
+# launch pcmanfm
 super + shift + e
-    nemo
+    pcmanfm 
+
+#dmenu
+super + shift + d
+	dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
 
 # launch emacs
 super + r

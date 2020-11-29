@@ -669,31 +669,6 @@ Want to figure out how to add hugo blog capture at some point
                :template ("* %?"
                           "%i %a")
                )
-              ("University" :keys "u"
-               :icon ("graduation-cap" :set "faicon" :color "purple")
-               :file +org-capture-todo-file
-               :headline "University"
-               :unit-prompt ,(format "%%^{Unit|%s}" (string-join +org-capture-uni-units "|"))
-               :prepend t
-               :type entry
-               :children (("Test" :keys "t"
-                           :icon ("timer" :set "material" :color "red")
-                           :template ("* TODO [#C] %{unit-prompt} %? :uni:tests:"
-                                      "SCHEDULED: %^{Test date:}T"
-                                      "%i %a"))
-                          ("Assignment" :keys "a"
-                           :icon ("library_books" :set "material" :color "orange")
-                           :template ("* TODO [#B] %{unit-prompt} %? :uni:assignments:"
-                                      "DEADLINE: %^{Due date:}T"
-                                      "%i %a"))
-                          ("Lecture" :keys "l"
-                           :icon ("keynote" :set "fileicon" :color "orange")
-                           :template ("* TODO [#C] %{unit-prompt} %? :uni:lecture:"
-                                      "%i %a"))
-                          ("Miscellaneous task" :keys "u"
-                           :icon ("list" :set "faicon" :color "yellow")
-                           :template ("* TODO [#D] %{unit-prompt} %? :uni:"
-                                      "%i %a"))))
               ("Email" :keys "e"
                :icon ("envelope" :set "faicon" :color "blue")
                :file +org-capture-todo-file
@@ -867,4 +842,39 @@ I’ve bound it to M-/ since other editors sometimes use this binding but you co
 #+begin_src emacs-lisp
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+* Spell check
+** Hunspell
+#+begin_src shell :tangle (if (file-exists-p "/usr/share/myspell/en-custom.dic") "no" "setup.sh")
+cd /tmp
+curl -o "hunspell-en-custom.zip" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=hunspell'
+unzip "hunspell-en-custom.zip"
+
+sudo chown root:root en-custom.*
+sudo mv en-custom.{aff,dic} /usr/share/myspell/
+#+end_src
+
+** Aspell
+#+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
+cd /tmp
+curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
+tar -xjf "aspell6-en-custom.tar.bz2"
+
+cd aspell6-en-custom
+./configure && make && sudo make install
+#+end_src
+
+*** Configuration
+#+begin_src emacs-lisp
+(setq ispell-dictionary "en-custom")
+#+end_src
+Oh, and by the way, if ~company-ispell-dictionary~ is ~nil~, then
+~ispell-complete-word-dict~ is used instead, which once again when ~nil~ is
+~ispell-alternate-dictionary~, which at the moment maps to a plaintext version of
+the above.
+
+It seems reasonable to want to keep an eye on my personal dict, let's have it
+nearby (also means that if I change the 'main' dictionary I keep my addition).
+#+begin_src emacs-lisp
+(setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 #+end_src
