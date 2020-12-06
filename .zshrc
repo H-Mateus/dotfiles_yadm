@@ -57,9 +57,9 @@ DISABLE_UNTRACKED_FILES_DIRTY=true
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+#ZSH_THEME="powerlevel10k/powerlevel10k"
 
-typeset -g POWERLEVEL9K_INSTANT_PROMPT=quite
+#typeset -g POWERLEVEL9K_INSTANT_PROMPT=quite
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -173,3 +173,5 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 #source /usr/share/undistract-me/long-running.bash
 #notify_when_long_running_commands_finish_install
 
+# add starship prompt
+eval "$(starship init zsh)"

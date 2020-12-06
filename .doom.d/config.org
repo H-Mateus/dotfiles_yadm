@@ -878,3 +878,10 @@ nearby (also means that if I change the 'main' dictionary I keep my addition).
 #+begin_src emacs-lisp
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 #+end_src
+*** Snippets
+#+begin_src emacs-lisp
+;; (setq yas-triggers-in-field t)
+;; (set-file-template! "\\.tex$" :trigger "__" :mode 'latex-mode)
+;; (set-file-template! "\\.org$" :trigger "__" :mode 'org-mode)
+;; (set-file-template! "/LICEN[CS]E$" :trigger '+file-templates/insert-license)
+#+end_src

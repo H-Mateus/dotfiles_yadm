@@ -79,4 +79,6 @@
 (package! ess-view)
 (package! polymode)
 (package! poly-R)
+(package! ess-view-data)
 (package! org-pretty-table-mode)
+(package! ebuku) ; package for bookmarks with buku

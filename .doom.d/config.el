@@ -650,3 +650,8 @@
 (setq ispell-dictionary "en-custom")
 
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
+
+;; (setq yas-triggers-in-field t)
+;; (set-file-template! "\\.tex$" :trigger "__" :mode 'latex-mode)
+;; (set-file-template! "\\.org$" :trigger "__" :mode 'org-mode)
+;; (set-file-template! "/LICEN[CS]E$" :trigger '+file-templates/insert-license)
