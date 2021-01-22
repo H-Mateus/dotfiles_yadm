@@ -52,10 +52,11 @@
 (package! zotxt)
 (package! ox-pandoc)
 (package! org-roam-bibtex)
+;; from org-roam-bibtex github: When using org-roam via the `+roam` flag
+(unpin! org-roam company-org-roam)
 (package! org-noter)
 ;(package! org-roam-server :recipe (:host github :repo "org-roam/org-roam-server" :files ("*")))
 (package! org-roam-server)
-(unpin! org-roam)
 (package! org-download)
 ;(package! nov)                                             not using anymore as epub note taking is annoying in nov.el
 (package! rotate)
@@ -79,6 +80,7 @@
 (package! ess-view)
 (package! polymode)
 (package! poly-R)
+(package! poly-markdown)
 (package! ess-view-data)
 (package! org-pretty-table-mode)
 (package! ebuku) ; package for bookmarks with buku

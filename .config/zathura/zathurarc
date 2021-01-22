@@ -13,3 +13,9 @@ set inputbar-fg '#dfdfdf'
 
 set statusbar-bg '#2b263a'
 set statusbar-fg '#dfdfdf'
+
+set statusbar-h-padding 0
+set statusbar-v-padding 0
+set page-padding 1
+map i recolor
+map p print

@@ -177,6 +177,16 @@ If you use `org' and don't want your org files in the default location below, ch
         )
   )
 #+end_src
+
+*** Org-babel templates
+#+begin_src elisp
+(add-to-list 'org-structure-template-alist
+             '("sp" . "src python"))
+
+;; key binding
+(map! :leader "c ."#'org-insert-structure-template)
+#+end_src
+
 ** Org-Ref
 I initially started using this package in order to manage my citations. However, I soon found that this package required a lot of manual work for my liking. I still keep it in my config as it allows me to use citations in org-documents, if I am working on them directly. I can output these org-documents later to pdf or .docx later.
 #+BEGIN_SRC elisp
@@ -854,6 +864,8 @@ sudo chown root:root en-custom.*
 sudo mv en-custom.{aff,dic} /usr/share/myspell/
 #+end_src
 
+#+RESULTS:
+
 ** Aspell
 #+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
 cd /tmp
@@ -884,4 +896,14 @@ nearby (also means that if I change the 'main' dictionary I keep my addition).
 ;; (set-file-template! "\\.tex$" :trigger "__" :mode 'latex-mode)
 ;; (set-file-template! "\\.org$" :trigger "__" :mode 'org-mode)
 ;; (set-file-template! "/LICEN[CS]E$" :trigger '+file-templates/insert-license)
+#+end_src
+* RMarkdown
+#+begin_src emacs-lisp
+(defun tws-insert-r-chunk (header)
+  "Insert an r-chunk in markdown mode. Necessary due to interactions between polymode and yas snippet"
+  (interactive "sHeader: ")
+  (insert (concat "```{r " header "}\n\n```"))
+  (forward-line -1))
+;; key binding
+(map! :leader "c I"#'tws-insert-r-chunk)
 #+end_src

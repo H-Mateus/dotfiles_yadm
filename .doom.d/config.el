@@ -95,6 +95,12 @@
         )
   )
 
+(add-to-list 'org-structure-template-alist
+             '("sp" . "src python"))
+
+;; key binding
+(map! :leader "c ."#'org-insert-structure-template)
+
 (use-package! org-ref
   :after org
   :init
@@ -655,3 +661,11 @@
 ;; (set-file-template! "\\.tex$" :trigger "__" :mode 'latex-mode)
 ;; (set-file-template! "\\.org$" :trigger "__" :mode 'org-mode)
 ;; (set-file-template! "/LICEN[CS]E$" :trigger '+file-templates/insert-license)
+
+(defun tws-insert-r-chunk (header)
+  "Insert an r-chunk in markdown mode. Necessary due to interactions between polymode and yas snippet"
+  (interactive "sHeader: ")
+  (insert (concat "```{r " header "}\n\n```"))
+  (forward-line -1))
+;; key binding
+(map! :leader "c I"#'tws-insert-r-chunk)
