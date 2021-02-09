@@ -84,3 +84,4 @@
 (package! ess-view-data)
 (package! org-pretty-table-mode)
 (package! ebuku) ; package for bookmarks with buku
+(package! emacs-reveal) ; package for presentations

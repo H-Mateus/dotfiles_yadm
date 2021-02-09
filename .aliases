@@ -16,6 +16,8 @@ alias fgrep='fgrep --color=auto'
 
 # adding flags
 alias cp="cp -i"                          # confirm before overwriting something
+alias mv='mv -i'
+alias rm='rm -i'
 alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 
@@ -92,4 +94,29 @@ alias glog='git log --graph --decorate --oneline'
 # alias for using user vim setting with root user
 alias svim="HOME=/home/mateus && sudo vim -u $HOME/.vimrc"
 #alias svim ='sudo -E vim'
+alias vim="nvim"
 
+# navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias .3='cd ../../..'
+alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
+
+# youtube-dl
+alias yta-aac="youtube-dl --extract-audio --audio-format aac "
+alias yta-best="youtube-dl --extract-audio --audio-format best "
+alias yta-flac="youtube-dl --extract-audio --audio-format flac "
+alias yta-m4a="youtube-dl --extract-audio --audio-format m4a "
+alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
+alias yta-opus="youtube-dl --extract-audio --audio-format opus "
+alias yta-vorbis="youtube-dl --extract-audio --audio-format vorbis "
+alias yta-wav="youtube-dl --extract-audio --audio-format wav "
+alias ytv-best="youtube-dl -f bestvideo+bestaudio "
+
+# switch between shells
+alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
+alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
+
+# update all python pip packages
+alias uppip="pip3 list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip3 install -U"

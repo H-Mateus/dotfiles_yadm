@@ -81,8 +81,8 @@
       org-log-done 'time                          ; having the time a item is done sounds convininet
       org-list-allow-alphabetical t               ; have a. A. a) A) list bullets
                                         ;org-export-in-background t                  ; run export processes in external emacs process
-      org-catch-invisible-edits 'smart            ; try not to accidently do weird stuff in invisible regions
-      org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
+      org-catch-invisible-edits 'smart)            ; try not to accidently do weird stuff in invisible regions
+;;org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 
 (use-package org
   :config
@@ -661,6 +661,9 @@
 ;; (set-file-template! "\\.tex$" :trigger "__" :mode 'latex-mode)
 ;; (set-file-template! "\\.org$" :trigger "__" :mode 'org-mode)
 ;; (set-file-template! "/LICEN[CS]E$" :trigger '+file-templates/insert-license)
+
+(add-to-list 'load-path "~/.config/emacs-reveal")
+(require 'emacs-reveal)
 
 (defun tws-insert-r-chunk (header)
   "Insert an r-chunk in markdown mode. Necessary due to interactions between polymode and yas snippet"
