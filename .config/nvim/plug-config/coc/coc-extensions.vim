@@ -28,6 +28,9 @@ let g:coc_global_extensions = [
   \ 'coc-marketplace',
   \ 'coc-markdownlint',
   \ 'coc-r-lsp',
+  \ 'coc-bibtex',
+  \ 'coc-toml',
+  \ 'coc-sql',
   \ ]
   " \ 'coc-tabnine',
   " \ 'coc-highlight',

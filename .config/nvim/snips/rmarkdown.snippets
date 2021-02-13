@@ -1,0 +1,69 @@
+snippet meta(data)? "Simple html YAML" br
+---
+title: $1
+date: "`!v strftime("%Y-%m-%d")`"
+author: "Gabriel Mateus Bernardo Harrington"
+output:
+  html_document:
+    highlight: tango
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+    code_folding: hide
+    df_print: paged
+bibliography: /home/mateus/Documents/masterLib.bib
+csl: /home/mateus/Documents/citation_styles/elsevier-vancouver.csl
+link-citations: true
+---
+endsnippet
+
+snippet metap(data)? "YAML for paper " br
+---
+title: "$1"
+output:
+  bookdown::pdf_document2:
+    #template: null
+    pandoc_args:
+      - --citation-abbreviations=../500_patient/papers/extras/abbreviations.json
+      - --filter=pandoc-crossref
+      - --lua-filter=~/git_work/main_thesis/500_patient/papers/extras/scholarly-metadata.lua
+      - --lua-filter=~/git_work/main_thesis/500_patient/papers/extras/author-info-blocks.lua
+    keep_tex: true
+  bookdown::word_document2:
+    #  - --reference-doc=extras/Reference_Document.docx # this can cause file 'NA' error
+    pandoc_args:
+      - --citation-abbreviations=../500_patient/papers/extras/abbreviations.json
+      - --filter=pandoc-crossref
+      - --lua-filter=~/git_work/main_thesis/500_patient/papers/extras/scholarly-metadata.lua
+      - --lua-filter=~/git_work/main_thesis/500_patient/papers/extras/author-info-blocks.lua
+  html_document:  
+author:
+  - Gabriel Mateus Bernardo Harrington, BSc:
+      email: g.m.bernardo.harrington@keele.ac.uk
+      Telephone: 0169140-4138
+      institute: [UofK]
+      correspondence: false
+institute:
+  - UofK: Keele University, Staffordshire, United Kingdom, ST5 5BG, 
+  - RJAH: Robert Jones and Agnes Hunt Orthopaedic Hospital NHS Foundation Trust, Oswestry, United Kingdom, SY10 7AG
+keywords: "Spinal cord injury, biomarker, prognostic modelling, blood, outcome"
+link-citations: yes
+number_sections: yes
+csl: ~/git_work/main_thesis/500_patient/papers/extras/journal-of-neurotrauma.csl
+toc: false
+geometry: margin=2cm
+always_allow_html: true
+date: "`r format(Sys.time())`"
+bibliography: /home/mateus/Documents/masterLib.bib
+header-includes:
+- \usepackage{pdflscape}
+- \usepackage{fullpage}
+---
+endsnippet
+
+snippet link "Insert markdown link"
+[$1]($2)
+endsnippet
+
