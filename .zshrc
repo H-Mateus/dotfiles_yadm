@@ -173,5 +173,22 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 #source /usr/share/undistract-me/long-running.bash
 #notify_when_long_running_commands_finish_install
 
+# Add fzf keybinding - see archwiki for details
+source /usr/share/fzf/completion.zsh
+source /usr/share/fzf/key-bindings.zsh
+
+# codi shell wrapper
+codi() {
+   local syntax="${1:-python}"
+   shift
+   nvim -c \
+     "let g:startify_disable_at_vimenter = 1 |\
+     set bt=nofile ls=0 noru nonu nornu |\
+     hi CodiVirtualText guifg=red
+     hi ColorColumn ctermbg=NONE |\
+     hi VertSplit ctermbg=NONE |\
+     hi NonText ctermfg=0 |\
+     Codi $syntax" "$@"
+}
 # add starship prompt
 eval "$(starship init zsh)"

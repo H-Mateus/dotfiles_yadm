@@ -25,6 +25,7 @@ alias free='free -m'                      # show sizes in MB
 ## pacman or pm
 alias pacman='sudo pacman --color auto'
 alias update='sudo pacman -Syyu'
+alias rmpac='pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns'
 
 ## yay as aur helper - updates everything
 alias pksyua="yay -Syu --noconfirm"
