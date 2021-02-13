@@ -52,7 +52,7 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     " Rmarkdown support
     Plug 'vim-pandoc/vim-pandoc'
     Plug 'vim-pandoc/vim-pandoc-syntax'
-    Plug 'vim-pandoc/vim-rmarkdown'
+    "Plug 'vim-pandoc/vim-rmarkdown'
     " Codi - live code evaluation
     Plug 'metakirby5/codi.vim'
     " Better Comments

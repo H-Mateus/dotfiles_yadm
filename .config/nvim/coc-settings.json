@@ -90,6 +90,7 @@
     "latex",
     "pandoc",
     "markdown",
+    "markdown.pandoc",
     "rmarkdown",
     "textile"
   ],

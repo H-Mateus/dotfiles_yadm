@@ -158,8 +158,8 @@ let g:which_key_map.d = {
 " e is for export
 let g:which_key_map.e = {
       \ 'name' : '+export' ,
-      \ 'h' : [':RMarkdown html'    , 'Rmd-html'],
-      \ 'p' : [':RMarkdown pdf'     , 'Rmd-pdf'],
+      \ 'h' : [':! R -e "rmarkdown::render(\"%\", \"html_document\")"'     , 'Rmd-html'],
+      \ 'p' : [':! R -e "rmarkdown::render(\"%\", \"pdf_document\")"'     , 'Rmd-pdf'],
       \ 'x' : [':! R -e "rmarkdown::render(\"%\", \"xaringan::moon_reader\")"'     , 'Rmd-xaringan'],
       \ }
 
