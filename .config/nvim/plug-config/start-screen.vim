@@ -11,8 +11,10 @@ let g:startify_bookmarks = [
             \ { 'c': '~/.config/bspwm/bspwmrc' },
             \ { 'i': '~/.config/nvim/init.vim' },
             \ { 'z': '~/.zshrc' },
-            \ '~/git_work/personal_website',
-            \ '~/git_work',
+            \ { 'o': '~/git_work/main_thesis' },
+            \ { 'p': '~/git_work/personal_website' },
+            \ { 's': '~/git_work/spinal-studies-rjah-site' },
+            \ { 'g': '~/git_work' },
             \ '~/Pictures',
             \ ]
 

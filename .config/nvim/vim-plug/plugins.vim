@@ -10,8 +10,8 @@ call plug#begin('~/.config/nvim/autoload/plugged')
 
     " Better Syntax Support
     Plug 'sheerun/vim-polyglot'
-    " File Explorer
-    Plug 'scrooloose/NERDTree'
+    " File Explorer - using coc-explorer and rnvimr
+    "Plug 'scrooloose/NERDTree' 
     " Auto pairs for '(' '[' '{'
     Plug 'jiangmiao/auto-pairs'
     " Themes
@@ -45,8 +45,8 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     " Floatterm - ternimal for quick commands in vim
     Plug 'voldikss/vim-floaterm'
     " Snippets with Coc
+    Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
-    "Plug 'SirVer/ultisnips'
     " Intuitive buffer closing
     Plug 'moll/vim-bbye'
     " Rmarkdown support
@@ -61,12 +61,29 @@ call plug#begin('~/.config/nvim/autoload/plugged')
     Plug 'unblevable/quick-scope'
     " Nvim-R - RStudio like set up - R console, etc
     Plug 'jalvesaq/Nvim-R', {'branch': 'stable'}
-    " for other languages
+    " REPL for other languages
     Plug 'jalvesaq/vimcmdline'
     " send commands to REPL
     "Plug 'KKPMW/vim-sendtowindow'        
     "Plug 'jpalardy/vim-slime'
     "Plug 'christoomey/vim-tmux-navigator'
+    " integration with zotero
+    Plug 'jalvesaq/zotcite'
+    " Easymotion
+    Plug 'easymotion/vim-easymotion'
+    " Surround
+    Plug 'tpope/vim-surround'
+    " Vista
+    Plug 'liuchengxu/vista.vim'
+    " undo time travel
+    Plug 'mbbill/undotree'
+    " Markdown Preview
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & npm install'  }
+    " Cool Icons
+    Plug 'kyazdani42/nvim-web-devicons'
+    Plug 'ryanoasis/vim-devicons'
+    " Better tabline - not working
+    "Plug 'romgrk/barbar.nvim'
 
 
 call plug#end()

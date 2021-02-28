@@ -63,7 +63,8 @@ header-includes:
 ---
 endsnippet
 
-snippet link "Insert markdown link"
-[$1]($2)
+snippet imgknitr "Insert image via knitr"
+```{r echo=FALSE, out.width='10%'}
+knitr::include_graphics('$1')
+```
 endsnippet
-

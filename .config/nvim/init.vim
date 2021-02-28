@@ -25,7 +25,11 @@ source $HOME/.config/nvim/plug-config/vim-commentary.vim
 source $HOME/.config/nvim/plug-config/codi.vim
 source $HOME/.config/nvim/plug-config/vimcmdline.vim
 "source $HOME/.config/nvim/plug-config/vim-slime.vim
-"source $HOME/.config/nvim/plug-config/utilsnips.vim
+source $HOME/.config/nvim/plug-config/utilsnips.vim
+source $HOME/.config/nvim/plug-config/easymotion.vim
+source $HOME/.config/nvim/plug-config/barbar.vim
+source $HOME/.config/nvim/plug-config/markdown-preview.vim
+source $HOME/.config/nvim/plug-config/vim-rooter.vim
 
 " key binding to open R console
 " map <Leader>, :vsp term://zsh<CR>iR<CR><C-\><C-N><C-w>h

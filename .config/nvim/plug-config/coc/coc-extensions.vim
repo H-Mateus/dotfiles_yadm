@@ -31,6 +31,7 @@ let g:coc_global_extensions = [
   \ 'coc-bibtex',
   \ 'coc-toml',
   \ 'coc-sql',
+  \ 'coc-spell-checker',
   \ ]
   " \ 'coc-tabnine',
   " \ 'coc-highlight',

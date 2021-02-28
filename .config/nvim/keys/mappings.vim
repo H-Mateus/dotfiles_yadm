@@ -43,6 +43,12 @@ nnoremap <C-l> <C-w>l
 nnoremap <Leader>o o<Esc>^Da
 nnoremap <Leader>O O<Esc>^Da
 
+" remap arrow keys to resize windows
+nnoremap <Up> :resize +2<CR> 
+nnoremap <Down> :resize -2<CR>
+nnoremap <Left> :vertical resize +2<CR>
+nnoremap <Right> :vertical resize -2<CR>
+
 " xaringan export map - figured out how to escape quote for which-key - left
 " for future reference
 " nnoremap <Leader>ex :! R -e "rmarkdown::render('%', 'xaringan::moon_reader')"<CR>

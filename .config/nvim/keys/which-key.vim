@@ -59,6 +59,7 @@ let g:which_key_map['z'] = [ 'Goyo'                                            ,
 " a is for actions
 let g:which_key_map.a = {
       \ 'name' : '+actions' ,
+      \ 'a' : [':ColorizerToggle'        , 'colorizer'],
       \ 'c' : [':ColorizerToggle'        , 'colorizer'],
       \ 'e' : [':CocCommand explorer'    , 'explorer'],
       \ 'h' : [':let @/ = ""'            , 'remove search highlight'],
@@ -161,6 +162,8 @@ let g:which_key_map.e = {
       \ 'h' : [':! R -e "rmarkdown::render(\"%\", \"html_document\")"'     , 'Rmd-html'],
       \ 'p' : [':! R -e "rmarkdown::render(\"%\", \"pdf_document\")"'     , 'Rmd-pdf'],
       \ 'x' : [':! R -e "rmarkdown::render(\"%\", \"xaringan::moon_reader\")"'     , 'Rmd-xaringan'],
+      \ 'b' : [':! R -e "setwd(\"%:p:h\");bookdown::render_book(\"%\")"'     , 'Rmd-bookdown'],
+      \ 'B' : [':! cd %:p:h && makeindex _main.nlo -s nomencl.ist -o _main.nls && R -e "bookdown::render_book(\"%\")"'      , 'Sort thesis abbreviations'],
       \ }
 
 " not working due to outer quotes - added shortcut to general maps
