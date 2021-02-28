@@ -1,0 +1,38 @@
+# -*- mode: snippet -*-
+# name: yaml_basic
+# key: /yamlb
+# --
+---
+title: "${1:title}"
+date: "`r Sys.time()`"
+author: "${2:Gabriel Mateus Bernardo Harrington}"
+output:
+  html_document:
+    highlight: tango
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+    code_download: true
+    df_print: paged
+bibliography: /home/mateus/Documents/masterLib.bib
+csl: /home/mateus/Documents/citation_styles/elsevier-vancouver.csl
+link-citations: true
+---
+
+\`\`\`{r, label='setup-options', include=FALSE}
+knitr::opts_chunk$set(
+  eval = TRUE, # eval code chunks
+  echo = TRUE, # include source code
+  #fig.width = 6, # set figure dims
+  #fig.height = 6
+  warning = FALSE, # exclude warnings
+  message = FALSE, # exclude messages
+  error = FALSE # exclude errors
+)
+\`\`\`
+
+\`\`\`{r, label='${3:chunk-label-use-dash-sep}'}
+$0
+\`\`\`

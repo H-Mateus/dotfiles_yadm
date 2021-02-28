@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: rmd-code-block
+# key: /rmdcb
+# --
+\`\`\`{${1:r}, label='${2:chunk-label-use-dash-sep}'}
+$0
+\`\`\`
