@@ -100,6 +100,7 @@ bspc rule -a pcloud state=floating desktop='^5'
 #Fullscreen apps
 bspc rule -a 'Microsoft Teams - Preview' desktop='^4'
 bspc rule -a Emacs state=tiled
+bspc rule -a Zathura state=tiled
 
 teams &
 ./Downloads/pcloud_appimage &

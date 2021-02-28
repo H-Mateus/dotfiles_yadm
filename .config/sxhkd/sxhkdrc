@@ -76,7 +76,7 @@ super + {_,shift + }{h,j,k,l}
 
 # focus the node for the given path jump
 # super + {p,b,comma,period}
-# 	bspc node -f @{parent,brother,first,second}
+#	bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous window in the current desktop
 super + {_,shift + }c
@@ -180,7 +180,7 @@ super + shift + v
 
 # launch pcmanfm
 super + shift + e
-    pcmanfm 
+    pcmanfm
 
 #dmenu
 super + shift + d
@@ -188,9 +188,10 @@ super + shift + d
 
 # launch emacs
 super + r
-    emacsclient -create-frame --alternate-editor=""
+    emacsclient -c -n
+
+## emacsclient -c --alternate-editor=""
 
 # launch oil bookmark viewer
 super + b
     kitty -e "oil"
-
