@@ -278,17 +278,18 @@ The auto-package-update package helps us keep our Emacs packages up to date!
 It will prompt you after a certain number of days either at startup or at a specific time of day to remind you to update your packages.
 
 You can also use =M-x auto-package-update-now= to update right now!
+Disabled for use with straight.el
 
 #+begin_src emacs-lisp
 
-  (use-package auto-package-update
-    :custom
-    (auto-package-update-interval 7)
-    (auto-package-update-prompt-before-update t)
-    (auto-package-update-hide-results t)
-    :config
-    (auto-package-update-maybe)
-    (auto-package-update-at-time "09:00"))
+  ;; (use-package auto-package-update
+  ;;   :custom
+  ;;   (auto-package-update-interval 7)
+  ;;   (auto-package-update-prompt-before-update t)
+  ;;   (auto-package-update-hide-results t)
+  ;;   :config
+  ;;   (auto-package-update-maybe)
+  ;;   (auto-package-update-at-time "09:00"))
 
 #+end_src
 
@@ -398,6 +399,10 @@ Both can usually be found in the various Linux distro package managers or downlo
 
   ;; Set the variable pitch face
   (set-face-attribute 'variable-pitch nil :font "Overpass Nerd Font" :height efs/default-variable-font-size :weight 'regular)
+  ;; this set viarable-pitch for markdown/org mode
+  (add-hook 'text-mode-hook 'variable-pitch-mode)
+  ;; set line-spacing
+  (setq-default line-spacing 2)
 
 #+end_src
 
@@ -511,8 +516,8 @@ Insert matching parentheses and jump across them
     :diminish smartparens-mode
     :config
     (add-hook 'ess-mode-hook #'smartparens-mode)
-    (add-hook 'inferior-ess-mode-hook #'smartparens-mode)
-    (add-hook 'ess-mode-hook #'turn-on-smartparens-strict-mode))
+    (add-hook 'inferior-ess-mode-hook #'smartparens-mode))
+    ;;(add-hook 'ess-mode-hook #'turn-on-smartparens-strict-mode))
 
 #+end_src
 
@@ -532,110 +537,131 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
 [[https://github.com/noctuid/general.el][general.el]] is used for easy keybinding configuration that integrates well with which-key.
 [[https://github.com/emacs-evil/evil-collection][evil-collection]] is used to automatically configure various Emacs modes with Vi-like keybindings for evil-mode.
 
+I like being able to rotate the windows, and this functionality already exists within DOOM under `SPC w r` and `SPC w R`.
+Layout rotation is also preferable, so I added this under `SPC w SPC`
+
 #+begin_src emacs-lisp
 
-  ;; Make ESC quit prompts
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+    ;; Make ESC quit prompts
+    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  ;; try and fix odd indenting behavior
-  (setq-default default-tab-width 4)
-  (setq tab-always-indent 'complete)
-  (setq-default indent-tabs-mode nil)
-  ;; disable tab-always-indent as it messes with yasnippets
-  ;;(setq tab-always-indent nil)
+    ;; try and fix odd indenting behavior
+    (setq-default default-tab-width 4)
+    (setq tab-always-indent 'complete)
+    (setq-default indent-tabs-mode nil)
+    ;; disable tab-always-indent as it messes with yasnippets
+    ;;(setq tab-always-indent nil)
 
-  (use-package general
-    :after evil
-    :config
-    ;; (general-create-definer efs/leader-keys
-    ;;   :keymaps '(normal insert visual emacs)
-    ;;   :prefix "SPC"
-    ;;   :global-prefix "C-SPC")
-    (general-create-definer efs/leader-keys
-      :keymaps 'override
-      :states  '(insert emacs normal hybrid motion visual operator)
-      :prefix  "SPC"
-      :global-prefix "C-SPC"
-      :non-normal-prefix "S-SPC")
-    ;; enable recentf
-                                          ;(recentf-mode 1)
+    (use-package general
+      :after evil
+      :config
+      ;; (general-create-definer efs/leader-keys
+      ;;   :keymaps '(normal insert visual emacs)
+      ;;   :prefix "SPC"
+      ;;   :global-prefix "C-SPC")
+      (general-create-definer efs/leader-keys
+        :keymaps 'override
+        :states  '(insert emacs normal hybrid motion visual operator)
+        :prefix  "SPC"
+        :global-prefix "C-SPC"
+        :non-normal-prefix "S-SPC")
+      ;; enable recentf
+                                            ;(recentf-mode 1)
 
-    ;; Set up main which-y bindings
-    (efs/leader-keys
-      "t"  '(:ignore t :which-key "toggles")
-      "tt" '(counsel-load-theme :which-key "choose theme")
-      "X" '(org-capture :which-key "capture")
-      "a"  '(:ignore a :which-key "actions")
-      "as"  '(avy-goto-char-2 :which-key "avy goto char2")
-      "b"  '(:ignore b :which-key "buffers")
-      "bb" '(counsel-switch-buffer :which-key "switch buffer")
-      "bc" '(ispell :which-key "ispell")
-      "bk" '(kill-current-buffer :which-key "kill buffer")
-      "bs" '(save-buffer :which-key "save buffer")
-      "bf" '(swiper :which-key "swiper")
-      "bu" '(browse-url-of-file :which-key "open html")
-      "."  '(find-file :which-key "find file")
-      "s"  '(ivy-yasnippet :which-key "snippets")
-      "w"  '(evil-window-map :which-key "windows")
-      "h"  '(help-command :which-key "help")
-      "TAB"  '(perspective-map :which-key "workspaces")
-      ","  '(persp-mode-map :which-key "workspaces")
-      "."  '(find-file :which-key "find file")
-      "o"  '(:ignore o :which-key "org")
-      "oa" '(org-agenda :which-key "org agenda")
-      "o'" '(org-edit-special :which-key "edit code")
-      "op" '(org-set-property :which-key "org property")
-      "oe" '(org-export-dispatch :which-key "org export")
-      "oi"  '(:ignore oi :which-key "insert")
-      "oil" '(org-insert-link :which-key "link")
-      "oiu" '(insert-url-as-org-link-fancy :which-key "url")
-      "oic" '(org-ref-ivy-insert-cite-link :which-key "cite")
-      "oit" '(org-set-tags-command :which-key "tags")
-      "ot" '(:ignore ot :which-key "org todo")
-      "otd" '(org-todo :which-key "switch todo state")
-      "ott" '(counsel-org-tag :which-key "tag")
-      "os" '(:ignore os :which-key "scheduling")
-      "oss" '(org-schedule :which-key "schedule")
-      "osd" '(org-deadline :which-key "deadline")
-      "ost" '(org-time-stamp :which-key "timestamp")
-      "f"  '(:ignore f :which-key "files")
-      "fr" '(counsel-recentf :which-key "recent files")
-      "fc" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/config.org")) :which-key "config.org"))) ; point to config.org
+      ;; Set up main which-y bindings
+      (efs/leader-keys
+        "t"  '(:ignore t :which-key "toggles")
+        "t"  '(:ignore t :which-key "toggles")
+        "tt" '(counsel-load-theme :which-key "choose theme")
+        "X" '(org-capture :which-key "capture")
+        "a"  '(:ignore a :which-key "actions")
+        "as"  '(avy-goto-char-2 :which-key "avy goto char2")
+        "ac"  '(helm-bibtex :which-key "helm-bibtex")
+        "b"  '(:ignore b :which-key "buffers")
+        "bb" '(counsel-switch-buffer :which-key "switch buffer")
+        "bc" '(ispell :which-key "ispell")
+        "bk" '(kill-current-buffer :which-key "kill buffer")
+        "bs" '(save-buffer :which-key "save buffer")
+        "bf" '(swiper :which-key "swiper")
+        "bu" '(browse-url-of-file :which-key "open html")
+        "."  '(find-file :which-key "find file")
+        "s"  '(ivy-yasnippet :which-key "snippets")
+        "w"  '(evil-window-map :which-key "windows")
+        "h"  '(help-command :which-key "help")
+        ;; "TAB"  '(tab-prefix-map :which-key "workspaces")
+        "TAB"  '(:ignore TAB :which-key "workspaces")
+        "TAB TAB"  '(tab-new :which-key "new tab")
+        "TAB o"  '(tab-next :which-key "next tab")
+        "TAB O"  '(tab-previous :which-key "previous tab")
+        "TAB r"  '(tab-rename :which-key "rename tab")
+        "TAB c"  '(tab-close :which-key "close tab")
+        "TAB u"  '(tab-undo-close-tab :which-key "undo close tab")
+        ","  '(tab-prefix-map :which-key "workspaces")
+        "."  '(find-file :which-key "find file")
+        "o"  '(:ignore o :which-key "org")
+        "oa" '(org-agenda :which-key "org agenda")
+        "o'" '(org-edit-special :which-key "edit code")
+        "op" '(org-set-property :which-key "org property")
+        "oe" '(org-export-dispatch :which-key "org export")
+        "on" '(orb-note-actions :which-key "note actions")
+        "oi"  '(:ignore oi :which-key "insert")
+        "oil" '(org-insert-link :which-key "link")
+        "oiu" '(insert-url-as-org-link-fancy :which-key "url")
+        "oic" '(org-ref-ivy-insert-cite-link :which-key "cite")
+        "oit" '(org-set-tags-command :which-key "tags")
+        "ot" '(:ignore ot :which-key "org todo")
+        "otd" '(org-todo :which-key "switch todo state")
+        "ott" '(counsel-org-tag :which-key "tag")
+        "os" '(:ignore os :which-key "scheduling")
+        "oss" '(org-schedule :which-key "schedule")
+        "osd" '(org-deadline :which-key "deadline")
+        "ost" '(org-time-stamp :which-key "timestamp")
+        "f"  '(:ignore f :which-key "files")
+        "fr" '(counsel-recentf :which-key "recent files")
+        "fc" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/config.org")) :which-key "config.org"))) ; point to config.org
 
-  (use-package undo-tree
-    :init
-    (global-undo-tree-mode 1))
+    (use-package undo-tree
+      :init
+      (global-undo-tree-mode 1))
 
-  (use-package evil
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    (setq evil-undo-system 'undo-tree)
-    :config
-    (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state) ; binding to get out of insert mode
-    ;;(define-key evil-insert-state-map (kbd "kj") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    (use-package evil
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      (setq evil-want-C-u-scroll t)
+      (setq evil-want-C-i-jump nil)
+      (setq evil-undo-system 'undo-tree)
+      :config
+      (evil-mode 1)
+      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state) ; binding to get out of insert mode
+      ;;(define-key evil-insert-state-map (kbd "kj") 'evil-normal-state)
+      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-    ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+      ;; Use visual line motions even outside of visual-line-mode buffers
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
+      (evil-set-initial-state 'messages-buffer-mode 'normal)
+      (evil-set-initial-state 'dashboard-mode 'normal))
+        ;; :keymaps
+        ;; '(tab-bar-map)
+        ;; "TAB" '(:ignore TAB :which-key "workspace"))
+    ;;   :keymaps
+    ;;   '(evil-window-map)
+    ;;   "SPC" '(rotate-layout :which-key "rotate-layout")
+    ;;   "<left>" '(evil-window-left :which-key "evil-window-left"))
 
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
+    (use-package evil-collection
+      :after evil
+      :config
+      (evil-collection-init))
 
-  ;; add evil escape
-  ;; (require 'evil-escape)
-  ;; ;(setq evil-escape-mode t)
-  ;; (setq-default evil-escape-key-sequence "ii")
-  ;; (setq-default evil-escape-delay 0.2)
+    ;; add evil escape
+    (use-package evil-escape)
+    (setq evil-escape-mode t)
+    (setq-default evil-escape-key-sequence "ii")
+    (setq-default evil-escape-delay 0.2)
+
 #+end_src
 
 ** Evil surround
@@ -770,6 +796,23 @@ It allows you to select and edit matches interactively, integrating iedit-mode i
   (evil-ex-define-cmd "ie[dit]" 'evil-multiedit-ex-match)
 #+end_src
 
+** Windows Behaviour
+
+The following code allows me to choose which buffer I want to see when I split a window.
+It first does a split to the right, and then opens Ivy and then shows me a preview.
+Not working
+
+#+begin_src emacs-lisp
+
+  ;; (setq evil-vsplit-window-right t
+  ;;       evil-split-window-below t)
+  ;; (defadvice! prompt-for-buffer (&rest _)
+  ;;   :after '(evil-window-split evil-window-vsplit)
+  ;;   (+ivy/switch-buffer))
+  ;; (setq +ivy-buffer-preview t)
+
+#+end_src
+
 ** make-capture-frame
 
 #+begin_src emacs-lisp
@@ -794,6 +837,7 @@ It allows you to select and edit matches interactively, integrating iedit-mode i
         (delete-frame)))
 
 #+end_src
+
 ** Get labels in current buffer
 from [[https://kitchingroup.cheme.cmu.edu/blog/2014/03/08/Using-yasnippet-to-get-completion-in-ref-links/][JKitchin’s blog]]
 
@@ -884,7 +928,7 @@ Counsel is a customized set of commands to replace `find-file` with `counsel-fin
 #+begin_src emacs-lisp
 
   (use-package ivy
-    :diminish
+    ;;:diminish
     :bind (("C-s" . swiper)
            :map ivy-minibuffer-map
            ("TAB" . ivy-alt-done)
@@ -1056,9 +1100,14 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
     (setq org-ellipsis " ▾")
 
     (setq org-agenda-start-with-log-mode t)
+    ;; add time stamp when completeing todo
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
-    ;; use enter to follow link
+    ;; have a. A. a) A) list bullets
+    (setq org-list-allow-alphabetical t)
+    ;; try not to accidently do weird stuff in invisible regions
+    (setq org-catch-invisible-edits 'smart)
+    ;; use enter to follow link - not working?
     (setq org-return-follows-link t)
     (setq org-ctrl-k-protect-subtree t)
     (setq org-display-remote-inline-images 'cache
@@ -1068,6 +1117,14 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
           '("~/Documents/org/tasks.org"
             "~/Documents/org/habits.org"
             "~/Documents/org/birthdays.org"))
+
+    ;; set default org-babel header-args
+    (setq org-babel-default-header-args
+          (cons '(:exports . "both")
+                (assq-delete-all :exports org-babel-default-header-args))
+          org-babel-default-header-args
+          (cons '(:results . "output verbatim replace")
+                (assq-delete-all :results org-babel-default-header-args)))
 
     (require 'org-habit)
     (add-to-list 'org-modules 'org-habit)
@@ -1169,6 +1226,10 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
             ("w" "Workflows")
             ("we" "Checking Email" entry (file+olp+datetree "~/Documents/org/journal.org")
              "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+
+            ("h" "Hugo")
+            ("hp" "Blog Post" entry (file+olp "~/git_work/personal_website/org-content/blog.org" "Posts")
+             (function  org-hugo-new-subtree-post-capture-template))
 
             ("m" "Metrics Capture")
             ("mw" "Weight" table-line (file+headline "~/Documents/org/metrics.org" "Weight")
@@ -1373,6 +1434,7 @@ cd aspell6-en-custom
 #+end_src
 
 **** Configuration
+
 #+begin_src emacs-lisp
   (use-package ispell
     :config
@@ -1444,6 +1506,11 @@ The docs can be found [[https://joaotavora.github.io/yasnippet/][here]].
 
 #+end_src
 
+* References
+
+Here we set up how to insert citation, and how to take notes for our citations with org-roam and org-noter.
+The setup is heavily based on [[https://github.com/sunnyhasija/Academic-Doom-Emacs-Config][sunnyhasijas config]].
+
 ** Org-ref
 
 Set up [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org][org-ref]]
@@ -1453,33 +1520,74 @@ Set up [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org][org-ref]]
   (use-package org-ref
     :after org
     :init
-    (setq org-ref-completion-library 'org-ref-ivy-cite
-          org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-          reftex-default-bibliography '("~/Documents/masterLib.bib")
-          org-ref-bibliography-notes '("~/Documents/org-roam/notes.org")
+    (setq ;org-ref-completion-library 'org-ref-ivy-cite
+          ;; org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+          ;; reftex-default-bibliography '("~/Documents/masterLib.bib")
+          ;; org-ref-bibliography-notes '("~/Documents/org-roam/notes.org")
           org-ref-default-bibliography '("~/Documents/masterLib.bib")
-          org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+          ;; org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
           org-ref-notes-directory "~/Documents/org-roam/"
-          org-ref-notes-function 'orb-edit-notes
-          ;; org-ref-pdf-directory '("~/Documents/bibliography/bibtex-pdfs/")
-          bibtex-completion-pdf-open-function 'org-open-file)
+          ;; org-ref-notes-function 'orb-edit-notes
+          org-ref-pdf-directory '("~/Zotero/"))
+          ;; bibtex-completion-pdf-open-function 'org-open-file)
     ;; :bind
     ;; (:map org-mode-map ("SPC o i c" . org-ref-ivy-insert-cite-link))
-    :config
-    (require 'org-ref)
+    :config)
+    ;; (require 'org-ref)
     ;; (require 'doi-utils)
     ;; (require 'org-id)
     ;; (require 'org-ref-wos)
     ;; (require 'org-ref-scopus)
     ;; (require 'org-ref-pubmed)
     ;; (require 'org-ref-sci-id)
-    (setq bibtex-autokey-year-length 4
-          bibtex-autokey-name-year-separator ""
-          bibtex-autokey-year-title-separator "-"
-          bibtex-autokey-titleword-separator "-"
-          bibtex-autokey-titlewords 0
-          bibtex-autokey-titlewords-stretch 1
-          bibtex-autokey-titleword-length 5))
+    ;; (setq bibtex-autokey-year-length 4
+    ;;       bibtex-autokey-name-year-separator ""
+    ;;       bibtex-autokey-year-title-separator "-"
+    ;;       bibtex-autokey-titleword-separator "-"
+    ;;       bibtex-autokey-titlewords 0
+    ;;       bibtex-autokey-titlewords-stretch 1
+    ;;       bibtex-autokey-titleword-length 5))
+
+#+end_src
+
+** Helm-Bibtex
+
+We need to install helm as well
+
+#+begin_src emacs-lisp
+
+  (use-package helm)
+  (use-package helm-bibtex
+    :after org)
+
+  ;; (use-package ivy-bibtex
+  ;;   :after org)
+
+  (setq bibtex-format-citation-functions
+        '((org-mode . (lambda (x) (insert (concat
+                                           "\\cite{"
+                                           (mapconcat 'identity x ",")
+                                           "}")) ""))))
+
+  (setq
+   bibtex-completion-pdf-field "file"
+   bibtex-completion-bibliography
+   '("~/Documents/masterLib.bib")
+   bibtex-completion-library-path '("~/Zotero/"))
+                                          ; bibtex-completion-notes-path "~/Documents/Org/references/articles.org"  ;; not needed anymore as I take notes in org-roam
+
+#+end_src
+
+** Zotxt
+
+Allows for syncing of the notes between zotero and emacs.
+*** Note: This package only seems to load initial notes into emacs - Probably not needed anymore.
+
+#+begin_src emacs-lisp
+
+  (use-package zotxt
+    :after org)
+  ;;(add-to-list 'load-path (expand-file-name "ox-pandoc" starter-kit-dir))
 
 #+end_src
 
@@ -1491,7 +1599,7 @@ Taken from the [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-n
 
   (setq bibtex-completion-pdf-field "file")
 
-  (defun my/org-ref-open-pdf-at-point ()
+  (defun efs/org-ref-open-pdf-at-point ()
     "Open the pdf for bibtex key under point if it exists."
     (interactive)
     (let* ((results (org-ref-get-bibtex-key-and-file))
@@ -1505,6 +1613,41 @@ Taken from the [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-n
   ;; (setq org-ref-get-pdf-filename-function 'bibtex-completion-find-pdf-in-field)
 
   (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
+
+#+end_src
+
+** Org-roam-bibtex
+
+#+begin_src emacs-lisp
+
+  (use-package org-roam-bibtex
+    :load-path "~/Documents/masterLib.bib" ;Modify with your own path
+    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :bind (:map org-mode-map
+                (("C-c n a" . orb-note-actions))))
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point) ""
+           :file-name "${citekey}"
+           :head "#+TITLE: ${citekey}: ${title}\n#+ROAM_KEY: ${ref}\n" ; <--
+           :unnarrowed t)))
+  (setq orb-preformat-keywords   '(("citekey" . "=key=") "title" "url" "file" "author-or-editor" "keywords"))
+
+  (setq orb-templates
+        '(("n" "ref+noter" plain (function org-roam-capture--get-point)
+           ""
+           :file-name "${slug}"
+           :head "#+TITLE: ${citekey}: ${title}\n#+ROAM_KEY: ${ref}\n#+ROAM_TAGS:
+
+  - tags ::
+  - keywords :: ${keywords}
+  \* ${title}
+  :PROPERTIES:
+  :Custom_ID: ${citekey}
+  :URL: ${url}
+  :AUTHOR: ${author-or-editor}
+  :NOTER_DOCUMENT: %(orb-process-file-field \"${citekey}\")
+  :NOTER_PAGE:
+  :END:")))
 
 #+end_src
 
@@ -1530,16 +1673,26 @@ Taken from the [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-n
 #+begin_src emacs-lisp
 
   (use-package pdf-tools
+    :commands (pdf-view-mode pdf-tools-install)
+    ;; :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
     :magic ("%PDF" . pdf-view-mode)
-    :load-path "/usr/share/emacs/site-lisp/pdf-tools"
-    :init
-    (pdf-tools-install)
+    ;; :load-path "/usr/share/emacs/site-lisp/pdf-tools"
+    ;; :init
+    ;; (pdf-tools-install)
     :config
-    ;(pdf-loader-install)
+    ;; (pdf-loader-install)
+    (pdf-tools-install)
     (setq-default pdf-view-display-size 'fit-width)
+    ;; (define-pdf-cache-function pagelabels)
+    ;; :hook ((pdf-view-mode-hook . (lambda () (display-line-numbers-mode -1)))
+           ;; (pdf-view-mode-hook . pdf-tools-enable-minor-modes))
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
+
+  ;; (use-package org-pdftools
+  ;;   :defer t
+  ;;   :hook (org-load-hook . org-pdftools-setup-link))
 
 #+end_src
 
@@ -1573,7 +1726,7 @@ Taken from [[https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420][zaeph]
 
 #+begin_src emacs-lisp
 
-  (defun zp/org-noter-insert-precise-note-dwim (force-mouse)
+  (defun efs/org-noter-insert-precise-note-dwim (force-mouse)
     "Insert note associated with a specific location.
   If in nov-mode, use point rather than the mouse to target the
   position."
@@ -1629,7 +1782,8 @@ Documentation can be found [[https://org-roam.readthedocs.io/en/latest/installat
     "nf" '(org-roam-find-file :which-key "find")
     "ni" '(org-roam-insert :which-key "insert")
     "nc" '(org-roam-capture :which-key "capture")
-    "nb" '(org-roam-switch-to-buffer :which-key "switch")
+    "nw" '(org-roam-switch-to-buffer :which-key "switch roam buffer")
+    "nb" '(org-roam-buffer-toggle-display :which-key "toggle display")
     "nd" '(org-roam-dailies-capture-today :which-key "daily capture")
     "ng" '(org-roam-server-open :which-key "show graph")
     "n[" '(org-roam-dailies-find-previous-note :which-key "previous daily")
@@ -1678,6 +1832,41 @@ Allows me to see my org-roam-graph. This is a fantastic package and I have my ro
 
   ;; (unless (server-running-p)
   ;;   (org-roam-server-mode))
+#+end_src
+
+* Blogging
+
+** Ox-Hugo
+
+I have recently started using [[https://ox-hugo.scripter.co/][ox-hugo]] to help post on my Hugo based website.
+The following section sets up a function for the previously defined org-capture to enable quick blogging.
+
+#+begin_src emacs-lisp
+
+  ;; install ox-hugo
+  (use-package ox-hugo)
+
+  (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+        See `org-capture-templates' for more information."
+    (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+           (date (format-time-string (org-time-stamp-format  :inactive) (org-current-time)))
+           (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+           (fname (org-hugo-slug title)))
+      (mapconcat #'identity
+                 `(
+                   ,(concat "* TODO " title)
+                   ":PROPERTIES:"
+                   ,(concat ":EXPORT_FILE_NAME: " fname)
+                   ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                   ,(concat ":EXPORT_HUGO_CUSTOM_FRONT_MATTER: "  ":tags something :subtitle booyea :featured false :categories abc :highlight true ")
+                   ":END:"
+                   "%?\n")          ;Place the cursor here
+                 "\n")))
+  (defvar hugo-org-path "~/git_work/personal_website/org-content/"
+    "define the place where we put our org files for hugo")
+  ;;(defvar org-capture-blog (concat hugo-org-path "blog.org"))
+
 #+end_src
 
 * Development
@@ -1731,7 +1920,7 @@ Define some functions for inserting various operators and exporting .Rmd
                (sbuffer (process-buffer sprocess))
                (buf-coding (symbol-name buffer-file-coding-system))
                (R-cmd
-                (format "library(rmarkdown); rmarkdown::render(\"%s\")"
+                (format "library(rmarkdown); rmarkdown::render(\"%s\", \"all\")"
                         buffer-file-name)))
           (message "Running rmarkdown on %s" buffer-file-name)
           (ess-execute R-cmd 'buffer nil nil)
