@@ -4,7 +4,7 @@
 # --
 ---
 title: "${1:title}"
-date: "`r Sys.time()`"
+date: "\`r Sys.time()\`"
 author: "${2:Gabriel Mateus Bernardo Harrington}"
 output:
   html_document:
@@ -33,6 +33,4 @@ knitr::opts_chunk$set(
 )
 \`\`\`
 
-\`\`\`{r, label='${3:chunk-label-use-dash-sep}'}
 $0
-\`\`\`

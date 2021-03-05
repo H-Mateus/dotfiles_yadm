@@ -698,12 +698,13 @@ I'm choosing =C-M-u= for this purpose.
 
 I liked the workspaces from doom emacs, let try and replicate with [[https://depp.brause.cc/eyebrowse/][eyebrowse]]
 Current package is [[https://github.com/nex3/perspective-el][perspective]]
+Removed in favour of built in tab-mode
 
 #+begin_src emacs-lisp
 
-  (use-package perspective
-    :config
-    (persp-mode))
+  ;; (use-package perspective
+  ;;   :config
+  ;;   (persp-mode))
 
 #+end_src
 
@@ -782,7 +783,6 @@ It allows you to select and edit matches interactively, integrating iedit-mode i
 
   ;; RET will toggle the region under the cursor
   (define-key evil-multiedit-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
-
   ;; ...and in visual mode, RET will disable all fields outside the selected region
   (define-key evil-motion-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
 
@@ -900,6 +900,17 @@ The default configuration is quite good but you can check out the [[https://gith
 
 #+end_src
 
+** Scroll margin
+
+=Scroll-margin= lets you set a line offset when scrolling.
+So a scroll-margin of 5 will mean the buffer will start scrolling when you are 5 lines from the top or bottom, as opposed the final line
+
+#+begin_src emacs-lisp
+
+  (setq scoll-margin 7)
+
+#+end_src
+
 ** Which Key
 
 [[https://github.com/justbur/emacs-which-key][which-key]] is a useful UI panel that appears when you start pressing any key binding in Emacs to offer you all possible completions for the prefix.
@@ -976,8 +987,11 @@ This Prescient configuration is optimized for use in System Crafters videos and 
     (ivy-prescient-enable-filtering nil)
     :config
     ;; Uncomment the following line to have sorting remembered across sessions!
-    ;(prescient-persist-mode 1)
+                                          ;(prescient-persist-mode 1)
     (ivy-prescient-mode 1))
+
+  (straight-use-package 'company-prescient)
+  (company-prescient-mode)
 
 #+end_src
 
@@ -1467,6 +1481,21 @@ nearby (also means that if I change the 'main' dictionary I keep my addition).
 
 #+end_src
 
+** Olivetti
+
+Add a nice writing minor mode with [[https://github.com/rnkn/olivetti][Olivetti.]]
+It mainly add some nice margins either side to make reader and writing more pleasant
+
+#+begin_src emacs-lisp
+
+  (use-package olivetti)
+  ;; Set the body text width
+  (setq olivetti-body-width 140)
+  ;; Enable Olivetti for text-related mode such as Org Mode
+  (add-hook 'text-mode-hook 'olivetti-mode)
+
+#+end_src
+
 ** Yasnippet
 
 Good video guide to using [[https://github.com/joaotavora/yasnippet][yasnippet]] can be found [[https://www.youtube.com/watch?v=xmBovJvQ3KU][here]].
@@ -1871,6 +1900,82 @@ The following section sets up a function for the previously defined org-capture 
 
 * Development
 
+** Company Mode
+
+[[http://company-mode.github.io/][Company Mode]] provides a nicer in-buffer completion interface than =completion-at-point= which is more reminiscent of what you would expect from an IDE.
+We add a simple configuration to make the keybindings a little more useful (=TAB= now completes the selection and initiates completion at the current location if needed).
+
+We also use [[https://github.com/company-mode/company-quickhelp][company-quickhelp]] for documentation with completion - TODO company-box and quickhelp aren't working correctly with docstrings...
+
+#+begin_src emacs-lisp
+
+  (use-package company
+    :diminish company-mode
+    :init
+    (require 'company-dabbrev)
+    (require 'company-dabbrev-code)
+    :hook ((lsp-mode ess-r-mode inferior-ess-r-mode) . company-mode)
+    :config
+    (global-company-mode)
+    (setq company-minimum-prefix-length 1)
+    (setq company-show-numbers t)
+    (setq company-idle-delay 0.1)
+    (setq company-echo-delay 0)
+    (setq company-begin-commands '(self-insert-command))
+    (setq company-dabbrev-downcase 0)
+    (setq company-dabbrev-code-everywhere t)
+    (setq company-dabbrev-code-ignore-case nil)
+    (setq company-dabbrev-ignore-case nil)
+    (setq company-selection-wrap-around t
+          company-tooltip-align-annotations t) ; here
+    (setq-local company-backends
+                (append '((
+                           ;; company-dabbrev-code
+                           ;; company-R-args
+                           company-R-objects
+                           company-irony))
+                        company-backends))
+    (add-to-list 'company-backends 'company-c-headers)
+    ;; (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
+  ;; (add-to-list 'company-dabbrev-code-modes 'ess-mode)
+  :bind (:map company-active-map
+  ;; ([tab] . company-complete-selection)
+  ("RET" . company-complete-selection)))
+  ;; ("C-n" . company-select-next)
+  ;; ("C-p" . company-select-previous)))
+
+  ;; (use-package company-box
+  ;;   :hook (company-mode . company-box-mode)
+  ;;   :config
+  ;;   (setq company-box-delay 0.1)
+    ;; (setq company-box-doc-delay 0.1))
+
+  (use-package company-quickhelp
+    :hook (company-mode . company-quickhelp-mode)
+    :config
+    (setq company-quickhelp-delay 0.1))
+
+  (straight-use-package 'company-lsp)
+  (use-package company-lsp
+    :requires company
+    :config
+    (push 'company-lsp company-backends)
+    ;; Disable client-side cache because the LSP server does a better job.
+    (setq company-transformers nil
+          company-lsp-async t
+          company-lsp-cache-candidates nil))
+
+  ;; lsp-mode for bash
+  (straight-use-package 'lsp-mode)
+  (use-package lsp-mode
+    :commands lsp
+    :hook
+    (sh-mode . lsp)
+    (c++-mode . lsp))
+  ;;(add-hook 'evil-normal-state-entry-hook #'company-abort) ;; make aborting less annoying.
+
+#+end_src
+
 ** Languages
 
 *** ESS for R
@@ -1923,6 +2028,27 @@ Define some functions for inserting various operators and exporting .Rmd
                 (format "library(rmarkdown); rmarkdown::render(\"%s\", \"all\")"
                         buffer-file-name)))
           (message "Running rmarkdown on %s" buffer-file-name)
+          (ess-execute R-cmd 'buffer nil nil)
+          (switch-to-buffer rmd-buf)
+          (ess-show-buffer (buffer-name sbuffer) nil)))))
+
+  (defun efs/ess-bookdown ()
+    "Compile with bookdown (.Rmd). Should work for any output type."
+    (interactive)
+    ;; Check if attached R-session
+    (condition-case nil
+        (ess-get-process)
+      (error
+       (ess-switch-process)))
+    (let* ((rmd-buf (current-buffer)))
+      (save-excursion
+        (let* ((sprocess (ess-get-process ess-current-process-name))
+               (sbuffer (process-buffer sprocess))
+               (buf-coding (symbol-name buffer-file-coding-system))
+               (R-cmd
+                (format "bookdown::render_book(\"%s\")"
+                        buffer-file-name)))
+          (message "Running bookdown on %s" buffer-file-name)
           (ess-execute R-cmd 'buffer nil nil)
           (switch-to-buffer rmd-buf)
           (ess-show-buffer (buffer-name sbuffer) nil)))))
@@ -1982,6 +2108,7 @@ Define some functions for inserting various operators and exporting .Rmd
       :defer t
       :init
       (require 'ess-r-mode)
+      (require 'ess-view-data)
       ;; (require 'ess-site)
       ;; (require 'ess-rutils)
       ;; Auto set width and length options when initiate new Ess processes
@@ -2048,6 +2175,7 @@ Define some functions for inserting various operators and exporting .Rmd
         "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
         "er" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
         "r" '(:ignore r :which-key "Rmd")
+        "rb" '(efs/ess-bookdown :which-key "bookdown-export")
         "re" '(efs/ess-rmarkdown :which-key "Rmd-export")
         "rs" '(efs/ess-rshiny :which-key "shiny-export")
         "rd" '(efs/ess-publish-rmd :which-key "publish Rmd")
@@ -2420,74 +2548,6 @@ The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =da
 
 #+end_src
 
-** Company Mode
-
-[[http://company-mode.github.io/][Company Mode]] provides a nicer in-buffer completion interface than =completion-at-point= which is more reminiscent of what you would expect from an IDE.
-We add a simple configuration to make the keybindings a little more useful (=TAB= now completes the selection and initiates completion at the current location if needed).
-
-We also use [[https://github.com/sebastiencs/company-box][company-box]] to further enhance the look of the completions with icons and better overall presentation.
-
-#+begin_src emacs-lisp
-
-  (use-package company
-    :diminish company-mode
-    :init
-    (require 'company-dabbrev)
-    (require 'company-dabbrev-code)
-    :hook ((lsp-mode ess-r-mode inferior-ess-r-mode) . company-mode)
-    :config
-    (global-company-mode)
-    (setq company-minimum-prefix-length 1)
-    (setq company-show-numbers t)
-    (setq company-idle-delay 0.0)
-    (setq company-echo-delay 0)
-    (setq company-begin-commands '(self-insert-command))
-    (setq company-dabbrev-downcase 0)
-    (setq company-dabbrev-code-everywhere t)
-    (setq company-dabbrev-code-ignore-case nil)
-    (setq company-dabbrev-ignore-case nil)
-    (setq company-selection-wrap-around t
-          company-tooltip-align-annotations t) ; here
-    (setq-local company-backends
-                (append '((
-                           ;; company-dabbrev-code
-                           ;; company-R-args
-                           company-R-objects
-                           company-irony))
-                        company-backends))
-    (add-to-list 'company-backends 'company-c-headers))
-  ;; (add-to-list 'company-dabbrev-code-modes 'ess-mode)
-  ;; :bind (:map company-active-map
-  ;; ([tab] . company-complete-selection)
-  ;; ("TAB" . company-complete-selection)
-  ;; ("C-n" . company-select-next)
-  ;; ("C-p" . company-select-previous))))
-
-  (use-package company-box
-    :hook (company-mode . company-box-mode)
-    :config
-    (setq company-box-delay 0.2))
-
-  (straight-use-package 'company-lsp)
-  (use-package company-lsp
-    :requires company
-    :config
-    (push 'company-lsp company-backends)
-    ;; Disable client-side cache because the LSP server does a better job.
-    (setq company-transformers nil
-          company-lsp-async t
-          company-lsp-cache-candidates nil))
-
-  ;; lsp-mode for bash
-  (straight-use-package 'lsp-mode)
-  (use-package lsp-mode
-    :commands lsp
-    :hook
-    (sh-mode . lsp)
-    (c++-mode . lsp))
-  ;;(add-hook 'evil-normal-state-entry-hook #'company-abort) ;; make aborting less annoying.
-
-#+end_src
 
 ** Projectile
 
