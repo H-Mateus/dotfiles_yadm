@@ -224,27 +224,31 @@ Try [[https://github.com/raxod502/straight.el][stright.el]] - note that this dem
 A migration guide can be found [[https://github.crookster.org/switching-to-straight.el-from-emacs-26-builtin-package.el/#put-in-place-org-workaround][here.]]
 To update with straight.el use =straight-normalize-all=
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 
   ;; Initialize package sources
-  ;; (require 'package)
+  (require 'package)
 
-  ;; (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-  ;;                          ("org" . "https://orgmode.org/elpa/")
-  ;;                          ("elpa" . "https://elpa.gnu.org/packages/")))
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
 
-  ;; (package-initialize)
+  (package-initialize)
   ;; (unless package-archive-contents
   ;;   (package-refresh-contents))
 
-  ;; ;s  Initialize use-package on non-Linux platforms
-  ;; (unless (package-installed-p 'use-package)
-  ;;   (package-install 'use-package))
+  ;; Initialize use-package on non-Linux platforms
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
 
-  ;; (require 'use-package)
-  ;; (setq use-package-always-ensure t)
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 
-  ;; ;; install stright.el
+#+end_src
+
+#+begin_src emacs-lisp
+
+  ;; install stright.el
   (defvar bootstrap-version)
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -258,16 +262,21 @@ To update with straight.el use =straight-normalize-all=
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
+  ;; prevent package.el loading packages prior to their init-file loading
+  (setq package-enable-at-startup nil)
   (straight-use-package 'use-package)
   (setq straight-use-package-by-default t) ; no need to refactor use-package configuration
   (straight-use-package 'diminish)                  ; to enable :diminish
   (straight-use-package 'bind-key)                  ; to enable :bind
 
-  ;;;;  package.el
-  ;;; so package-list-packages includes them
-  (require 'package)
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/"))
+  ;; Load the helper package for commands like `straight-x-clean-unused-repos'
+  (require 'straight-x)
+
+      ;;;;  package.el
+      ;;; so package-list-packages includes them
+  ;; (require 'package)
+  ;; (add-to-list 'package-archives
+  ;;              '("melpa" . "https://melpa.org/packages/"))
 
 
 #+end_src
@@ -280,16 +289,16 @@ It will prompt you after a certain number of days either at startup or at a spec
 You can also use =M-x auto-package-update-now= to update right now!
 Disabled for use with straight.el
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 
-  ;; (use-package auto-package-update
-  ;;   :custom
-  ;;   (auto-package-update-interval 7)
-  ;;   (auto-package-update-prompt-before-update t)
-  ;;   (auto-package-update-hide-results t)
-  ;;   :config
-  ;;   (auto-package-update-maybe)
-  ;;   (auto-package-update-at-time "09:00"))
+  (use-package auto-package-update
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-hide-results t)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "09:00"))
 
 #+end_src
 
@@ -344,6 +353,9 @@ If you're just getting started in Emacs, the menu bar might be helpful so you ca
   ;; Add rule at 80 characters
   (global-display-fill-column-indicator-mode 1)
   (setq fill-column 80)
+  ;; set colour of indicator
+  (set-face-attribute 'fill-column-indicator nil :foreground "grey90")
+
   ;; Set frame transparency
   ;; (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
   ;; (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
@@ -571,7 +583,7 @@ Layout rotation is also preferable, so I added this under `SPC w SPC`
       ;; Set up main which-y bindings
       (efs/leader-keys
         "t"  '(:ignore t :which-key "toggles")
-        "t"  '(:ignore t :which-key "toggles")
+        "to"  '(olivetti-mode :which-key "olivetti")
         "tt" '(counsel-load-theme :which-key "choose theme")
         "X" '(org-capture :which-key "capture")
         "a"  '(:ignore a :which-key "actions")
@@ -584,6 +596,7 @@ Layout rotation is also preferable, so I added this under `SPC w SPC`
         "bs" '(save-buffer :which-key "save buffer")
         "bf" '(swiper :which-key "swiper")
         "bu" '(browse-url-of-file :which-key "open html")
+        "bw" '(count-words :which-key "word count")
         "."  '(find-file :which-key "find file")
         "s"  '(ivy-yasnippet :which-key "snippets")
         "w"  '(evil-window-map :which-key "windows")
@@ -664,6 +677,40 @@ Layout rotation is also preferable, so I added this under `SPC w SPC`
 
 #+end_src
 
+** Markdown folding
+
+#+begin_src emacs-lisp
+
+  ;; (use-package origami
+  ;;   :config
+  ;;   (setq origami-show-fold-header t)     ;highlight fold headers
+  ;;   (defun my:origami-fold-start-line-p ()
+  ;;     (equal (line-number-at-pos
+  ;;             (save-excursion
+  ;;               (origami-previous-fold
+  ;;                (current-buffer) (line-end-position))))
+  ;;            (line-number-at-pos (point))))
+  ;;   (defun my:origami-settings ()
+  ;;     (general-nmap :keymaps 'local
+  ;;                   ;; enhance folds toggling
+  ;;                   "<tab>" (general-predicate-dispatch nil ;override only on fold start line
+  ;;                             (my:origami-fold-start-line-p) #'origami-forward-toggle-node)
+  ;;                   "z a" #'origami-forward-toggle-node
+  ;;                   "z f" #'my:evil-origami-create-fold-operator
+  ;;                   ;; map extra evil-fold keys
+  ;;                   "[ z" #'origami-previous-fold
+  ;;                   "] z" #'origami-next-fold
+  ;;                   "z j" #'origami-forward-fold-same-level
+  ;;                   "z k" #'origami-backward-fold-same-level)
+  ;;     ;; explicit folds only
+  ;;     ;; (setq-local origami-fold-style 'triple-braces)
+  ;;     (origami-mode)
+  ;;     (origami-close-all-nodes (current-buffer)))
+  ;;   :hook (prog-mode . my:origami-settings))
+  ;; ;; (add-to-list 'origami-parser-alist `(markdown-mode . ,(origami-markers-parser "```{r " "```")))
+
+#+end_src
+
 ** Evil surround
 
 Surround visual selection with =S= or =gS=
@@ -698,13 +745,21 @@ I'm choosing =C-M-u= for this purpose.
 
 I liked the workspaces from doom emacs, let try and replicate with [[https://depp.brause.cc/eyebrowse/][eyebrowse]]
 Current package is [[https://github.com/nex3/perspective-el][perspective]]
-Removed in favour of built in tab-mode
 
 #+begin_src emacs-lisp
 
-  ;; (use-package perspective
-  ;;   :config
-  ;;   (persp-mode))
+  (use-package perspective
+    :demand t
+    :bind (("C-M-j" . persp-counsel-switch-buffer)
+           ("C-M-k" . persp-switch)
+           ("C-M-n" . persp-next)
+           ("C-x k" . persp-kill-buffer*))
+    :custom
+    (persp-initial-frame-name "Main")
+    :config
+    ;; Running `persp-mode' multiple times resets the perspective list...
+    (unless (equal persp-mode t)
+      (persp-mode)))
 
 #+end_src
 
@@ -894,6 +949,10 @@ The default configuration is quite good but you can check out the [[https://gith
     :config
     (all-the-icons-ivy-setup))
 
+  ;; add time
+  (setq display-time-format "%l:%M %p %b %y"
+        display-time-default-load-average nil)
+
   (use-package doom-modeline
     :init (doom-modeline-mode 1)
     :custom ((doom-modeline-height 15)))
@@ -907,7 +966,7 @@ So a scroll-margin of 5 will mean the buffer will start scrolling when you are 5
 
 #+begin_src emacs-lisp
 
-  (setq scoll-margin 7)
+  (setq scroll-margin 7)
 
 #+end_src
 
@@ -920,10 +979,10 @@ This is very useful for learning the possible key bindings in the mode of your c
 #+begin_src emacs-lisp
 
   (use-package which-key
-    :defer 0
+    ;; :defer 0
+    :init (which-key-mode)
     :diminish which-key-mode
     :config
-    (which-key-mode)
     (setq which-key-idle-delay 0.2))
 
 #+end_src
@@ -1050,6 +1109,35 @@ You can press any other key (or =f= specifically) to exit the transient key map.
 
 #+end_src
 
+** Displaying World Time
+
+=display-time-world= command provides a nice display of the time at a specified list of timezones.
+Nice for working in a team with remote members.
+
+#+begin_src emacs-lisp
+
+  (setq display-time-world-list
+    '(("America/Los_Angeles" "Seattle")
+      ("America/New_York" "New York")
+      ("Europe/Athens" "Athens")
+      ("Europe/London" "London")
+      ("Pacific/Auckland" "Auckland")
+      ("Asia/Shanghai" "Shanghai")))
+  (setq display-time-world-time-format "%a, %d %b %I:%M %p %Z")
+
+#+end_src
+
+** Folding with Origami.el
+
+[[https://github.com/gregsexton/origami.el][Origami.el]] is a package for folding text.
+
+#+begin_src emacs-lisp
+
+  (use-package origami
+    :hook (yaml-mode . origami-mode))
+
+#+end_src
+
 * Org Mode
 
 [[https://orgmode.org/][Org Mode]] is one of the hallmark features of Emacs.
@@ -1104,7 +1192,9 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
   (defun efs/org-mode-setup ()
     (org-indent-mode)
     (variable-pitch-mode 1)
-    (visual-line-mode 1))
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil)
+    (diminish org-indent-mode))
 
   (use-package org
     ;;:pin org ; planned feature in stright.el?
@@ -1114,6 +1204,7 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
     (setq org-ellipsis " ▾")
 
     (setq org-agenda-start-with-log-mode t)
+    (setq org-startup-folded 'content)
     ;; add time stamp when completeing todo
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
@@ -1321,6 +1412,7 @@ To execute or export code in =org-mode= code blocks, you'll need to set up =org-
        (R .t)
        (sql .t)
        (shell .t)
+       ;;(sh . t)
        (latex .t)))
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
@@ -1399,6 +1491,8 @@ You can add more =src= block templates below by copying one of the lines and cha
 
     (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
+    (add-to-list 'org-structure-template-alist '("json" . "src json"))
     (add-to-list 'org-structure-template-alist '("py" . "src python"))
     (add-to-list 'org-structure-template-alist '("r" . "src R")))
 
@@ -1420,6 +1514,16 @@ This function checks to see if the file being saved is the Emacs.org file you're
         (org-babel-tangle))))
 
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+
+#+end_src
+
+** Presentations
+
+Here we use [[https://github.com/yjwen/org-reveal/][org-reveal]]
+#+begin_src emacs-lisp
+
+  (use-package ox-reveal)
+  (setq org-reveal-root "file:///home/mateus/git_work/presentations/reveal-root")
 
 #+end_src
 
@@ -1702,15 +1806,15 @@ Taken from the [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-n
 #+begin_src emacs-lisp
 
   (use-package pdf-tools
-    :commands (pdf-view-mode pdf-tools-install)
-    ;; :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
+    ;; :commands (pdf-view-mode pdf-tools-install)
+    :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
     :magic ("%PDF" . pdf-view-mode)
-    ;; :load-path "/usr/share/emacs/site-lisp/pdf-tools"
-    ;; :init
-    ;; (pdf-tools-install)
+    :load-path "~/.emacs.d/straight/build/pdf-tools"
+    :init
+    (pdf-tools-install)
     :config
     ;; (pdf-loader-install)
-    (pdf-tools-install)
+    ;; (pdf-tools-install)
     (setq-default pdf-view-display-size 'fit-width)
     ;; (define-pdf-cache-function pagelabels)
     ;; :hook ((pdf-view-mode-hook . (lambda () (display-line-numbers-mode -1)))
@@ -2103,106 +2207,107 @@ Define some functions for inserting various operators and exporting .Rmd
 
 #+begin_src emacs-lisp
 
-    ;; set up ess
-    (use-package ess
-      :defer t
-      :init
-      (require 'ess-r-mode)
-      (require 'ess-view-data)
-      ;; (require 'ess-site)
-      ;; (require 'ess-rutils)
-      ;; Auto set width and length options when initiate new Ess processes
-      :config
-      (add-hook 'ess-post-run-hook 'ess-execute-screen-options)
-      (add-hook 'ess-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
-      (add-hook 'ess-mode-hook
-                (lambda () (ess-set-style 'RRR 'quiet)
-                  (add-hook 'local-write-file-hooks
-                            (lambda () (ess-nuke-trailing-whitespace)))))
-      (add-hook 'inferior-ess-mode-hook 'ansi-color-for-comint-mode-on)
-      (add-hook 'inferior-ess-mode-hook #'(lambda ()
-                                            (setq-local comint-use-prompt-regexp nil)
-                                            (setq-local inhibit-field-text-motion nil)))
-      (add-hook 'ess-r-mode-hook
-                (lambda()
-                  'eglot-ensure
-                  (make-local-variable 'company-backends)
-                  (delete-dups (push 'company-capf company-backends))
-                  (delete-dups (push 'company-files company-backends))))
-      (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-      (show-paren-mode)
-      ;;(setq ess-eval-empty t)               ; don't skip non-code line
-      (setq comint-scroll-to-bottom-on-input 'this)
-      (setq comint-move-point-for-output 'others)
-      ;;(setq ess-ask-for-ess-directory nil)
-      (setq ess-eval-visibly 'nowait)
-      (setq ess-use-flymake nil)
-      ;; (setq ess-r-flymake-linters '("infix_spaces_linter" . "commas_linter"))
-      (setq ess-roxy-fold-examples nil)
-      (setq ess-roxy-fontify-examples t)
-      (setq ess-use-company 'script-only)
-      (setq ess-company-arg-prefix-length 1)
-      ;;(setq ess-blink-region nil)
+  ;; set up ess
+  (use-package ess
+    ;; :defer t
+    ;; :straight t
+    :init
+    (require 'ess-r-mode)
+    ;;(require 'ess-view-data)
+    ;; (require 'ess-site)
+    ;; (require 'ess-rutils)
+    ;; Auto set width and length options when initiate new Ess processes
+    :config
+    (add-hook 'ess-post-run-hook 'ess-execute-screen-options)
+    (add-hook 'ess-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+    (add-hook 'ess-mode-hook
+              (lambda () (ess-set-style 'RRR 'quiet)
+                (add-hook 'local-write-file-hooks
+                          (lambda () (ess-nuke-trailing-whitespace)))))
+    (add-hook 'inferior-ess-mode-hook 'ansi-color-for-comint-mode-on)
+    (add-hook 'inferior-ess-mode-hook #'(lambda ()
+                                          (setq-local comint-use-prompt-regexp nil)
+                                          (setq-local inhibit-field-text-motion nil)))
+    (add-hook 'ess-r-mode-hook
+              (lambda()
+                'eglot-ensure
+                (make-local-variable 'company-backends)
+                (delete-dups (push 'company-capf company-backends))
+                (delete-dups (push 'company-files company-backends))))
+    (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+    (show-paren-mode)
+    ;;(setq ess-eval-empty t)               ; don't skip non-code line
+    (setq comint-scroll-to-bottom-on-input 'this)
+    (setq comint-move-point-for-output 'others)
+    ;;(setq ess-ask-for-ess-directory nil)
+    (setq ess-eval-visibly 'nowait)
+    (setq ess-use-flymake nil)
+    ;; (setq ess-r-flymake-linters '("infix_spaces_linter" . "commas_linter"))
+    (setq ess-roxy-fold-examples nil)
+    (setq ess-roxy-fontify-examples t)
+    (setq ess-use-company 'script-only)
+    (setq ess-company-arg-prefix-length 1)
+    ;;(setq ess-blink-region nil)
 
-      (setq ess-r-flymake-lintr-cache nil)
-      (setq ess-history-directory "~/.R/")
-      (setq inferior-R-args "--no-restore-history --no-save")
-      (setq ess-offset-arguments 'prev-line)
+    (setq ess-r-flymake-lintr-cache nil)
+    (setq ess-history-directory "~/.R/")
+    (setq inferior-R-args "--no-restore-history --no-save")
+    (setq ess-offset-arguments 'prev-line)
 
-      (setq ess-indent-with-fancy-comments nil)
+    (setq ess-indent-with-fancy-comments nil)
 
-      ;; fix assignment key
-      (ess-toggle-underscore nil)
-      (setq ess-insert-assign (car ess-assign-list))
-      (setq ess-assign-list '(" = "))
-      (bind-key "M--" 'ess-insert-assign)
+    ;; fix assignment key
+    (ess-toggle-underscore nil)
+    (setq ess-insert-assign (car ess-assign-list))
+    (setq ess-assign-list '(" = "))
+    (bind-key "M--" 'ess-insert-assign)
 
-      (setq ess-eldoc-show-on-symbol nil)
-      (setq ess-eldoc-abbreviation-style 'mild)
-      ;;(setq ess-use-eldoc nil)
-      (setq comint-scroll-to-bottom-on-output t)
-      :general
-      (global-leader
-        :major-modes
-        '(ess-r-mode inferior-ess-r-mode t)
-        :keymaps
-        '(ess-r-mode-map inferior-ess-r-mode-map)
-        "e" '(:ignore e :which-key "eval")
-        "eb" '(ess-eval-buffer :which-key "buffer")
-        "ed" '(eval-buffer-from-beg-to-here :which-key "buffer from beg")
-        "ee" '(eval-buffer-from-here-to-end :which-key "buffer to end")
-        "el" '(ess-eval-region-or-line-and-step :which-key "line or region")
-        "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
-        "er" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
-        "r" '(:ignore r :which-key "Rmd")
-        "rb" '(efs/ess-bookdown :which-key "bookdown-export")
-        "re" '(efs/ess-rmarkdown :which-key "Rmd-export")
-        "rs" '(efs/ess-rshiny :which-key "shiny-export")
-        "rd" '(efs/ess-publish-rmd :which-key "publish Rmd")
-        "rn" '(polymode-next-chunk :which-key "next chunk")
-        "rp" '(polymode-previous-chunk :which-key "previous chunk")
-        "rk" '(polymode-kill-chunk :which-key "kill chunk")
-        "rl" '(markdown-insert-link :which-key "insert link")
-        "ri" '(markdown-insert-image :which-key "insert image")
-        "d" '(ess-doc-map :which-key "docs")
-        ;;"c" '(ess-r-mode-map :which-key "ess r map") ; doesn't work - maybe command?
-        "i" '(:ignore i :which-key "insert")
-        "ii" '(efs/insert-r-in :which-key "%in%")
-        "id" '(efs/insert_double_assign_operator :which-key "<<-")
-        ";" '(ess-insert-assign :which-key "<-")
-        "v" '(efs/insert-r-pipe :which-key "insert %>%")
-        "w" '(ess-set-working-directory :which-key "set wd")))
-    ;; :bind (:map ess-r-mode-map
-    ;;             ("C-c C-w w" . ess-r-package-use-dir)
-    ;;             ("C-c C-w C-w" . ess-r-package-use-dir)
-    ;;             ("<C-M-return>" . ess-eval-region-or-function-or-paragraph-and-step)
-    ;;             ("<C-S-return>" . ess-eval-buffer)
-    ;;             ("C-M-;" . comment-line)
-    ;;             ("C-S-<f10>" . inferior-ess-reload)
-    ;;             ("<f5>" . ess-display-help-on-object)
-    ;;             ("<C-return>" . ess-eval-region-or-function-or-paragraph))
-    ;; :bind (:map inferior-ess-mode-map
-    ;;             ("C-S-<f10>" . inferior-ess-reload)))
+    (setq ess-eldoc-show-on-symbol nil)
+    (setq ess-eldoc-abbreviation-style 'mild)
+    ;;(setq ess-use-eldoc nil)
+    (setq comint-scroll-to-bottom-on-output t)
+    :general
+    (global-leader
+      :major-modes
+      '(ess-r-mode inferior-ess-r-mode t)
+      :keymaps
+      '(ess-r-mode-map inferior-ess-r-mode-map)
+      "e" '(:ignore e :which-key "eval")
+      "eb" '(ess-eval-buffer :which-key "buffer")
+      "ed" '(eval-buffer-from-beg-to-here :which-key "buffer from beg")
+      "ee" '(eval-buffer-from-here-to-end :which-key "buffer to end")
+      "el" '(ess-eval-region-or-line-and-step :which-key "line or region")
+      "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
+      "er" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
+      "r" '(:ignore r :which-key "Rmd")
+      "rb" '(efs/ess-bookdown :which-key "bookdown-export")
+      "re" '(efs/ess-rmarkdown :which-key "Rmd-export")
+      "rs" '(efs/ess-rshiny :which-key "shiny-export")
+      "rd" '(efs/ess-publish-rmd :which-key "publish Rmd")
+      "rn" '(polymode-next-chunk :which-key "next chunk")
+      "rp" '(polymode-previous-chunk :which-key "previous chunk")
+      "rk" '(polymode-kill-chunk :which-key "kill chunk")
+      "rl" '(markdown-insert-link :which-key "insert link")
+      "ri" '(markdown-insert-image :which-key "insert image")
+      "d" '(ess-doc-map :which-key "docs")
+      ;;"c" '(ess-r-mode-map :which-key "ess r map") ; doesn't work - maybe command?
+      "i" '(:ignore i :which-key "insert")
+      "ii" '(efs/insert-r-in :which-key "%in%")
+      "id" '(efs/insert_double_assign_operator :which-key "<<-")
+      ";" '(ess-insert-assign :which-key "<-")
+      "v" '(efs/insert-r-pipe :which-key "insert %>%")
+      "w" '(ess-set-working-directory :which-key "set wd")))
+  ;; :bind (:map ess-r-mode-map
+  ;;             ("C-c C-w w" . ess-r-package-use-dir)
+  ;;             ("C-c C-w C-w" . ess-r-package-use-dir)
+  ;;             ("<C-M-return>" . ess-eval-region-or-function-or-paragraph-and-step)
+  ;;             ("<C-S-return>" . ess-eval-buffer)
+  ;;             ("C-M-;" . comment-line)
+  ;;             ("C-S-<f10>" . inferior-ess-reload)
+  ;;             ("<f5>" . ess-display-help-on-object)
+  ;;             ("<C-return>" . ess-eval-region-or-function-or-paragraph))
+  ;; :bind (:map inferior-ess-mode-map
+  ;;             ("C-S-<f10>" . inferior-ess-reload)))
   ;; syntax highlight
   (setq ess-R-font-lock-keywords
         (quote
@@ -2248,34 +2353,36 @@ Define some functions for inserting various operators and exporting .Rmd
 
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess"
-    :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
+    (require 'ess-r-mode)
+    ;; :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
+    ;; (require 'ess-rutils)
     :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
     :commands R
     :general
     (global-leader
-     :major-modes
-     '(ess-r-mode inferior-ess-r-mode t)
-     :keymaps
-     '(ess-r-mode-map inferior-ess-r-mode-map)
-     "e" '(:ignore e :which-key "eval")
-     "eb" '(ess-eval-buffer :which-key "buffer")
-     "ed" '(eval-buffer-from-beg-to-here :which-key "buffer from beg")
-     "ee" '(eval-buffer-from-here-to-end :which-key "buffer to end")
-     "el" '(ess-eval-region-or-line-and-step :which-key "line or region")
-     "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
-     "ep" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
-     "r" '(:ignore r :which-key "Rmd")
-     "re" '(polymode-export :which-key "poly-export")
-     "rn" '(polymode-next-chunk :which-key "next chunk")
-     "rp" '(polymode-previous-chunk :which-key "previous chunk")
-     "rk" '(polymode-kill-chunk :which-key "kill chunk")
-     "rl" '(markdown-insert-link :which-key "insert link")
-     "ri" '(markdown-insert-image :which-key "insert image")
-     "d" '(ess-doc-map :which-key "docs")
-     "i" '(:ignore i :which-key "insert")
-     ";" '(ess-insert-assign :which-key "insert <-")
-     "i" 'efs/insert-r-in
-     "p" 'efs/insert-r-pipe)
+      :major-modes
+      '(ess-r-mode inferior-ess-r-mode t)
+      :keymaps
+      '(ess-r-mode-map inferior-ess-r-mode-map)
+      "e" '(:ignore e :which-key "eval")
+      "eb" '(ess-eval-buffer :which-key "buffer")
+      "ed" '(eval-buffer-from-beg-to-here :which-key "buffer from beg")
+      "ee" '(eval-buffer-from-here-to-end :which-key "buffer to end")
+      "el" '(ess-eval-region-or-line-and-step :which-key "line or region")
+      "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
+      "ep" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
+      "r" '(:ignore r :which-key "Rmd")
+      "re" '(polymode-export :which-key "poly-export")
+      "rn" '(polymode-next-chunk :which-key "next chunk")
+      "rp" '(polymode-previous-chunk :which-key "previous chunk")
+      "rk" '(polymode-kill-chunk :which-key "kill chunk")
+      "rl" '(markdown-insert-link :which-key "insert link")
+      "ri" '(markdown-insert-image :which-key "insert image")
+      "d" '(ess-doc-map :which-key "docs")
+      "i" '(:ignore i :which-key "insert")
+      ";" '(ess-insert-assign :which-key "insert <-")
+      "i" 'efs/insert-r-in
+      "p" 'efs/insert-r-pipe)
 
     :config
     (defun my-org-confirm-babel-evaluate (lang body)
@@ -2356,6 +2463,7 @@ Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
 
   (use-package markdown-mode
+    :hook (markdown-mode . flyspell-mode)
     :general
     (global-leader
       :major-modes

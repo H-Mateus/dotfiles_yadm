@@ -268,6 +268,10 @@ alt + F2
 alt + F3
     xfce4-appfinder
 
+#Xlunch app launcher
+#alt + F5
+#    xlunch --config ~/.config/xlunch/default.conf --input ~/.config/xlunch/entries.dsv   
+
 
 #################################################################
 #VARIETY KEYS WITH PYWAL
@@ -592,3 +596,10 @@ super + shift + {1-9,0}
 #    id=$(bspc query -N -n); bspc node -d ^{1-9,10}; bspc node -f ${id}}
 
 #################################################################
+
+
+## super & mouse scroll
+
+# Focused desktop window gap
+super + button{4,5}
+  bspc config -d focused window_gap $((`bspc config -d focused window_gap` {-,+} 2 ))

@@ -30,3 +30,6 @@ disabled = false
 #deleted = "  "
 #renamed = " ➜ "
 #unmerged = " ═ "
+
+[conda]
+format = "[$symbol$environment](dimmed green) "
