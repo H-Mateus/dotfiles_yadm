@@ -509,40 +509,6 @@ Stolen from [[http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html]
 
 #+end_src
 
-** Nice Parentheses
-
-#+begin_src emacs-lisp
-
-  ;;(electric-pair-mode 1) ; auto-insert matching bracket
-  (show-paren-mode 1)    ; turn on paren match highlighting
-
-#+end_src
-
-*** smartparens
-
-Insert matching parentheses and jump across them
-
-#+begin_src emacs-lisp
-
-  (use-package smartparens
-    :diminish smartparens-mode
-    :config
-    (add-hook 'ess-mode-hook #'smartparens-mode)
-    (add-hook 'inferior-ess-mode-hook #'smartparens-mode))
-    ;;(add-hook 'ess-mode-hook #'turn-on-smartparens-strict-mode))
-
-#+end_src
-
-*** evil-smartparens
-
-#+begin_src emacs-lisp
-
-  (use-package evil-smartparens
-    :after evil
-    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
-
-#+end_src
-
 * Keybinding Configuration
 
 This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil-mode]] for a Vi-like modal editing experience.
@@ -582,13 +548,16 @@ Layout rotation is also preferable, so I added this under `SPC w SPC`
 
       ;; Set up main which-y bindings
       (efs/leader-keys
+        "SPC"  '(counsel-M-x :which-key "M-x")
         "t"  '(:ignore t :which-key "toggles")
         "to"  '(olivetti-mode :which-key "olivetti")
         "tt" '(counsel-load-theme :which-key "choose theme")
+        "tl"  '(toggle-truncate-lines :which-key "Toggle truncate lines")
         "X" '(org-capture :which-key "capture")
         "a"  '(:ignore a :which-key "actions")
         "as"  '(avy-goto-char-2 :which-key "avy goto char2")
         "ac"  '(helm-bibtex :which-key "helm-bibtex")
+        "ar" '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :which-key "Reload emacs config")
         "b"  '(:ignore b :which-key "buffers")
         "bb" '(counsel-switch-buffer :which-key "switch buffer")
         "bc" '(ispell :which-key "ispell")
@@ -730,6 +699,40 @@ I'm choosing =C-M-u= for this purpose.
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-M-u") 'universal-argument)
 #+end_src* UI Configuration
+
+** Nice Parentheses
+
+#+begin_src emacs-lisp
+
+  ;;(electric-pair-mode 1) ; auto-insert matching bracket
+  (show-paren-mode 1)    ; turn on paren match highlighting
+
+#+end_src
+
+*** smartparens
+
+Insert matching parentheses and jump across them
+
+#+begin_src emacs-lisp
+
+  (use-package smartparens
+    :diminish smartparens-mode
+    :config
+    (add-hook 'ess-mode-hook #'smartparens-mode)
+    (add-hook 'inferior-ess-mode-hook #'smartparens-mode))
+    ;;(add-hook 'ess-mode-hook #'turn-on-smartparens-strict-mode))
+
+#+end_src
+
+*** evil-smartparens
+
+#+begin_src emacs-lisp
+
+  (use-package evil-smartparens
+    :after evil
+    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
+
+#+end_src
 
 ** Avy
 
@@ -959,7 +962,7 @@ The default configuration is quite good but you can check out the [[https://gith
 
 #+end_src
 
-** Scroll margin
+** Scrolling
 
 =Scroll-margin= lets you set a line offset when scrolling.
 So a scroll-margin of 5 will mean the buffer will start scrolling when you are 5 lines from the top or bottom, as opposed the final line
@@ -967,6 +970,10 @@ So a scroll-margin of 5 will mean the buffer will start scrolling when you are 5
 #+begin_src emacs-lisp
 
   (setq scroll-margin 7)
+  (setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+  (setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+  (setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
+  (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 
 #+end_src
 
@@ -979,11 +986,20 @@ This is very useful for learning the possible key bindings in the mode of your c
 #+begin_src emacs-lisp
 
   (use-package which-key
-    ;; :defer 0
-    :init (which-key-mode)
-    :diminish which-key-mode
-    :config
-    (setq which-key-idle-delay 0.2))
+    :init
+    (setq which-key-side-window-location 'bottom
+          which-key-sort-order #'which-key-key-order-alpha
+          which-key-sort-uppercase-first nil
+          which-key-add-column-padding 1
+          which-key-max-display-columns nil
+          which-key-min-display-lines 6
+          which-key-side-window-slot -10
+          which-key-side-window-max-height 0.25
+          which-key-idle-delay 0.2
+          which-key-max-description-length 25
+          which-key-allow-imprecise-window-fit t
+          which-key-separator " → " ))
+  (which-key-mode)
 
 #+end_src
 
@@ -1051,6 +1067,27 @@ This Prescient configuration is optimized for use in System Crafters videos and 
 
   (straight-use-package 'company-prescient)
   (company-prescient-mode)
+
+#+end_src
+
+** M-x changes
+
+The following line removes the annoying '^' in things like counsel-M-x and other ivy/counsel prompts.
+The default '^' string means that if you type something immediately after this string only completion candidates that begin with what you typed are shown.
+Most of the time, I’m searching for a command without knowing what it begins with though.
+
+#+begin_src emacs-lisp
+
+  (setq ivy-initial-inputs-alist nil)
+
+#+end_src
+
+Smex is a package the makes M-x remember our history.  Now M-x will show our last used commands first.
+
+#+begin_src emacs-lisp
+
+  (use-package smex)
+  (smex-initialize)
 
 #+end_src
 
@@ -1596,7 +1633,7 @@ It mainly add some nice margins either side to make reader and writing more plea
   ;; Set the body text width
   (setq olivetti-body-width 140)
   ;; Enable Olivetti for text-related mode such as Org Mode
-  (add-hook 'text-mode-hook 'olivetti-mode)
+  ;; (add-hook 'text-mode-hook 'olivetti-mode)
 
 #+end_src
 
