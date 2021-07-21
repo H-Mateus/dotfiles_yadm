@@ -1,0 +1,91 @@
+sw_volume: 100
+audio_device_state:1:pulse audio
+audio_device_state:1:my_fifo
+state: play
+current: 0
+time: 167.265000
+random: 0
+repeat: 0
+single: 0
+consume: 0
+crossfade: 0
+mixrampdb: 0.000000
+mixrampdelay: -1.000000
+playlist_begin
+0:playlist 1/32-Dead op.mp3
+1:playlist 1/Overlord ED - L.L.L..mp3
+2:playlist 1/05-Colors-Flow.mp3
+3:playlist 1/二息歩行_Two_breaths_walking_-_Hatsune_Miku_初音ミク.mp3
+4:playlist 1/Shigatsu wa Kimi no Uso.mp3
+5:playlist 1/Mahoutsukai_no_Yome_OPOpening_Full_「Here_-_JUNNA」_Cover_by_Kami.mp3
+6:playlist 1/04-Blue Bird.mp3
+7:playlist 1/Yosuga_no_Sora_ED_alternative_ver[Mp3Mp4X.online].mp3
+8:playlist 1/NieR_Automata_OST_-_Kainé_Salvation_Orchestral.mp3
+9:playlist 1/風_16_Out_of_the_gravity_-_Hatsune_Miku_初音ミク.mp3
+10:playlist 1/No_pain_No_game_Nano_Btooom_OP.mp3
+11:playlist 1/Attack on Titan OP - Feuerroter Pfeil und Bogen.mp3
+12:playlist 1/Yuri on Ice Opening - History Maker.mp3
+13:playlist 1/07-105 Carnival Night.mp3
+14:playlist 1/Lolipop.mp3
+15:playlist 1/02-Darren_Korb__Build_That_Wall_Zia39s_Theme_[www.Mp3Drug.to].mp3
+16:playlist 1/29-Darren Korb - Transistor Original Soundtrack - 23 Paper Boats.mp3
+17:playlist 1/10-112 At the Station.mp3
+18:playlist 1/Konosuba_Season_2_OPOpening_Theme_-_Tomorrow_by_Machico[Mp3orMp4X.online].mp3
+19:playlist 1/FMA again.mp3
+20:playlist 1/Seishun_Buta_Yarou_wa_Bunny_Girl_Senpai_no_Yume_wo_Minai_Ending_-「Fukashigi_no_Carte」Full_Version.mp3
+21:playlist 1/15-Forever we can make it.mp3
+22:playlist 1/16-Peace Ball  FUNKIST.mp3
+23:playlist 1/Houseki_no_Kuni_Opening_Theme「YURiKA_-_Kyoumen_no_Nami」OP_Full.mp3
+24:playlist 1/19-06 Kono Hi no Mama de.mp3
+25:playlist 1/FMA Sid-Uso.mp3
+26:playlist 1/Fairy Tail - Snow fairy.mp3
+27:playlist 1/03-Beyond The Sea.mp3
+28:playlist 1/08-110 Moonlight Tango.mp3
+29:playlist 1/High_School_DxD_New_ED2_Lovely_♥_Devil_FULL_DL_links_Lyrics.mp3
+30:playlist 1/26. Lovelyâ™¥Devil (TV Size).mp3
+31:playlist 1/No_Game_No_Life_Zero_-_THERE_IS_A_REASON_Lyrics_NO_SONG_NO_LIFE.mp3
+32:playlist 1/Yuru_Camp△_OPOpening_Theme_-_Shiny_Days_Asaka_ゆるキャン△_OP.mp3
+33:playlist 1/HOWLING.mp3
+34:playlist 1/17-04 SKIP.mp3
+35:playlist 1/25-01. This game.mp3
+36:playlist 1/09-111 Palm Brinks.mp3
+37:playlist 1/01 - Destin Histoire.mp3
+38:playlist 1/Death Parade - Flyers_-_bradio.mp3
+39:playlist 1/Sorairo Days.mp3
+40:playlist 1/18-05 Mayoi no Mori.mp3
+41:playlist 1/23-2-05 Living With Determination.mp3
+42:playlist 1/Guilty Crown - 【Official OP】 - Extreme HD.mp3
+43:playlist 1/13-130 Peace of the world.mp3
+44:playlist 1/Lilium.mp3
+45:playlist 1/26-Darren Korb - Transistor Original Soundtrack - 04 The Spine.mp3
+46:playlist 1/Erased Opening - ReRe.mp3
+47:playlist 1/227. STUDYÃ—STUDY (TV Size).mp3
+48:playlist 1/Guilty Crown - Euterpe.mp3
+49:playlist 1/Umineko no naku koro ni opening full-Katayoku no Tori.mp3
+50:playlist 1/28-Darren Korb - Transistor Original Soundtrack - 17 We All Become.mp3
+51:playlist 1/12-206 Gundorada Workshop.mp3
+52:playlist 1/06-104 Premonition of Something Going to Happen.mp3
+53:playlist 1/Danganronpa - Zetsuboseihero chiryouyaku -suzumu ft soraru.mp3
+54:playlist 1/LET IT OUT - FMAB - Samehadaku.net.mp3
+55:playlist 1/34-01. キラメキ.mp3
+56:playlist 1/29 - the WORLD ü`TVâTâCâYü`.mp3
+57:playlist 1/01-Kousaki_Satoru_-_Sappuukei_(get-tune.net).mp3
+58:playlist 1/30-Shigatsu wa Kimi no Uso.mp3
+59:playlist 1/27-Darren Korb - Transistor Original Soundtrack - 10 In Circles.mp3
+60:playlist 1/Kyoukai no Kanata OP.mp3
+61:playlist 1/Bleach - Life is Like a Boat.mp3
+62:playlist 1/14-133 Shifting Windows.mp3
+63:playlist 1/風_からくりピエロ_Puppet_Clown_Pierrot_-_Hatsune_Miku_初音ミク.mp3
+64:playlist 1/21-1-13 Iwatodai Station.mp3
+65:playlist 1/I wanna be your girl.mp3
+66:playlist 1/33-Movin.mp3
+67:playlist 1/11-117 Menu.mp3
+68:playlist 1/35-01. オラシオン.mp3
+69:playlist 1/20-1-02 The Poem for Everyone's Souls.mp3
+70:playlist 1/Anohana - Secret Base _Kimi ga Kureta Mono_ 10 Years After.mp3
+71:playlist 1/31-tokyo goul ending 2.mp3
+72:playlist 1/22-1-28 Joy.mp3
+73:playlist 1/24-2-16 Living With Determination -Iwatodai Station Arrange-.mp3
+74:playlist 1/Kyoukai no Kanata - Star.mp3
+75:playlist 1/Tsuki Akari.mp3
+playlist_end

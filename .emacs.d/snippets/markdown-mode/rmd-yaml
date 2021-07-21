@@ -4,7 +4,7 @@
 # --
 ---
 title: "${1:title}"
-date: "\`r Sys.time()\`"
+date: "\`r Sys.Date()\`"
 author: "${2:Gabriel Mateus Bernardo Harrington}"
 output:
   html_document:
@@ -16,6 +16,8 @@ output:
       collapsed: yes
     code_download: true
     df_print: paged
+  pdf_document:
+    toc: no
 bibliography: /home/mateus/Documents/masterLib.bib
 csl: /home/mateus/Documents/citation_styles/elsevier-vancouver.csl
 link-citations: true
@@ -33,4 +35,6 @@ knitr::opts_chunk$set(
 )
 \`\`\`
 
+\`\`\`{r, label='load-packages'}
 $0
+\`\`\`

@@ -993,11 +993,11 @@ This is very useful for learning the possible key bindings in the mode of your c
           which-key-add-column-padding 1
           which-key-max-display-columns nil
           which-key-min-display-lines 6
-          which-key-side-window-slot -10
+          which-key-side-window-slot 0
           which-key-side-window-max-height 0.25
           which-key-idle-delay 0.2
           which-key-max-description-length 25
-          which-key-allow-imprecise-window-fit t
+          which-key-allow-imprecise-window-fit nil
           which-key-separator " → " ))
   (which-key-mode)
 
@@ -1233,6 +1233,9 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
     (setq evil-auto-indent nil)
     (diminish org-indent-mode))
 
+    ;; use enter to follow link - not working?
+    (setq org-return-follows-link t)
+
   (use-package org
     ;;:pin org ; planned feature in stright.el?
     :commands (org-capture org-agenda)
@@ -1249,8 +1252,6 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
     (setq org-list-allow-alphabetical t)
     ;; try not to accidently do weird stuff in invisible regions
     (setq org-catch-invisible-edits 'smart)
-    ;; use enter to follow link - not working?
-    (setq org-return-follows-link t)
     (setq org-ctrl-k-protect-subtree t)
     (setq org-display-remote-inline-images 'cache
           org-startup-with-inline-images t)
@@ -2061,7 +2062,7 @@ We also use [[https://github.com/company-mode/company-quickhelp][company-quickhe
     (setq company-minimum-prefix-length 1)
     (setq company-show-numbers t)
     (setq company-idle-delay 0.1)
-    (setq company-echo-delay 0)
+    (setq company-echo-delay 0.1)
     (setq company-begin-commands '(self-insert-command))
     (setq company-dabbrev-downcase 0)
     (setq company-dabbrev-code-everywhere t)
@@ -2194,6 +2195,27 @@ Define some functions for inserting various operators and exporting .Rmd
           (switch-to-buffer rmd-buf)
           (ess-show-buffer (buffer-name sbuffer) nil)))))
 
+  (defun efs/ess-xaringan ()
+    "Compile with xaringan moon_reader (.Rmd). Should work for any output type."
+    (interactive)
+    ;; Check if attached R-session
+    (condition-case nil
+        (ess-get-process)
+      (error
+       (ess-switch-process)))
+    (let* ((rmd-buf (current-buffer)))
+      (save-excursion
+        (let* ((sprocess (ess-get-process ess-current-process-name))
+               (sbuffer (process-buffer sprocess))
+               (buf-coding (symbol-name buffer-file-coding-system))
+               (R-cmd
+                (format "rmarkdown::render(\"%s\", \"xaringan::moon_reader\")"
+                        buffer-file-name)))
+          (message "Running xaringan::moon_reader on %s" buffer-file-name)
+          (ess-execute R-cmd 'buffer nil nil)
+          (switch-to-buffer rmd-buf)
+          (ess-show-buffer (buffer-name sbuffer) nil)))))
+
   (defun efs/ess-rshiny ()
     "Compile R markdown (.Rmd). Should work for any output type."
     (interactive)
@@ -2300,7 +2322,8 @@ Define some functions for inserting various operators and exporting .Rmd
     (bind-key "M--" 'ess-insert-assign)
 
     (setq ess-eldoc-show-on-symbol nil)
-    (setq ess-eldoc-abbreviation-style 'mild)
+    ;; This may cause massive slow downs?
+    (setq ess-eldoc-abbreviation-style nil)
     ;;(setq ess-use-eldoc nil)
     (setq comint-scroll-to-bottom-on-output t)
     :general
@@ -2318,6 +2341,7 @@ Define some functions for inserting various operators and exporting .Rmd
       "er" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
       "r" '(:ignore r :which-key "Rmd")
       "rb" '(efs/ess-bookdown :which-key "bookdown-export")
+      "rx" '(efs/ess-xaringan :which-key "xaringan-export")
       "re" '(efs/ess-rmarkdown :which-key "Rmd-export")
       "rs" '(efs/ess-rshiny :which-key "shiny-export")
       "rd" '(efs/ess-publish-rmd :which-key "publish Rmd")
@@ -2332,7 +2356,8 @@ Define some functions for inserting various operators and exporting .Rmd
       "ii" '(efs/insert-r-in :which-key "%in%")
       "id" '(efs/insert_double_assign_operator :which-key "<<-")
       ";" '(ess-insert-assign :which-key "<-")
-      "v" '(efs/insert-r-pipe :which-key "insert %>%")
+      "p" '(efs/insert-r-pipe :which-key "insert %>%")
+      "v" '(ess-rdired :which-key "rdired")
       "w" '(ess-set-working-directory :which-key "set wd")))
   ;; :bind (:map ess-r-mode-map
   ;;             ("C-c C-w w" . ess-r-package-use-dir)
@@ -2345,6 +2370,26 @@ Define some functions for inserting various operators and exporting .Rmd
   ;;             ("<C-return>" . ess-eval-region-or-function-or-paragraph))
   ;; :bind (:map inferior-ess-mode-map
   ;;             ("C-S-<f10>" . inferior-ess-reload)))
+
+  ;; An example of window configuration:
+  (setq display-buffer-alist
+        '(("*R Dired"
+           (display-buffer-reuse-window display-buffer-at-bottom)
+           (window-width . 0.5)
+           (window-height . 0.25)
+           (reusable-frames . nil))
+          ("*R"
+           (display-buffer-reuse-window display-buffer-in-side-window)
+           (side . right)
+           (slot . -1)
+           (window-width . 0.5)
+           (reusable-frames . nil))
+          ("*Help"
+           (display-buffer-reuse-window display-buffer-in-side-window)
+           (side . right)
+           (slot . 1)
+           (window-width . 0.5)
+           (reusable-frames . nil))))
   ;; syntax highlight
   (setq ess-R-font-lock-keywords
         (quote
@@ -2488,7 +2533,7 @@ Put spaces around operators such as +, -, etc.
 
   (use-package flycheck
     ;;:ensure t
-    :init (global-flycheck-mode))
+    :init (global-flycheck-mode 1))
 
   (use-package format-all)
 

@@ -27,9 +27,9 @@ alias pacman='sudo pacman --color auto'
 alias update='sudo pacman -Syyu'
 alias rmpac='pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns'
 
-## yay as aur helper - updates everything
-alias pksyua="yay -Syu --noconfirm"
-alias upall="yay -Syu --noconfirm"
+# paru as aur helper - updates everything
+alias pksyua="paru -Syu --noconfirm"
+alias upall="paru -Syu --noconfirm"
 
 ## grub update
 alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
