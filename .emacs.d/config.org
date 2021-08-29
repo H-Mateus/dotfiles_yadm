@@ -2061,8 +2061,8 @@ We also use [[https://github.com/company-mode/company-quickhelp][company-quickhe
     (global-company-mode)
     (setq company-minimum-prefix-length 1)
     (setq company-show-numbers t)
-    (setq company-idle-delay 0.1)
-    (setq company-echo-delay 0.1)
+    (setq company-idle-delay 0.3)
+    (setq company-echo-delay 0.3)
     (setq company-begin-commands '(self-insert-command))
     (setq company-dabbrev-downcase 0)
     (setq company-dabbrev-code-everywhere t)
@@ -2095,7 +2095,7 @@ We also use [[https://github.com/company-mode/company-quickhelp][company-quickhe
   (use-package company-quickhelp
     :hook (company-mode . company-quickhelp-mode)
     :config
-    (setq company-quickhelp-delay 0.1))
+    (setq company-quickhelp-delay 0.4))
 
   (straight-use-package 'company-lsp)
   (use-package company-lsp

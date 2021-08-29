@@ -38,7 +38,7 @@ fi
 # done
 # }
 # Try using arcolinux polybar launch script
-$HOME/.config/polybar/launch.sh --shapes &
+$HOME/.config/polybar/launch.sh --forest &
 
 # Divide workspaces/desktops to all connected monitors
 #multimonitors

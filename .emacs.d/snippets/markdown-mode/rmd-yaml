@@ -15,6 +15,7 @@ output:
     toc_float:
       collapsed: yes
     code_download: true
+    code_folding: show
     df_print: paged
   pdf_document:
     toc: no
