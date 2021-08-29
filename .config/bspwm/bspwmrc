@@ -113,6 +113,7 @@ run nm-applet &
 run pamac-tray &
 run xfce4-power-manager &
 blueberry-tray &
+mpd &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 ## notifications
 /usr/bin/dunst &
