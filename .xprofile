@@ -24,7 +24,8 @@ else
     $HOME/.screenlayout/rjah-dual-external.sh
 fi
 
-nitrogen --restore &
+# nitrogen --restore &
+variety &
 picom &
 
 #teams

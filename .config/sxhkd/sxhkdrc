@@ -8,7 +8,10 @@ super + Return
 
 # program launcher
 super + e
-    ~/.config/rofi/launchers/colorful/launcher.sh
+    rofi -no-lazy-grab -show drun -modi drun
+## old script
+# super + e
+#     ~/.config/rofi/launchers/colorful/launcher.sh
 
 # reload sxhkd
 super + Escape
