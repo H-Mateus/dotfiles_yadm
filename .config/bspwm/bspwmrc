@@ -107,9 +107,10 @@ bspc rule -a Gnome-disks state=tiled
 bspc rule -a Xfce4-settings-manager state=tiled
 
 teams &
-./Downloads/pcloud_appimage &
-run variety &
-run nm-applet &
+./Appimages/pcloud &
+slack &
+# variety &
+nm-applet &
 run pamac-tray &
 run xfce4-power-manager &
 blueberry-tray &
@@ -118,5 +119,8 @@ mpd &
 ## notifications
 /usr/bin/dunst &
 #/usr/lib/xfce4/notifyd/xfce4-notifyd &
-run volumeicon &
+# volumeicon &
 flatpak run com.toggl.TogglDesktop &
+
+# disable wacom pen pen input to fix cursor jump issue
+xinput disable `xinput | grep "Pen Pen" | awk '{print $9}' | sed 's/id=//'`
