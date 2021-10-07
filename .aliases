@@ -29,7 +29,7 @@ alias rmpac='pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sud
 
 # paru as aur helper - updates everything
 alias pksyua="paru -Syu --noconfirm"
-alias upall="paru -Syu --noconfirm"
+alias upall="paru -Syu"
 
 ## grub update
 alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
