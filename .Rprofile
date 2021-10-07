@@ -14,3 +14,10 @@ local({
   options(mc.cores =  n)                                      # Parallel apply-type functions via 'parallel' package
 })
 error <- quote(dump.frames("${R_HOME_USER}/testdump", TRUE))  # Post-mortem debugging facilities
+
+## Set CRAN Mirror:
+local({
+  r <- getOption("repos")
+  r["CRAN"] <- "https://cloud.r-project.org/"
+  options(repos = r)
+})
