@@ -24,10 +24,6 @@ else
     $HOME/.screenlayout/rjah-dual-external.sh
 fi
 
-# nitrogen --restore &
-variety &
+nitrogen --restore &
+# variety &
 picom &
-
-#teams
-#pcloud
-#TogglDesktop
