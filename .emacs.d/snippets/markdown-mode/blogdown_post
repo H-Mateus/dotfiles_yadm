@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# name: blogdown_post
+# key: /blogp
+# --
+---
+title: "${1:title}"
+date: "\`r Sys.Date()\`"
+author: "${2:Gabriel Mateus Bernardo Harrington}"
+slug:
+categories:
+  - Methodology
+tags:
+  - Reproducible Research
+  - Methodology
+subtitle: 'Why all scientists should learn to code'
+summary: ''
+authors: []
+lastmod: '2021-05-12T10:35:05+01:00'
+featured: no
+image:
+  caption: 'Image credit: [**Unsplash**](https://unsplash.com/photos/mDinBvq1Sfg)'
+  focal_point: ''
+  preview_only: no
+projects: []
+---

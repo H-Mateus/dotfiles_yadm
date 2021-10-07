@@ -1,0 +1,66 @@
+# -*- mode: snippet -*-
+# name: yaml_xaringan
+# key: /yxar
+# --
+---
+title: "${1:title}"
+subtitle: "${2:subtitle}"
+author: "${3:Gabriel Mateus Bernardo Harrington}"
+date: "${4:date} (updated: \`r Sys.Date()\`"
+institute: "Keele University"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    ## the following two lines are for having a logo on each slide
+    ## update the insert-logo.html to change logo and size/pos
+    #includes:
+      #after_body: ../insert-logo.html
+    lib_dir: libs
+    stand_alone: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+bibliography: /home/mateus/Documents/masterLib.bib
+csl: /home/mateus/Documents/citation_styles/elsevier-vancouver.csl
+---
+
+\`\`\`{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE,
+                      fig.showtext = TRUE, fig.retina = 3, warning = FALSE)
+options(knitr.kable.NA = '') #sets NAs in tables to be blank
+library(xaringanthemer)
+library(tidyverse)
+library(kableExtra)
+\`\`\`
+
+
+\`\`\`{r, load_refs, include=FALSE, cache=FALSE}
+## set citation styles
+BibOptions(check.entries = FALSE,
+           bib.style = "authoryear",
+           cite.style = "alphabetic",
+           style = "markdown",
+           hyperlink = "to.doc",
+           dashed = FALSE)
+## read bib file. trying to read masterlib causes R to crash, maybe file size or non-standard charaters
+# bib <- ReadBib("iscos_talk_2021.bib", check = FALSE)
+\`\`\`
+
+\`\`\`{r xaringan-themer, include=FALSE}
+## set theme details via xaringanthemer - this generates the xaringan-themer.css file
+style_duo(primary_color = "#1F4257", secondary_color = "#F97B64",
+          ## lower header font sizes by 0.5rem
+          header_h1_font_size = "2.25rem", header_h2_font_size = "1.75rem",
+          header_h3_font_size = "1.25rem",
+          ## set srtiped row colour for tables
+          table_row_even_background_color = "#F97B64")
+\`\`\`
+
+---
+
+## References
+
+\`\`\`{r, label='print-bib', results="asis"}
+# PrintBibliography(bib, start = 1, end = 7)
+\`\`\`
