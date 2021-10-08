@@ -520,129 +520,138 @@ Layout rotation is also preferable, so I added this under `SPC w SPC`
 
 #+begin_src emacs-lisp
 
-    ;; Make ESC quit prompts
-    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  ;; Make ESC quit prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-    ;; try and fix odd indenting behavior
-    (setq-default default-tab-width 4)
-    (setq tab-always-indent 'complete)
-    (setq-default indent-tabs-mode nil)
-    ;; disable tab-always-indent as it messes with yasnippets
-    ;;(setq tab-always-indent nil)
+  ;; try and fix odd indenting behavior
+  (setq-default default-tab-width 4)
+  (setq tab-always-indent 'complete)
+  (setq-default indent-tabs-mode nil)
+  ;; disable tab-always-indent as it messes with yasnippets
+  ;;(setq tab-always-indent nil)
 
-    (use-package general
-      :after evil
-      :config
-      ;; (general-create-definer efs/leader-keys
-      ;;   :keymaps '(normal insert visual emacs)
-      ;;   :prefix "SPC"
-      ;;   :global-prefix "C-SPC")
-      (general-create-definer efs/leader-keys
-        :keymaps 'override
-        :states  '(insert emacs normal hybrid motion visual operator)
-        :prefix  "SPC"
-        :global-prefix "C-SPC"
-        :non-normal-prefix "S-SPC")
-      ;; enable recentf
-                                            ;(recentf-mode 1)
+  (use-package general
+    :after evil
+    :config
+    ;; (general-create-definer efs/leader-keys
+    ;;   :keymaps '(normal insert visual emacs)
+    ;;   :prefix "SPC"
+    ;;   :global-prefix "C-SPC")
+    (general-create-definer efs/leader-keys
+      :keymaps 'override
+      :states  '(insert emacs normal hybrid motion visual operator)
+      :prefix  "SPC"
+      :global-prefix "C-SPC"
+      :non-normal-prefix "S-SPC")
+    ;; enable recentf
+                                          ;(recentf-mode 1)
 
-      ;; Set up main which-y bindings
-      (efs/leader-keys
-        "SPC"  '(counsel-M-x :which-key "M-x")
-        "t"  '(:ignore t :which-key "toggles")
-        "to"  '(olivetti-mode :which-key "olivetti")
-        "tt" '(counsel-load-theme :which-key "choose theme")
-        "tl"  '(toggle-truncate-lines :which-key "Toggle truncate lines")
-        "X" '(org-capture :which-key "capture")
-        "a"  '(:ignore a :which-key "actions")
-        "as"  '(avy-goto-char-2 :which-key "avy goto char2")
-        "ac"  '(helm-bibtex :which-key "helm-bibtex")
-        "ar" '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :which-key "Reload emacs config")
-        "b"  '(:ignore b :which-key "buffers")
-        "bb" '(counsel-switch-buffer :which-key "switch buffer")
-        "bc" '(ispell :which-key "ispell")
-        "bk" '(kill-current-buffer :which-key "kill buffer")
-        "bs" '(save-buffer :which-key "save buffer")
-        "bf" '(swiper :which-key "swiper")
-        "bu" '(browse-url-of-file :which-key "open html")
-        "bw" '(count-words :which-key "word count")
-        "."  '(find-file :which-key "find file")
-        "s"  '(ivy-yasnippet :which-key "snippets")
-        "w"  '(evil-window-map :which-key "windows")
-        "h"  '(help-command :which-key "help")
-        ;; "TAB"  '(tab-prefix-map :which-key "workspaces")
-        "TAB"  '(:ignore TAB :which-key "workspaces")
-        "TAB TAB"  '(tab-new :which-key "new tab")
-        "TAB o"  '(tab-next :which-key "next tab")
-        "TAB O"  '(tab-previous :which-key "previous tab")
-        "TAB r"  '(tab-rename :which-key "rename tab")
-        "TAB c"  '(tab-close :which-key "close tab")
-        "TAB u"  '(tab-undo-close-tab :which-key "undo close tab")
-        ","  '(tab-prefix-map :which-key "workspaces")
-        "."  '(find-file :which-key "find file")
-        "o"  '(:ignore o :which-key "org")
-        "oa" '(org-agenda :which-key "org agenda")
-        "o'" '(org-edit-special :which-key "edit code")
-        "op" '(org-set-property :which-key "org property")
-        "oe" '(org-export-dispatch :which-key "org export")
-        "on" '(orb-note-actions :which-key "note actions")
-        "oi"  '(:ignore oi :which-key "insert")
-        "oil" '(org-insert-link :which-key "link")
-        "oiu" '(insert-url-as-org-link-fancy :which-key "url")
-        "oic" '(org-ref-ivy-insert-cite-link :which-key "cite")
-        "oit" '(org-set-tags-command :which-key "tags")
-        "ot" '(:ignore ot :which-key "org todo")
-        "otd" '(org-todo :which-key "switch todo state")
-        "ott" '(counsel-org-tag :which-key "tag")
-        "os" '(:ignore os :which-key "scheduling")
-        "oss" '(org-schedule :which-key "schedule")
-        "osd" '(org-deadline :which-key "deadline")
-        "ost" '(org-time-stamp :which-key "timestamp")
-        "f"  '(:ignore f :which-key "files")
-        "fr" '(counsel-recentf :which-key "recent files")
-        "fc" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/config.org")) :which-key "config.org"))) ; point to config.org
+    ;; Set up main which-y bindings
+    (efs/leader-keys
+      "SPC"  '(counsel-M-x :which-key "M-x")
+      "t"  '(:ignore t :which-key "toggles")
+      "to"  '(olivetti-mode :which-key "olivetti")
+      "tt" '(counsel-load-theme :which-key "choose theme")
+      "tl"  '(toggle-truncate-lines :which-key "Toggle truncate lines")
+      "X" '(org-capture :which-key "capture")
+      "a"  '(:ignore a :which-key "actions")
+      "as"  '(avy-goto-char-2 :which-key "avy goto char2")
+      "ac"  '(helm-bibtex :which-key "helm-bibtex")
+      "ar" '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :which-key "Reload emacs config")
+      "b"  '(:ignore b :which-key "buffers")
+      "bb" '(counsel-switch-buffer :which-key "switch buffer")
+      "bc" '(ispell :which-key "ispell")
+      "bk" '(kill-current-buffer :which-key "kill buffer")
+      "bs" '(save-buffer :which-key "save buffer")
+      "bf" '(swiper :which-key "swiper")
+      "bu" '(browse-url-of-file :which-key "open html")
+      "bw" '(count-words :which-key "word count")
+      "."  '(find-file :which-key "find file")
+      "s"  '(ivy-yasnippet :which-key "snippets")
+      "w"  '(evil-window-map :which-key "windows")
+      "h"  '(help-command :which-key "help")
+      ;; "TAB"  '(tab-prefix-map :which-key "workspaces")
+      "TAB"  '(:ignore TAB :which-key "workspaces")
+      "TAB TAB"  '(tab-new :which-key "new tab")
+      "TAB o"  '(tab-next :which-key "next tab")
+      "TAB O"  '(tab-previous :which-key "previous tab")
+      "TAB r"  '(tab-rename :which-key "rename tab")
+      "TAB c"  '(tab-close :which-key "close tab")
+      "TAB u"  '(tab-undo-close-tab :which-key "undo close tab")
+      ","  '(tab-prefix-map :which-key "workspaces")
+      "."  '(find-file :which-key "find file")
+      "o"  '(:ignore o :which-key "org")
+      "oa" '(org-agenda :which-key "org agenda")
+      "o'" '(org-edit-special :which-key "edit code")
+      "op" '(org-set-property :which-key "org property")
+      "oe" '(org-export-dispatch :which-key "org export")
+      "on" '(orb-note-actions :which-key "note actions")
+      "oi"  '(:ignore oi :which-key "insert")
+      "oil" '(org-insert-link :which-key "link")
+      "oiu" '(insert-url-as-org-link-fancy :which-key "url")
+      "oic" '(org-ref-ivy-insert-cite-link :which-key "cite")
+      "oit" '(org-set-tags-command :which-key "tags")
+      "ot" '(:ignore ot :which-key "org todo")
+      "otd" '(org-todo :which-key "switch todo state")
+      "ott" '(counsel-org-tag :which-key "tag")
+      "os" '(:ignore os :which-key "scheduling")
+      "oss" '(org-schedule :which-key "schedule")
+      "osd" '(org-deadline :which-key "deadline")
+      "ost" '(org-time-stamp :which-key "timestamp")
+      "l" '(:ignore t :which-key "lsp")
+      "ld" '(xref-find-definitions :which-key "find definitions")
+      "lr" '(xref-find-references :which-key "find references")
+      "ln" '(lsp-ui-find-next-reference :which-key "find next ref")
+      "lp" '(lsp-ui-find-prev-reference :which-key "find prev ref")
+      "ls" '(counsel-imenu :which-key "counsel-imenu")
+      "le" '(lsp-ui-flycheck-list :which-key "flycheck list")
+      "lS" '(lsp-ui-sideline-mode :which-key "sideline mode")
+      "lX" '(lsp-execute-code-action :which-key "execute code action")
+      "f"  '(:ignore f :which-key "files")
+      "fr" '(counsel-recentf :which-key "recent files")
+      "fc" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/config.org")) :which-key "config.org"))) ; point to config.org
 
-    (use-package undo-tree
-      :init
-      (global-undo-tree-mode 1))
+  (use-package undo-tree
+    :init
+    (global-undo-tree-mode 1))
 
-    (use-package evil
-      :init
-      (setq evil-want-integration t)
-      (setq evil-want-keybinding nil)
-      (setq evil-want-C-u-scroll t)
-      (setq evil-want-C-i-jump nil)
-      (setq evil-undo-system 'undo-tree)
-      :config
-      (evil-mode 1)
-      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state) ; binding to get out of insert mode
-      ;;(define-key evil-insert-state-map (kbd "kj") 'evil-normal-state)
-      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    (setq evil-undo-system 'undo-tree)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state) ; binding to get out of insert mode
+    ;;(define-key evil-insert-state-map (kbd "kj") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-      ;; Use visual line motions even outside of visual-line-mode buffers
-      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-      (evil-set-initial-state 'messages-buffer-mode 'normal)
-      (evil-set-initial-state 'dashboard-mode 'normal))
-        ;; :keymaps
-        ;; '(tab-bar-map)
-        ;; "TAB" '(:ignore TAB :which-key "workspace"))
-    ;;   :keymaps
-    ;;   '(evil-window-map)
-    ;;   "SPC" '(rotate-layout :which-key "rotate-layout")
-    ;;   "<left>" '(evil-window-left :which-key "evil-window-left"))
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+  ;; :keymaps
+  ;; '(tab-bar-map)
+  ;; "TAB" '(:ignore TAB :which-key "workspace"))
+  ;;   :keymaps
+  ;;   '(evil-window-map)
+  ;;   "SPC" '(rotate-layout :which-key "rotate-layout")
+  ;;   "<left>" '(evil-window-left :which-key "evil-window-left"))
 
-    (use-package evil-collection
-      :after evil
-      :config
-      (evil-collection-init))
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
 
-    ;; add evil escape
-    (use-package evil-escape)
-    (setq evil-escape-mode t)
-    (setq-default evil-escape-key-sequence "ii")
-    (setq-default evil-escape-delay 0.2)
+  ;; add evil escape
+  (use-package evil-escape)
+  (setq evil-escape-mode t)
+  (setq-default evil-escape-key-sequence "ii")
+  (setq-default evil-escape-delay 0.2)
 
 #+end_src
 
@@ -1031,10 +1040,10 @@ Counsel is a customized set of commands to replace `find-file` with `counsel-fin
     :config
     (ivy-mode 1))
 
-  (use-package ivy-rich
-    :after ivy
-    :init
-    (ivy-rich-mode 1))
+  ;; (use-package ivy-rich
+  ;;   :after ivy
+  ;;   :init
+    ;; (ivy-rich-mode 1))
 
   (use-package counsel
     :bind (("C-M-j" . 'counsel-switch-buffer)
@@ -2614,11 +2623,12 @@ The =which-key= integration adds helpful descriptions of the various keys so you
     :commands (lsp lsp-deferred)
     :hook (lsp-mode . efs/lsp-mode-setup)
     :init
-    (setq lsp-keymap-prefix "SPC l")  ;; Or 'C-l', 's-l'
+    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
     :config
     (lsp-enable-which-key-integration t))
 
 #+end_src
+
 **** lsp-ui
 
 [[https://emacs-lsp.github.io/lsp-ui/][lsp-ui]] is a set of UI enhancements built on top of =lsp-mode= which make Emacs feel even more like an IDE.
@@ -2742,6 +2752,21 @@ The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =da
 
 #+begin_src emacs-lisp
 
+  (use-package sql
+    :general
+    (global-leader
+      :major-modes
+      '(sql-mode t)
+      :keymaps
+      '(lsp-mode-map)
+      "e" '(:ignore e :which-key "eval")
+      "eb" '(sql-send-buffer :which-key "send buffer")
+      "ep" '(sql-send-paragraph :which-key "send paragraph")
+      "el" '(sql-send-line-and-next :which-key "send line and next")
+      "er" '(sql-send-region :which-key "send region")
+      "l" '(sql-list-all :which-key "list all")
+      "t" '(sql-list-table :which-key "list table")))
+
   ;; default login params
   (setq sql-postgres-login-params
         '((user :default "mateus")
@@ -2753,37 +2778,38 @@ The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =da
   (add-hook 'sql-interactive-mode-hook
             (lambda ()
               (toggle-truncate-lines t)))
-  ;; (add-hook 'sql-interactive-mode-hook 'lsp-mode)
-  ;; (add-hook 'sql-mode-hook 'lsp-mode)
-  (add-hook 'sql-mode-hook #'lsp-deferred)
+  ;; (add-hook 'sql-interactive-mode-hook 'lsp-deferred)
+  (add-hook 'sql-mode-hook 'lsp-mode)
+  ;; (add-hook 'sql-mode-hook #'lsp-deferred)
   (setq lsp-sqls-workspace-config-path nil)
 
+  ;; add sqls path
+  (setq lsp-sqls-server (concat (getenv "HOME") "/go/bin/sqls"))
+
   (setq lsp-sqls-connections
-        '(((driver . "mysql") (dataSourceName . "mateus:local@tcp(localhost:3306)/foo"))
-          ((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=mateus password=local dbname=postgres sslmode=disable"))))
+        '(((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=mateus dbname=postgres sslmode=disable"))))
 
 
   ;; (setq lsp-sqls-connections
   ;;       '(((driver . "mysql") (dataSourceName . "yyoncho:local@tcp(localhost:3306)/foo"))
   ;;         ((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=yyoncho password=local dbname=sammy sslmode=disable"))))
 
-  ;; (setq sql-connection-alist
-  ;;       '((pool-a
-  ;;          (sql-product 'postgresql)
-  ;;          (sql-server "1.2.3.4")
-  ;;          (sql-user "mateus")
-  ;;          (sql-password "")
-  ;;          (sql-database "postgres")
-  ;; (sql-port 5432))))
-
   (setq sql-connection-alist
         '((pool-a
-           (sql-product 'mysql)
+           (sql-product 'postgresql)
            (sql-server "1.2.3.4")
-           (sql-user "me")
-           (sql-password "mypassword")
-           (sql-database "thedb")
-           (sql-port 3306))))
+           (sql-user "mateus")
+           (sql-database "postgres")
+           (sql-port 5432))))
+
+  ;; (setq sql-connection-alist
+  ;;       '((pool-a
+  ;;          (sql-product 'mysql)
+  ;;          (sql-server "1.2.3.4")
+  ;;          (sql-user "me")
+  ;;          (sql-password "mypassword")
+  ;;          (sql-database "thedb")
+  ;; (sql-port 3306))))
 
   ;; prevent tripup from databases with underscores in their name - rom emacs wiki
   ;; (sql-set-product-feature 'postgres :prompt-regexp "^[-[:alnum:]_]*=[#>] ")
