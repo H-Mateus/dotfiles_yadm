@@ -10,7 +10,7 @@ if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
-export PATH=$PATH:/home/mateus/.local/bin
+export PATH=$HOME/.local/bin:$HOME/go/bin:$PATH
 
 # neofetch
 
