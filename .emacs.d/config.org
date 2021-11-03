@@ -1021,6 +1021,8 @@ Counsel is a customized set of commands to replace `find-file` with `counsel-fin
 
 [[https://github.com/Yevgnen/ivy-rich][ivy-rich]] adds extra columns to a few of the Counsel commands to provide more information about each item.
 
+You can force ivy to complete the input with =ivy-immediate-done= (default C-M-j)
+
 #+begin_src emacs-lisp
 
   (use-package ivy
@@ -1536,8 +1538,8 @@ You can add more =src= block templates below by copying one of the lines and cha
   (with-eval-after-load 'org
     ;; This is needed as of Org 9.2
     (require 'org-tempo)
-
     (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+    (add-to-list 'org-structure-template-alist '("sq" . "src sql"))
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
     (add-to-list 'org-structure-template-alist '("json" . "src json"))
@@ -1723,48 +1725,11 @@ Set up [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org][org-ref]]
 
 #+end_src
 
-#+begin_src emacs-lisp :tangle no
-
-  (use-package org-ref
-    :after org
-    :init
-    (setq ;org-ref-completion-library 'org-ref-ivy-cite
-     ;; org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-     ;; reftex-default-bibliography '("~/Documents/masterLib.bib")
-     ;; org-ref-bibliography-notes '("~/Documents/org-roam/notes.org")
-     ;; org-ref-default-bibliography '("~/Documents/masterLib.bib")
-     bibtex-completion-bibliography '("~/Documents/masterLib.bib")
-     ;; org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
-     bibtex-completion-notes-path "~/Documents/org-roam/"
-     ;; org-ref-notes-function 'orb-edit-notes
-     ;; org-ref-pdf-directory '("~/Zotero/"))
-     bibtex-completion-library-path '("~/Zotero/"))
-    ;; bibtex-completion-pdf-open-function 'org-open-file)
-    ;; :bind
-    ;; (:map org-mode-map ("SPC o i c" . org-ref-ivy-insert-cite-link))
-    :config)
-  ;; (require 'org-ref)
-  ;; (require 'doi-utils)
-  ;; (require 'org-id)
-  ;; (require 'org-ref-wos)
-  ;; (require 'org-ref-scopus)
-  ;; (require 'org-ref-pubmed)
-  ;; (require 'org-ref-sci-id)
-  ;; (setq bibtex-autokey-year-length 4
-  ;;       bibtex-autokey-name-year-separator ""
-  ;;       bibtex-autokey-year-title-separator "-"
-  ;;       bibtex-autokey-titleword-separator "-"
-  ;;       bibtex-autokey-titlewords 0
-  ;;       bibtex-autokey-titlewords-stretch 1
-  ;;       bibtex-autokey-titleword-length 5))
-
-#+end_src
-
 ** Helm-Bibtex
 
 We need to install helm as well
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 
   (use-package helm)
   (use-package helm-bibtex
@@ -1883,9 +1848,9 @@ Taken from the [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-n
 
   (setq
    org_notes (concat (getenv "HOME") "/Documents/org-roam/")
-   zot_bib (concat (getenv "HOME") "/Documents/masterLib.bib")
+   ;; zot_bib (concat (getenv "HOME") "/Documents/masterLib.bib")
    org-directory org_notes
-   org-roam-dailies-directory (concat org_notes "daily")
+   ;; org-roam-dailies-directory (concat org_notes "daily")
    deft-directory org_notes
    org-roam-directory org_notes
    org-roam-db-location (concat org_notes "org-roam.db"))
@@ -1972,38 +1937,35 @@ Repo [[https://github.com/org-roam/org-roam][here]]
 
 #+begin_src emacs-lisp
 
-  (setq org-roam-v2-ack t) ; stop org-roam v2 warning
   (use-package org-roam
     :straight (:host github :repo "org-roam/org-roam"
                      :files (:defaults "extensions/*"))
+    :init
+    (setq org-roam-v2-ack t) ; stop org-roam v2 warning
     :hook (after-init-hook . org-roam-db-autosync-mode)
-    :commands (org-roam-buffer-toggle-display
-               org-roam-find-file
-               org-roam-graph
-               org-roam-insert
-               org-roam-switch-to-buffer
-               org-roam-dailies-date
-               org-roam-dailies-today
-               org-roam-dailies-tomorrow
-               org-roam-dailies-yesterday)
+    :custom
+    (org-roam-completion-everywhere t)
+    (org-roam-dailies-capture-templates
+     '(("d" "default" entry "* %<%I:%M %p>: %?"
+        :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+    (org-roam-capture-templates '(("d" "default" plain "%?"
+                                   :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+                                   :unnarrowed t)
+                                  ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+                                   :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: Project")
+                                   :unnarrowed t)))
+    :bind-keymap
+    ("C-c n d" . org-roam-dailies-map)
     :config
-    (require 'org-roam-capture)
-    (setq org-roam-verbose nil  ; https://youtu.be/fn4jIlFwuLU
-          org-roam-buffer-no-delete-other-windows t ; make org-roam buffer sticky
-          org-roam-capture-templates '(("d" "default" plain #'org-roam-capture--get-point "%?"
-                                        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-                                        :head "#+title: ${title}\n#+created: %U\n#+last_modified:\n#+roam_tags:\n\n"
-                                        :unnarrowed t)
-                                       ("r" "bibliography reference" plain "%?"
-                                        :target
-                                        (file+head "references/${citekey}.org" "#+title: ${title}\n")
-                                        :unnarrowed t))
-          org-roam-dailies-capture-templates
-          '(("d" "default" entry #'org-roam-capture--get-point
-             "* %?"
-             :add-created t
-             :file-name "daily/%<%Y-%m-%d>"
-             :head "#+title: %<%Y-%m-%d>\n#+created: %u\n#+last_modified: %U\n#+roam_tags: dailies\n\n"))))
+    (require 'org-roam-dailies) ;; Ensure the keymap is available
+    ;; (setq org-roam-verbose nil  ; https://youtu.be/fn4jIlFwuLU
+    ;;       org-roam-buffer-no-delete-other-windows t ; make org-roam buffer sticky
+    ;;       )
+    ;; ("r" "bibliography reference" plain "%?"
+    ;;  :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+    ;;  (file+head "references/${citekey}.org" "#+title: ${title}\n")
+    ;;  :unnarrowed t))
+    (org-roam-db-autosync-mode))
 
   ;;setupeybindings
   (efs/leader-keys
@@ -2014,12 +1976,67 @@ Repo [[https://github.com/org-roam/org-roam][here]]
     ;; "nc" '(org-roam-capture :which-key "capture")
     "nw" '(org-roam-switch-to-buffer :which-key "switch roam buffer")
     "nb" '(org-roam-buffer-toggle :which-key "toggle display")
-    "nd" '(org-roam-dailies-capture-today :which-key "daily capture")
+    "nd" '(org-roam-dailies-map :which-key "daily map")
     "ng" '(org-roam-ui-mode :which-key "show graph")
-    "n[" '(org-roam-dailies-find-date :which-key "previous daily")
-    "n]" '(org-roam-dailies-find-today :which-key "next daily")
+    ;; "n[" '(org-roam-dailies-find-date :which-key "previous daily")
+    ;; "n]" '(org-roam-dailies-find-today :which-key "next daily")
     "nt" '(org-roam-tag-add :which-key "tag")
     "ns" '(deft :which-key "deft"))
+
+#+end_src
+
+*** Org-roam custom functions
+
+Taken from [[https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/][SystemCrafters]]
+
+#+begin_src emacs-lisp
+  (defun my/org-roam-project-finalize-hook ()
+    "Adds the captured project file to `org-agenda-files' if the
+  capture was not aborted."
+    ;; Remove the hook since it was added temporarily
+    (remove-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+    ;; Add project file to the agenda list if the capture was confirmed
+    (unless org-note-abort
+      (with-current-buffer (org-capture-get :buffer)
+        (add-to-list 'org-agenda-files (buffer-file-name)))))
+
+  (defun my/org-roam-find-project ()
+    (interactive)
+    ;; Add the project file to the agenda after capture is finished
+    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+    ;; Select a project file to open, creating it if necessary
+    (org-roam-node-find
+     nil
+     nil
+     (my/org-roam-filter-by-tag "Project")
+     :templates
+     '(("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
+        :unnarrowed t))))
+
+  ;; (global-set-key (kbd "SPC n p") #'my/org-roam-find-project)
+
+  (defun my/org-roam-capture-task ()
+    (interactive)
+    ;; Add the project file to the agenda after capture is finished
+    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+    ;; Capture the new task, creating the project file if necessary
+    (org-roam-capture- :node (org-roam-node-read
+                              nil
+                              (my/org-roam-filter-by-tag "Project"))
+                       :templates '(("p" "project" plain "* TODO %?"
+                                     :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                            "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                            ("Tasks"))))))
+
+  ;; (global-set-key (kbd "SPC n P") #'my/org-roam-capture-task)
+
+  (efs/leader-keys
+    "np" '(my/org-roam-find-project)
+    "nP" '(my/org-roam-capture-task))
 
 #+end_src
 
@@ -2044,47 +2061,6 @@ Used to be org-roam-server, now that ones for org-roam version 1.
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
-#+end_src
-
-** Org-Roam-Server
-
-Allows me to see my org-roam-graph. This is a fantastic package and I have my roam -server almost always open as I take notes.
-
-#+begin_src emacs-lisp
-
-  ;; (use-package org-roam-server
-  ;;               :after org-roam
-  ;;               :config
-  ;;               (setq org-roam-server-host "127.0.0.1"
-  ;;                     org-roam-server-port 8078
-  ;;                     org-roam-server-export-inline-images t
-  ;;                     org-roam-server-authenticate nil
-  ;;                     org-roam-server-network-poll t
-  ;;                     org-roam-server-label-truncate t
-  ;;                     org-roam-server-label-truncate-length 60
-  ;;                     org-roam-server-label-wrap-length 20)
-  ;;               (defun org-roam-server-open ()
-  ;;                 "Ensure the server is active, then open the roam graph."
-  ;;                 (interactive)
-  ;;                 (org-roam-server-mode 1)
-  ;;                 (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))))
-  ;; (use-package org-roam-server
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq org-roam-server-host "127.0.0.1"
-  ;;         org-roam-server-port 8078
-  ;;         org-roam-server-authenticate nil
-  ;;         org-roam-server-export-inline-images t
-  ;;         org-roam-server-serve-files nil
-  ;;         org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-  ;;         org-roam-server-network-poll t
-  ;;         org-roam-server-network-arrows nil
-  ;;         org-roam-server-network-label-truncate t
-  ;;         org-roam-server-network-label-truncate-length 60
-  ;;         org-roam-server-network-label-wrap-length 20))
-
-  ;; (unless (server-running-p)
-  ;;   (org-roam-server-mode))
 #+end_src
 
 * Blogging
@@ -2361,6 +2337,8 @@ Define some functions for inserting various operators and exporting .Rmd
     :config
     (add-hook 'ess-post-run-hook 'ess-execute-screen-options)
     (add-hook 'ess-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
+    (add-hook 'ess-mode-hook ;; truncate lines to make tables easier to view
+              (lambda () (toggle-truncate-lines t)))
     (add-hook 'ess-mode-hook
               (lambda () (ess-set-style 'RRR 'quiet)
                 (add-hook 'local-write-file-hooks
@@ -2838,6 +2816,7 @@ The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =da
       "el" '(sql-send-line-and-next :which-key "send line and next")
       "er" '(sql-send-region :which-key "send region")
       "l" '(sql-list-all :which-key "list all")
+      "f" '(sql-beautify-region-or-buffer :which-key "format region or buffer")
       "t" '(sql-list-table :which-key "list table")))
 
   ;; default login params
@@ -2898,9 +2877,29 @@ The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =da
   ;; auto-indent
   (use-package sql-indent
     :config
-    (add-hook 'sql-mode-hook 'sqlup-mode)
-    (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
-    (add-hook 'redis-mode-hook 'sqlup-mode))
+    (add-hook 'sql-mode-hook 'sqlind-minor-mode)
+    (add-hook 'sql-interactive-mode-hook 'sqlind-minor-mode)
+    (add-hook 'redis-mode-hook 'sqlind-minor-mode))
+  ;; functions to use sqlbeautify to format code in region or buffer
+  (defun sql-beautify-region (beg end)
+    "Beautify SQL in region between beg and END."
+    (interactive "r")
+    (save-excursion
+      (shell-command-on-region beg end "anbt-sql-formatter" nil t)))
+  ;; change sqlbeautify to anbt-sql-formatter if you
+  ;;ended up using the ruby gem
+
+  (defun sql-beautify-buffer ()
+    "Beautify SQL in buffer."
+    (interactive)
+    (sql-beautify-region (point-min) (point-max)))
+
+  (defun sql-beautify-region-or-buffer ()
+    "Beautify SQL for the entire buffer or the marked region between beg and end"
+    (interactive)
+    (if (use-region-p)
+        (sql-beautify-region (region-beginning) (region-end))
+      (sql-beautify-buffer)))
 
 #+end_src
 
