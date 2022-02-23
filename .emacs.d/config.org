@@ -337,8 +337,8 @@ If you're just getting started in Emacs, the menu bar might be helpful so you ca
   (setq inhibit-startup-message t)
 
   (scroll-bar-mode -1)        ; Disable visible scrollbar
-  ;; (tool-bar-mode -1)          ; Disable the toolbar
-  ;;(tooltip-mode -1)           ; Disable tooltips
+  (tool-bar-mode -1)          ; Disable the toolbar
+  ;; (tooltip-mode -1)           ; Disable tooltips
   (set-fringe-mode 10)        ; Give some breathing room
 
   ;; (menu-bar-mode -1)            ; Disable the menu bar
@@ -969,30 +969,9 @@ The default configuration is quite good but you can check out the [[https://gith
   (setq display-time-format "%l:%M %p %b %y"
         display-time-default-load-average nil)
 
-  ;; (use-package doom-modeline
-  ;;   :init (doom-modeline-mode 1)
-  ;;   :custom ((doom-modeline-height 15)))
-
-  (use-package minions
-    :hook (doom-modeline-mode . minions-mode))
-
   (use-package doom-modeline
-    :after eshell     ;; Make sure it gets hooked after eshell
-    :hook (after-init . doom-modeline-init)
-    :custom-face
-    (mode-line ((t (:height 0.85))))
-    (mode-line-inactive ((t (:height 0.85))))
-    :custom
-    (doom-modeline-height 15)
-    (doom-modeline-bar-width 6)
-    (doom-modeline-lsp t)
-    (doom-modeline-github nil)
-    (doom-modeline-mu4e nil)
-    (doom-modeline-irc nil)
-    (doom-modeline-minor-modes t)
-    (doom-modeline-persp-name nil)
-    (doom-modeline-buffer-file-name-style 'truncate-except-project)
-    (doom-modeline-major-mode-icon nil))
+    :init (doom-modeline-mode 1)
+    :custom ((doom-modeline-height 15)))
 
 #+end_src
 
@@ -1958,6 +1937,7 @@ Taken from [[https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420][zaeph]
 
 Documentation can be found [[https://www.orgroam.com/][here]]
 Repo [[https://github.com/org-roam/org-roam][here]]
+Heavily inspired by [[https://jethrokuan.github.io/org-roam-guide/][this post]]
 
 #+begin_src emacs-lisp
 
@@ -1977,6 +1957,16 @@ Repo [[https://github.com/org-roam/org-roam][here]]
                                    :unnarrowed t)
                                   ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
                                    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: Project")
+                                   :unnarrowed t)
+                                  ("r" "reference" plain "%?"
+                                   :if-new
+                                   (file+head "reference/${title}.org" "#+title: ${title}\n")
+                                   :immediate-finish t
+                                   :unnarrowed t)
+                                  ("a" "article" plain "%?"
+                                   :if-new
+                                   (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
+                                   :immediate-finish t
                                    :unnarrowed t)))
     :bind-keymap
     ("C-c n d" . org-roam-dailies-map)
@@ -1991,10 +1981,43 @@ Repo [[https://github.com/org-roam/org-roam][here]]
     ;;  :unnarrowed t))
     (org-roam-db-autosync-mode))
 
+  ;; create property type on nodes
+  (cl-defmethod org-roam-node-type ((node org-roam-node))
+    "Return the TYPE of NODE."
+    (condition-case nil
+        (file-name-nondirectory
+         (directory-file-name
+          (file-name-directory
+           (file-relative-name (org-roam-node-file node) org-roam-directory))))
+      (error "")))
+
+  ;; modify display template to show type
+  (setq org-roam-node-display-template
+        (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
+  ;; function to generate node from reference
+  (defun efs/org-roam-node-from-cite (keys-entries)
+    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
+    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
+                                                "${author editor} :: ${title}")))
+      (org-roam-capture- :templates
+                         '(("r" "reference" plain "%?" :if-new
+                            (file+head "reference/${citekey}.org"
+                                       ":PROPERTIES:
+  :ROAM_REFS: [cite:@${citekey}]
+  :END:
+  ,#+title: ${title}\n")
+                            :immediate-finish t
+                            :unnarrowed t))
+                         :info (list :citekey (car keys-entries))
+                         :node (org-roam-node-create :title title)
+                         :props '(:finalize find-file))))
+
   ;;setupeybindings
   (efs/leader-keys
     "n"  '(:ignore t :which-key "notes")
     "nl" '(org-roam :which-key "org-roam")
+    "nc" '(efs/org-roam-node-from-cite :which-key "org-roam-cite")
     "nf" '(org-roam-node-find :which-key "find")
     "ni" '(org-roam-node-insert :which-key "insert")
     ;; "nc" '(org-roam-capture :which-key "capture")
@@ -2831,10 +2854,10 @@ The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =da
 
 #+begin_src emacs-lisp
 
-  (use-package pyvenv
-    :after python-mode
-    :config
-    (pyvenv-mode 1))
+  ;; (use-package pyvenv
+  ;;   :after python-mode
+  ;;   :config
+  ;;   (pyvenv-mode 1))
 
 #+end_src
 
@@ -3167,7 +3190,7 @@ Some basic keybinds can be found [[file:../../Documents/org-roam/20210221112029-
     :straight nil
     :commands (dired dired-jump)
     :bind (("C-x C-j" . dired-jump))
-    :custom ((dired-listing-switches "-agho --group-directories-first"))
+    :custom ((dired-listing-switches "-algho --group-directories-first"))
     :config
     (evil-collection-define-key 'normal 'dired-mode-map
       "h" 'dired-single-up-directory

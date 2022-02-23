@@ -7,7 +7,7 @@ title: "${1:title}"
 subtitle: "${2:subtitle}"
 author: "${3:Gabriel Mateus Bernardo Harrington}"
 date: "${4:date} (updated: \`r Sys.Date()\`"
-institute: "Keele University"
+institute: "Cardiff University"
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -20,6 +20,7 @@ output:
     nature:
       highlightStyle: github
       highlightLines: true
+      ratio: "16:9"
       countIncrementalSlides: false
 bibliography: /home/mateus/Documents/masterLib.bib
 csl: /home/mateus/Documents/citation_styles/elsevier-vancouver.csl
@@ -29,6 +30,7 @@ csl: /home/mateus/Documents/citation_styles/elsevier-vancouver.csl
 knitr::opts_chunk$set(echo = FALSE, message = FALSE,
                       fig.showtext = TRUE, fig.retina = 3, warning = FALSE)
 options(knitr.kable.NA = '') #sets NAs in tables to be blank
+options(knitr.table.format = "html") #set correct kable format
 library(xaringanthemer)
 library(tidyverse)
 library(kableExtra)
@@ -36,6 +38,8 @@ library(kableExtra)
 
 
 \`\`\`{r, load_refs, include=FALSE, cache=FALSE}
+## load package
+library(RefManageR)
 ## set citation styles
 BibOptions(check.entries = FALSE,
            bib.style = "authoryear",
