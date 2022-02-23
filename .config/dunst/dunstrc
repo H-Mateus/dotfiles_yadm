@@ -3,13 +3,13 @@
     color = "#AC9B91"
 
 [urgency_low]
-    background = "#0F1215"
-    foreground = "#AC9B91"
+    background = "#05132D"
+    foreground = "#c4c7c5"
     timeout = 2
 
 [urgency_normal]
-    background = "#0F1215"
-    foreground = "#dbd1c9"
+    background = "#05132D"
+    foreground = "#c4c7c5"
     timeout = 3
 
 [urgency_critical]
@@ -77,7 +77,7 @@
     # Close all notifications
     close_all = ctrl+shift+space
 
-    # Recall last message(s) 
+    # Recall last message(s)
     history = mod4+shift+h
 
     # Context menu
