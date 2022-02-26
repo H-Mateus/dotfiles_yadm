@@ -195,7 +195,7 @@ super + shift + d
 
 # launch emacs
 super + r
-    emacsclient -c -n
+    emacsclient -c -n -a 'emacs'
 
 ## emacsclient -c --alternate-editor=""
 
