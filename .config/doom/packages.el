@@ -49,9 +49,19 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! flycheck-aspell)
 (package! modus-themes)
+
+(package! flycheck-aspell)
+
 (unpin! org-roam)
 (package! org-roam-ui)
+
 (package! dired-open)
 (package! dired-subtree)
+
+(package! polymode)
+(package! poly-R)
+(package! poly-markdown)
+
+;; good for a refresher!
+(package! evil-tutor)

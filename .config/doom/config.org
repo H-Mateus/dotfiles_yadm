@@ -16,36 +16,7 @@ It's useful to have some basic personal information
       user-mail-address "Bernardo-HarringtonG@cardiff.ac.uk")
 #+end_src
 
-** Better defaults
-*** Simple settings
-Browsing the web and seeing [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][angrybacon/dotemacs]] and comparing with the values
-shown by =SPC h v= and selecting what I thought looks good, I've ended up adding
-the following:
-
-#+begin_src emacs-lisp
-(setq-default
- delete-by-moving-to-trash t                      ; Delete files to trash
- window-combination-resize t                      ; take new window space from all other windows (not just current)
- x-stretch-cursor t)                              ; Stretch cursor to the glyph width
-
-(setq undo-limit 80000000                         ; Raise undo-limit to 80Mb
-      evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
-      auto-save-default t                         ; Nobody likes to loose work, I certainly don't
-      truncate-string-ellipsis "…"                ; Unicode ellispis are nicer than "...", and also save /precious/ space
-      password-cache-expiry nil                   ; I can trust my computers ... can't I?
-      ;; scroll-preserve-screen-position 'always     ; Don't have `point' jump around
-      scroll-margin 2)                            ; It's nice to maintain a little margin
-
-(display-time-mode 1)                             ; Enable time in the mode-line
-
-(unless (string-match-p "^Power N/A" (battery))   ; On laptops...
-  (display-battery-mode 1))                       ; it's nice to know how much power you have
-
-(global-subword-mode 1)                           ; Iterate through CamelCase words
-#+end_src
-
-*** Fonts
-
+** Fonts
 Settings related to fonts within Doom Emacs:
 
 - 'doom-font' – standard monospace font that is used for most things in Emacs.
@@ -55,9 +26,9 @@ Settings related to fonts within Doom Emacs:
 - 'font-lock-keyword-face' – for keywords with special significance like 'setq' in elisp.
 
   #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Source Code Pro" :size 18)
+(setq doom-font (font-spec :family "Fira Code" :size 18)
       doom-variable-pitch-font (font-spec :family "Ubuntu" :size 19)
-      doom-big-font (font-spec :family "Source Code Pro" :size 24))
+      doom-big-font (font-spec :family "Fira Code" :size 24))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
@@ -65,6 +36,50 @@ Settings related to fonts within Doom Emacs:
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
   #+end_src
+
+Because we care about how things look let's add a check to make sure we're told
+if the system doesn't have any of those fonts.
+
+#+name: detect-missing-fonts
+#+begin_src emacs-lisp :tangle no
+(defvar required-fonts '("JetBrainsMono.*" "Overpass" "Fira Code" "IBM Plex Mono"))
+
+(defvar available-fonts
+  (delete-dups (or (font-family-list)
+                   (split-string (shell-command-to-string "fc-list : family")
+                                 "[,\n]"))))
+
+(defvar missing-fonts
+  (delq nil (mapcar
+             (lambda (font)
+               (unless (delq nil (mapcar (lambda (f)
+                                           (string-match-p (format "^%s$" font) f))
+                                         available-fonts))
+                 font))
+             required-fonts)))
+
+(if missing-fonts
+    (pp-to-string
+     `(unless noninteractive
+        (add-hook! 'doom-init-ui-hook
+          (run-at-time nil nil
+                       (lambda ()
+                         (message "%s missing the following fonts: %s"
+                                  (propertize "Warning!" 'face '(bold warning))
+                                  (mapconcat (lambda (font)
+                                               (propertize font 'face 'font-lock-variable-name-face))
+                                             ',missing-fonts
+                                             ", "))
+                         (sleep-for 0.5))))))
+  ";; No missing fonts detected")
+#+end_src
+
+#+begin_src emacs-lisp :noweb no-export
+<<detect-missing-fonts()>>
+#+end_src
+
+This way whenever fonts are missing, after Doom's UI has initialised, a warning
+listing the missing fonts should appear for at least half a second.
 
 #+begin_src emacs-lisp
 ;; There are two ways to load a theme. Both assume the theme is installed and
@@ -94,7 +109,7 @@ Settings related to fonts within Doom Emacs:
 ;; they are implemented.
 #+end_src
 
-*** Custom key-bindings
+** Custom key-bindings
 
 #+begin_src emacs-lisp
 (map! :leader
@@ -107,6 +122,80 @@ Settings related to fonts within Doom Emacs:
 ;;        (:prefix ("j" . "journal")
 ;;         :desc "New journal entry" "j" #'org-journal-new-entry
 ;;         :desc "Search journal entry" "s" #'org-journal-search)))
+#+end_src
+
+** Better defaults
+
+*** Simple settings
+Browsing the web and seeing [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][angrybacon/dotemacs]] and comparing with the values
+shown by =SPC h v= and selecting what I thought looks good, I've ended up adding
+the following:
+
+#+begin_src emacs-lisp
+(setq-default
+ delete-by-moving-to-trash t                      ; Delete files to trash
+ window-combination-resize t                      ; take new window space from all other windows (not just current)
+ x-stretch-cursor t)                              ; Stretch cursor to the glyph width
+
+(setq undo-limit 80000000                         ; Raise undo-limit to 80Mb
+      evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
+      auto-save-default t                         ; Nobody likes to loose work, I certainly don't
+      truncate-string-ellipsis "…"                ; Unicode ellispis are nicer than "...", and also save /precious/ space
+      password-cache-expiry nil                   ; I can trust my computers ... can't I?
+      ;; scroll-preserve-screen-position 'always     ; Don't have `point' jump around
+      scroll-margin 4)                            ; It's nice to maintain a little margin
+
+(display-time-mode 1)                             ; Enable time in the mode-line
+
+(unless (string-match-p "^Power N/A" (battery))   ; On laptops...
+  (display-battery-mode 1))                       ; it's nice to know how much power you have
+
+(global-subword-mode 1)                           ; Iterate through CamelCase words
+#+end_src
+
+*** Which-key delay
+
+#+begin_src emacs-lisp
+(setq which-key-idle-delay 0.5) ;; I need the help, I really do
+#+end_src
+
+
+*** EVIL
+
+From the :editor evil module.
+
+When I want to make a substitution, I want it to be global more often than not — so let’s make that the default.
+
+Now, EVIL cares a fair bit about keeping compatibility with Vim’s default behaviour.
+I don’t.
+There are some particular settings that I’d rather be something else, so let’s change them.
+
+#+begin_src emacs-lisp
+(after! evil
+  (setq evil-ex-substitute-global t     ; I like my s/../.. to by global by default
+        evil-move-cursor-back nil       ; Don't move the block cursor when toggling insert mode
+        evil-kill-on-visual-paste nil)) ; Don't put overwritten text in the kill ring
+#+end_src
+
+
+*** Windows
+
+I find it rather handy to be asked which buffer I want to see after splitting the window. Let’s make that happen.
+
+First, we’ll enter the new window
+
+#+begin_src emacs-lisp
+(setq evil-vsplit-window-right t
+      evil-split-window-below t)
+#+end_src
+
+Then, we’ll pull up a buffer prompt.
+
+#+begin_src emacs-lisp
+(defadvice! prompt-for-buffer (&rest _)
+  :after '(evil-window-split evil-window-vsplit)
+  (consult-buffer))
+
 #+end_src
 
 * Dired
@@ -247,6 +336,12 @@ This section contains the basic configuration for =org-mode= plus the configurat
 There's a lot to unpack in here so I'd recommend watching the videos for [[https://youtu.be/VcgjTEa0kU4][Part 5]] and [[https://youtu.be/PNE-mgkZ6HM][Part 6]] for a full explanation.
 
 #+begin_src emacs-lisp
+(after! org
+  (setq org-ellipsis " ▼ "
+        org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
+        org-superstar-item-bullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
+        ))
+
 (setq org-agenda-files
       '("~/Documents/org/tasks.org"
         "~/Documents/org/habits.org"
@@ -409,44 +504,6 @@ You can add more =src= block templates below by copying one of the lines and cha
 #+end_src
 
 
-** Yasnippet
-
-Good video guide to using [[https://github.com/joaotavora/yasnippet][yasnippet]] can be found [[https://www.youtube.com/watch?v=xmBovJvQ3KU][here]].
-Note that yasnippet doesn't include any snippets to start with, but there are several collection on MELPA.
-Here we start with [[http://github.com/AndreaCrotti/yasnippet-snippets][yasnippet-snippets]].
-The docs can be found [[https://joaotavora.github.io/yasnippet/][here]].
-
-#+begin_src emacs-lisp
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
-  ;;:diminish yas-mode
-  :config
-  (require 'warnings)
-  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
-  ;; (setq yas-snippet-dirs
-  ;;       '("~/.config/doom/snippets"                 ;; personal snippets
-  ;;         ;; "/path/to/some/collection/"           ;; foo-mode and bar-mode snippet collection
-  ;;         ;; "/path/to/yasnippet/yasmate/snippets" ;; the yasmate collection
-  ;;         ))
-  ;;(setq yas-snippet-dirs-custom (format "%s/%s" user-emacs-directory "snippets/"))
-  ;; (setq yas-snippet-dirs-custom (expand-file-name "/snippets" user-emacs-directory))
-  ;; (add-to-list' yas-snippet-dirs 'yas-snippet-dirs-custom)
-  (setq yas-indent-line t)
-  ;; install some snippets
-  ;; (use-package yasnippet-snippets)
-  (yas-reload-all))
-
-;; ivy support
-;; (use-package ivy-yasnippet)
-;; this doesn't seem to work - yasnippets in general not working well in R
-(use-package r-autoyas
-  :hook (ess-mode-hook . r-autoyas-ess-active))
-;; (require 'r-autoyas)
-;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate)
-#+end_src
-
-
 ** Org-roam
 
 #+begin_src emacs-lisp
@@ -576,6 +633,100 @@ The docs can be found [[https://joaotavora.github.io/yasnippet/][here]].
         citar-citeproc-csl-locales-dir "~/Zotero/locales"
         citar-citeproc-csl-style (org-file-name-concat org-cite-csl-styles-dir "apa.csl")))
 
+#+end_src
+
+*** Key-bindings
+
+#+begin_src emacs-lisp
+(map! :leader
+      (:prefix-map ("C" . "citations")
+       :desc "Citar refresh" "r" #'citar-refresh
+       :desc "Insert citation" "i" #'citar-insert-citation
+       :desc "Open notes" "n" #'citar-open-notes
+       :desc "Export bib" "e" #'citar-export-local-bib-file
+       :desc "Select csl style" "s" #'citar-citeproc-select-csl-style
+       (:prefix ("j" . "journal")
+        :desc "New journal entry" "j" #'org-journal-new-entry
+        :desc "Search journal entry" "s" #'org-journal-search)))
+#+end_src
+
+* Yasnippet
+
+Good video guide to using [[https://github.com/joaotavora/yasnippet][yasnippet]] can be found [[https://www.youtube.com/watch?v=xmBovJvQ3KU][here]].
+Note that yasnippet doesn't include any snippets to start with, but there are several collection on MELPA.
+Here we start with [[http://github.com/AndreaCrotti/yasnippet-snippets][yasnippet-snippets]].
+The docs can be found [[https://joaotavora.github.io/yasnippet/][here]].
+
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+  ;;:diminish yas-mode
+  :config
+  (require 'warnings)
+  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+  ;; (setq yas-snippet-dirs
+  ;;       '("~/.config/doom/snippets"                 ;; personal snippets
+  ;;         ;; "/path/to/some/collection/"           ;; foo-mode and bar-mode snippet collection
+  ;;         ;; "/path/to/yasnippet/yasmate/snippets" ;; the yasmate collection
+  ;;         ))
+  ;;(setq yas-snippet-dirs-custom (format "%s/%s" user-emacs-directory "snippets/"))
+  ;; (setq yas-snippet-dirs-custom (expand-file-name "/snippets" user-emacs-directory))
+  ;; (add-to-list' yas-snippet-dirs 'yas-snippet-dirs-custom)
+  (setq yas-indent-line t)
+  ;; install some snippets
+  ;; (use-package yasnippet-snippets)
+  (yas-reload-all))
+
+;; ivy support
+;; (use-package ivy-yasnippet)
+;; this doesn't seem to work - yasnippets in general not working well in R
+(use-package r-autoyas
+  :hook (ess-mode-hook . r-autoyas-ess-active))
+;; (require 'r-autoyas)
+;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate)
+#+end_src
+
+* REGISTERS
+
+Emacs registers are compartments where you can save text, rectangles and positions for later use.
+Once you save text or a rectangle in a register, you can copy it into the buffer once or many times; once you save a position in a register, you can jump back to that position once or many times.
+The default GNU Emacs keybindings for these commands (with the exception of counsel-register) involves 'C-x r' followed by one or more other keys.  I wanted to make this a little more user friendly, and since I am using Doom Emacs, I choose to replace the 'C-x r' part of the key chords with 'SPC r'.
+
+| COMMAND                          | DESCRIPTION                      | KEYBINDING |
+|----------------------------------+----------------------------------+------------|
+| copy-to-register                 | /Copy to register/                 | SPC r c    |
+| frameset-to-register             | /Frameset to register/             | SPC r f    |
+| insert-register                  | /Insert contents of register/      | SPC r i    |
+| jump-to-register                 | /Jump to register/                 | SPC r j    |
+| list-registers                   | /List registers/                   | SPC r l    |
+| number-to-register               | /Number to register/               | SPC r n    |
+| counsel-register                 | /Interactively choose a register/  | SPC r r    |
+| view-register                    | /View a register/                  | SPC r v    |
+| window-configuration-to-register | /Window configuration to register/ | SPC r w    |
+| increment-register               | /Increment register/               | SPC r +    |
+| point-to-register                | /Point to register/                | SPC r SPC  |
+
+#+BEGIN_SRC emacs-lisp
+(map! :leader
+      (:prefix ("r" . "registers")
+       :desc "Copy to register" "c" #'copy-to-register
+       :desc "Frameset to register" "f" #'frameset-to-register
+       :desc "Insert contents of register" "i" #'insert-register
+       :desc "Jump to register" "j" #'jump-to-register
+       :desc "List registers" "l" #'list-registers
+       :desc "Number to register" "n" #'number-to-register
+       :desc "Interactively choose a register" "r" #'counsel-register
+       :desc "View a register" "v" #'view-register
+       :desc "Window configuration to register" "w" #'window-configuration-to-register
+       :desc "Increment register" "+" #'increment-register
+       :desc "Point to register" "SPC" #'point-to-register))
+#+END_SRC
+
+* Projectile
+
+#+begin_src emacs-lisp
+(setq projectile-project-search-path '("~/git_work/"))
 #+end_src
 
 * Development
@@ -722,6 +873,123 @@ Define some functions for inserting various operators and exporting .Rmd
 **** ESS config
 
 #+begin_src emacs-lisp
+(after! ess
+  (add-hook! 'prog-mode-hook #'rainbow-delimiters-mode)
+
+  ;; combines https://github.com/fernandomayer/spacemacs/blob/master/private/ess/packages.el and
+  ;; https://github.com/MilesMcBain/spacemacs_cfg/blob/master/private/ess/packages.el.
+
+  ;; If I use LSP it is better to let LSP handle lintr. See example in
+  ;; https://github.com/hlissner/doom-emacs/issues/2606.
+  (setq! ess-use-flymake nil)
+  (setq! lsp-ui-doc-enable nil
+         lsp-ui-doc-delay 1.5)
+
+  ;; Code indentation copied from my old config.
+  ;; Follow Hadley Wickham's R style guide
+  (setq
+   ess-style 'RStudio
+   ess-offset-continued 2
+   ess-expression-offset 0)
+
+  (setq comint-move-point-for-output t)
+
+  ;; From https://emacs.readthedocs.io/en/latest/ess__emacs_speaks_statistics.html
+  ;; TODO: find out a way to make settings generic so that I can also set ess-inf-R-font-lock-keywords
+  (setq ess-R-font-lock-keywords
+        '((ess-R-fl-keyword:modifiers  . t)
+          (ess-R-fl-keyword:fun-defs   . t)
+          (ess-R-fl-keyword:keywords   . t)
+          (ess-R-fl-keyword:assign-ops . t)
+          (ess-R-fl-keyword:constants  . t)
+          (ess-fl-keyword:fun-calls    . t)
+          (ess-fl-keyword:numbers      . t)
+          (ess-fl-keyword:operators    . t)
+          (ess-fl-keyword:delimiters) ; don't because of rainbow delimiters
+          (ess-fl-keyword:=            . t)
+          (ess-R-fl-keyword:F&T        . t)
+          (ess-R-fl-keyword:%op%       . t)))
+  )
+
+  ;; ESS buffers should not be cleaned up automatically
+  ;; (add-hook 'inferior-ess-mode-hook #'doom-mark-buffer-as-real-h)
+
+  ;; Open ESS R window to the left iso bottom.
+  ;; (set-popup-rule! "^\\*R.*\\*$" :side 'left :size 0.38 :select nil :ttl nil :quit nil :modeline t))
+
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Activate polymode when loading Rmarkdown documents. Also see
+  ;; https://github.com/MilesMcBain/spacemacs_cfg/blob/master/private/polymode/packages.el
+  ;; for somewhat outdated hints about a personal Rmd-mode
+  (use-package! polymode
+    :commands (R))
+
+  (after! markdown-mode
+    ;; Disable trailing whitespace stripping for Markdown mode
+    (add-hook 'markdown-mode-hook #'doom-disable-delete-trailing-whitespace-h)
+    ;; Doom adds extra line spacing in markdown documents
+    (add-hook! 'markdown-mode-hook :append (setq line-spacing nil)))
+
+  ;; From Tecosaur's configuration
+  (add-hook! (gfm-mode markdown-mode) #'mixed-pitch-mode)
+  ;; (add-hook! (gfm-mode markdown-mode) #'visual-line-mode #'turn-off-auto-fill)
+  ;; ----------------------------------------------------------------------------
+
+
+  ;; ----------------------------------------------------------------------------
+  ;; Material on completing/completion mostly from
+  ;; https://github.com/tecosaur/emacs-config/blob/master/config.org
+  ;;
+  ;; company-show-numbers works with Alt-x.
+  ;; (after! company
+  ;;   (setq company-show-numbers t))
+  (set-company-backend! '(text-mode
+                          markdown-mode
+                          gfm-mode)
+    '(:seperate company-ispell
+      company-files
+      company-yasnippet))
+  ;; by default the following also has R-library in there, so this is not needed.
+  ;; (set-company-backend! 'ess-r-mode '(company-R-args company-R-objects company-dabbrev-code :separate))
+  (setq-default history-length 1000)
+  (setq-default prescient-history-length 1000)
+#+end_src
+
+** ESS Keybindings
+
+#+begin_src emacs-lisp
+;; (after! ess
+;;  (map! :localleader
+;;  ;; (:map ess-r-mode-map
+;;   (:prefix ("e" . "Rmd export")
+;;         :desc "next chunk" "n" #'polymode-next-chunk)))
+
+(map! :leader
+      (:prefix-map ("e" . "Extras")
+       (:prefix ("r" . "Rmd")
+        :desc "next chunk" "n" #'polymode-next-chunk
+        :desc "previous chunk" "p" #'polymode-previous-chunk
+        :desc "kill chunk" "k" #'polymode-kill-chunk
+       (:prefix ("e" . "eval")
+        :desc "eval region or chunk" "e" #'polymode-eval-region-or-chunk
+        :desc "eval buffer to point" "b" #'polymode-eval-buffer-from-beg-to-point
+        :desc "eval point to end" "E" #'polymode-eval-buffer-from-point-to-end)
+       (:prefix ("E" . "export")
+        :desc "Export Rmd" "e" #'efs/ess-rmarkdown
+        :desc "xaringan-export" "x" #'efs/ess-xaringan
+        :desc "rshiny-export" "s" #'efs/ess-rshiny
+        :desc "publish-rmd" "p" #'efs/ess-publish
+        :desc "bookdown-export" "b" #'efs/ess-bookdown))))
+
+;; "rl" '(markdown-insert-link :which-key "insert link")
+;; "ri" '(markdown-insert-image :which-key "insert image")
+#+end_src
+
+Old config:
+
+#+begin_src emacs-lisp :tangle no
 ;; set up ess
 (use-package ess
   ;; :defer t
@@ -1006,4 +1274,12 @@ https://stackoverflow.com/questions/28942860/emacs-flyspell-disable-for-custom-l
             '("^[" . "]$")
             '("^{" . "}$"))
   )
+#+end_src
+
+** Grammar
+
+I don't like the highlighting the grammar module applies
+
+#+begin_src emacs-lisp
+(setq writegood-mode nil)
 #+end_src

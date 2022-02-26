@@ -3,35 +3,30 @@
 (setq user-full-name "Mateus"
       user-mail-address "Bernardo-HarringtonG@cardiff.ac.uk")
 
-(setq-default
- delete-by-moving-to-trash t                      ; Delete files to trash
- window-combination-resize t                      ; take new window space from all other windows (not just current)
- x-stretch-cursor t)                              ; Stretch cursor to the glyph width
-
-(setq undo-limit 80000000                         ; Raise undo-limit to 80Mb
-      evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
-      auto-save-default t                         ; Nobody likes to loose work, I certainly don't
-      truncate-string-ellipsis "…"                ; Unicode ellispis are nicer than "...", and also save /precious/ space
-      password-cache-expiry nil                   ; I can trust my computers ... can't I?
-      ;; scroll-preserve-screen-position 'always     ; Don't have `point' jump around
-      scroll-margin 2)                            ; It's nice to maintain a little margin
-
-(display-time-mode 1)                             ; Enable time in the mode-line
-
-(unless (string-match-p "^Power N/A" (battery))   ; On laptops...
-  (display-battery-mode 1))                       ; it's nice to know how much power you have
-
-(global-subword-mode 1)                           ; Iterate through CamelCase words
-
-(setq doom-font (font-spec :family "Source Code Pro" :size 18)
+(setq doom-font (font-spec :family "Fira Code" :size 18)
       doom-variable-pitch-font (font-spec :family "Ubuntu" :size 19)
-      doom-big-font (font-spec :family "Source Code Pro" :size 24))
+      doom-big-font (font-spec :family "Fira Code" :size 24))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
+
+(unless noninteractive
+  (add-hook! 'doom-init-ui-hook
+    (run-at-time nil nil
+		 (lambda nil
+		   (message "%s missing the following fonts: %s"
+			    (propertize "Warning!" 'face
+					'(bold warning))
+			    (mapconcat
+			     (lambda
+			       (font)
+			       (propertize font 'face 'font-lock-variable-name-face))
+			     '("Overpass")
+			     ", "))
+		   (sleep-for 0.5)))))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -69,6 +64,40 @@
 ;;        (:prefix ("j" . "journal")
 ;;         :desc "New journal entry" "j" #'org-journal-new-entry
 ;;         :desc "Search journal entry" "s" #'org-journal-search)))
+
+(setq-default
+ delete-by-moving-to-trash t                      ; Delete files to trash
+ window-combination-resize t                      ; take new window space from all other windows (not just current)
+ x-stretch-cursor t)                              ; Stretch cursor to the glyph width
+
+(setq undo-limit 80000000                         ; Raise undo-limit to 80Mb
+      evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
+      auto-save-default t                         ; Nobody likes to loose work, I certainly don't
+      truncate-string-ellipsis "…"                ; Unicode ellispis are nicer than "...", and also save /precious/ space
+      password-cache-expiry nil                   ; I can trust my computers ... can't I?
+      ;; scroll-preserve-screen-position 'always     ; Don't have `point' jump around
+      scroll-margin 4)                            ; It's nice to maintain a little margin
+
+(display-time-mode 1)                             ; Enable time in the mode-line
+
+(unless (string-match-p "^Power N/A" (battery))   ; On laptops...
+  (display-battery-mode 1))                       ; it's nice to know how much power you have
+
+(global-subword-mode 1)                           ; Iterate through CamelCase words
+
+(setq which-key-idle-delay 0.5) ;; I need the help, I really do
+
+(after! evil
+  (setq evil-ex-substitute-global t     ; I like my s/../.. to by global by default
+        evil-move-cursor-back nil       ; Don't move the block cursor when toggling insert mode
+        evil-kill-on-visual-paste nil)) ; Don't put overwritten text in the kill ring
+
+(setq evil-vsplit-window-right t
+      evil-split-window-below t)
+
+(defadvice! prompt-for-buffer (&rest _)
+  :after '(evil-window-split evil-window-vsplit)
+  (consult-buffer))
 
 (map! :leader
       (:prefix ("d" . "dired")
@@ -132,6 +161,12 @@
 
 ;; (setq mh/default-bibliography `(,(expand-file-name "masterLib.bib" org-directory)))
 (setq mh/default-bibliography `("~/Documents/masterLib.bib"))
+
+(after! org
+  (setq org-ellipsis " ▼ "
+        org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
+        org-superstar-item-bullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
+        ))
 
 (setq org-agenda-files
       '("~/Documents/org/tasks.org"
@@ -278,34 +313,6 @@
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
   (add-to-list 'org-structure-template-alist '("r" . "src R")))
 
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
-  ;;:diminish yas-mode
-  :config
-  (require 'warnings)
-  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
-  ;; (setq yas-snippet-dirs
-  ;;       '("~/.config/doom/snippets"                 ;; personal snippets
-  ;;         ;; "/path/to/some/collection/"           ;; foo-mode and bar-mode snippet collection
-  ;;         ;; "/path/to/yasnippet/yasmate/snippets" ;; the yasmate collection
-  ;;         ))
-  ;;(setq yas-snippet-dirs-custom (format "%s/%s" user-emacs-directory "snippets/"))
-  ;; (setq yas-snippet-dirs-custom (expand-file-name "/snippets" user-emacs-directory))
-  ;; (add-to-list' yas-snippet-dirs 'yas-snippet-dirs-custom)
-  (setq yas-indent-line t)
-  ;; install some snippets
-  ;; (use-package yasnippet-snippets)
-  (yas-reload-all))
-
-;; ivy support
-;; (use-package ivy-yasnippet)
-;; this doesn't seem to work - yasnippets in general not working well in R
-(use-package r-autoyas
-  :hook (ess-mode-hook . r-autoyas-ess-active))
-;; (require 'r-autoyas)
-;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate)
-
 (use-package! org-roam
   :init
   (map! :leader
@@ -423,6 +430,61 @@
         citar-citeproc-csl-styles-dir org-cite-csl-styles-dir
         citar-citeproc-csl-locales-dir "~/Zotero/locales"
         citar-citeproc-csl-style (org-file-name-concat org-cite-csl-styles-dir "apa.csl")))
+
+(map! :leader
+      (:prefix-map ("C" . "citations")
+       :desc "Citar refresh" "r" #'citar-refresh
+       :desc "Insert citation" "i" #'citar-insert-citation
+       :desc "Open notes" "n" #'citar-open-notes
+       :desc "Export bib" "e" #'citar-export-local-bib-file
+       :desc "Select csl style" "s" #'citar-citeproc-select-csl-style
+       (:prefix ("j" . "journal")
+        :desc "New journal entry" "j" #'org-journal-new-entry
+        :desc "Search journal entry" "s" #'org-journal-search)))
+
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+  ;;:diminish yas-mode
+  :config
+  (require 'warnings)
+  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+  ;; (setq yas-snippet-dirs
+  ;;       '("~/.config/doom/snippets"                 ;; personal snippets
+  ;;         ;; "/path/to/some/collection/"           ;; foo-mode and bar-mode snippet collection
+  ;;         ;; "/path/to/yasnippet/yasmate/snippets" ;; the yasmate collection
+  ;;         ))
+  ;;(setq yas-snippet-dirs-custom (format "%s/%s" user-emacs-directory "snippets/"))
+  ;; (setq yas-snippet-dirs-custom (expand-file-name "/snippets" user-emacs-directory))
+  ;; (add-to-list' yas-snippet-dirs 'yas-snippet-dirs-custom)
+  (setq yas-indent-line t)
+  ;; install some snippets
+  ;; (use-package yasnippet-snippets)
+  (yas-reload-all))
+
+;; ivy support
+;; (use-package ivy-yasnippet)
+;; this doesn't seem to work - yasnippets in general not working well in R
+(use-package r-autoyas
+  :hook (ess-mode-hook . r-autoyas-ess-active))
+;; (require 'r-autoyas)
+;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate)
+
+(map! :leader
+      (:prefix ("r" . "registers")
+       :desc "Copy to register" "c" #'copy-to-register
+       :desc "Frameset to register" "f" #'frameset-to-register
+       :desc "Insert contents of register" "i" #'insert-register
+       :desc "Jump to register" "j" #'jump-to-register
+       :desc "List registers" "l" #'list-registers
+       :desc "Number to register" "n" #'number-to-register
+       :desc "Interactively choose a register" "r" #'counsel-register
+       :desc "View a register" "v" #'view-register
+       :desc "Window configuration to register" "w" #'window-configuration-to-register
+       :desc "Increment register" "+" #'increment-register
+       :desc "Point to register" "SPC" #'point-to-register))
+
+(setq projectile-project-search-path '("~/git_work/"))
 
 (defun efs/insert-r-pipe ()
   "Insert the pipe operator in R, %>%"
@@ -552,170 +614,111 @@
         (switch-to-buffer rmd-buf)
         (ess-show-buffer (buffer-name sbuffer) nil)))))
 
-;; set up ess
-(use-package ess
-  ;; :defer t
-  ;; :straight t
-  :init
-  (require 'ess-r-mode)
-  ;;(require 'ess-view-data)
-  ;; (require 'ess-site)
-  ;; (require 'ess-rutils)
-  ;; Auto set width and length options when initiate new Ess processes
-  :config
-  (add-hook 'ess-post-run-hook 'ess-execute-screen-options)
-  (add-hook 'ess-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
-  (add-hook 'ess-mode-hook ;; truncate lines to make tables easier to view
-            (lambda () (toggle-truncate-lines t)))
-  (add-hook 'ess-mode-hook
-            (lambda () (ess-set-style 'RRR 'quiet)
-              (add-hook 'local-write-file-hooks
-                        (lambda () (ess-nuke-trailing-whitespace)))))
-  (add-hook 'inferior-ess-mode-hook 'ansi-color-for-comint-mode-on)
-  (add-hook 'inferior-ess-mode-hook #'(lambda ()
-                                        (setq-local comint-use-prompt-regexp nil)
-                                        (setq-local inhibit-field-text-motion nil)))
-  (add-hook 'ess-r-mode-hook
-            (lambda()
-              'eglot-ensure
-              (make-local-variable 'company-backends)
-              (delete-dups (push 'company-capf company-backends))
-              (delete-dups (push 'company-files company-backends))))
-  (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-  (show-paren-mode)
-  ;;(setq ess-eval-empty t)               ; don't skip non-code line
-  (setq comint-scroll-to-bottom-on-input 'this)
-  (setq comint-move-point-for-output 'others)
-  ;;(setq ess-ask-for-ess-directory nil)
-  (setq ess-eval-visibly 'nowait)
-  (setq ess-use-flymake nil)
-  ;; (setq ess-r-flymake-linters '("infix_spaces_linter" . "commas_linter"))
-  (setq ess-roxy-fold-examples nil)
-  (setq ess-roxy-fontify-examples t)
-  (setq ess-use-company 'script-only)
-  (setq ess-company-arg-prefix-length 1)
-  ;;(setq ess-blink-region nil)
+(after! ess
+  (add-hook! 'prog-mode-hook #'rainbow-delimiters-mode)
 
-  (setq ess-r-flymake-lintr-cache nil)
-  (setq ess-history-directory "~/.R/")
-  (setq inferior-R-args "--no-restore-history --no-save")
-  (setq ess-offset-arguments 'prev-line)
+  ;; combines https://github.com/fernandomayer/spacemacs/blob/master/private/ess/packages.el and
+  ;; https://github.com/MilesMcBain/spacemacs_cfg/blob/master/private/ess/packages.el.
 
-  (setq ess-indent-with-fancy-comments nil)
+  ;; If I use LSP it is better to let LSP handle lintr. See example in
+  ;; https://github.com/hlissner/doom-emacs/issues/2606.
+  (setq! ess-use-flymake nil)
+  (setq! lsp-ui-doc-enable nil
+         lsp-ui-doc-delay 1.5)
 
-  ;; fix assignment key
-  (ess-toggle-underscore nil)
-  (setq ess-insert-assign (car ess-assign-list))
-  (setq ess-assign-list '(" = "))
-  (bind-key "M--" 'ess-insert-assign)
+  ;; Code indentation copied from my old config.
+  ;; Follow Hadley Wickham's R style guide
+  (setq
+   ess-style 'RStudio
+   ess-offset-continued 2
+   ess-expression-offset 0)
 
-  (setq ess-eldoc-show-on-symbol nil)
-  ;; This may cause massive slow downs?
-  (setq ess-eldoc-abbreviation-style nil)
-  ;;(setq ess-use-eldoc nil)
-  (setq comint-scroll-to-bottom-on-output t)
-  :general
-  (global-leader
-   :major-modes
-   '(ess-r-mode inferior-ess-r-mode t)
-   :keymaps
-   '(ess-r-mode-map inferior-ess-r-mode-map)
-   "e" '(:ignore e :which-key "eval")
-   "eb" '(ess-eval-buffer :which-key "buffer")
-   "ed" '(eval-buffer-from-beg-to-here :which-key "buffer from beg")
-   "ee" '(eval-buffer-from-here-to-end :which-key "buffer to end")
-   "el" '(ess-eval-region-or-line-and-step :which-key "line or region")
-   "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
-   "er" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
-   "eB" '(polymode-eval-buffer-from-beg-to-point :which-key "Rmd chunks from beg to point")
-   "eE" '(polymode-eval-buffer-from-point-to-end :which-key "Rmd chunks from point to end")
-   "r" '(:ignore r :which-key "Rmd")
-   "rb" '(efs/ess-bookdown :which-key "bookdown-export")
-   "rx" '(efs/ess-xaringan :which-key "xaringan-export")
-   "re" '(efs/ess-rmarkdown :which-key "Rmd-export")
-   "rs" '(efs/ess-rshiny :which-key "shiny-export")
-   "rd" '(efs/ess-publish-rmd :which-key "publish Rmd")
-   "rn" '(polymode-next-chunk :which-key "next chunk")
-   "rp" '(polymode-previous-chunk :which-key "previous chunk")
-   "rk" '(polymode-kill-chunk :which-key "kill chunk")
-   "rl" '(markdown-insert-link :which-key "insert link")
-   "ri" '(markdown-insert-image :which-key "insert image")
-   "d" '(ess-doc-map :which-key "docs")
-   ;;"c" '(ess-r-mode-map :which-key "ess r map") ; doesn't work - maybe command?
-   "i" '(:ignore i :which-key "insert")
-   "ii" '(efs/insert-r-in :which-key "%in%")
-   "id" '(efs/insert_double_assign_operator :which-key "<<-")
-   ";" '(ess-insert-assign :which-key "<-")
-   "p" '(efs/insert-r-pipe :which-key "insert %>%")
-   "v" '(ess-rdired :which-key "rdired")
-   "w" '(ess-set-working-directory :which-key "set wd")))
-;; :bind (:map ess-r-mode-map
-;;             ("C-c C-w w" . ess-r-package-use-dir)
-;;             ("C-c C-w C-w" . ess-r-package-use-dir)
-;;             ("<C-M-return>" . ess-eval-region-or-function-or-paragraph-and-step)
-;;             ("<C-S-return>" . ess-eval-buffer)
-;;             ("C-M-;" . comment-line)
-;;             ("C-S-<f10>" . inferior-ess-reload)
-;;             ("<f5>" . ess-display-help-on-object)
-;;             ("<C-return>" . ess-eval-region-or-function-or-paragraph))
-;; :bind (:map inferior-ess-mode-map
-;;             ("C-S-<f10>" . inferior-ess-reload)))
+  (setq comint-move-point-for-output t)
 
-;; An example of window configuration:
-(setq display-buffer-alist
-      '(("*R Dired"
-         (display-buffer-reuse-window display-buffer-at-bottom)
-         (window-width . 0.5)
-         (window-height . 0.25)
-         (reusable-frames . nil))
-        ("*R"
-         (display-buffer-reuse-window display-buffer-in-side-window)
-         (side . right)
-         (slot . -1)
-         (window-width . 0.5)
-         (reusable-frames . nil))
-        ("*Help"
-         (display-buffer-reuse-window display-buffer-in-side-window)
-         (side . right)
-         (slot . 1)
-         (window-width . 0.5)
-         (reusable-frames . nil))))
-;; syntax highlight
-(setq ess-R-font-lock-keywords
-      (quote
-       ((ess-R-fl-keyword:modifiers . t)
-        (ess-R-fl-keyword:fun-defs . t)
-        (ess-R-fl-keyword:fun-defs2 . t)
-        (ess-R-fl-keyword:keywords . t)
-        (ess-R-fl-keyword:assign-ops)
-        (ess-R-fl-keyword:constants . t)
-        (ess-fl-keyword:fun-calls . t)
-        (ess-fl-keyword:numbers . t)
-        (ess-fl-keyword:operators)
-        (ess-fl-keyword:delimiters)
-        (ess-fl-keyword:=)
-        (ess-fl-keyword::= . t)
-        (ess-R-fl-keyword:F&T)
-        (ess-R-fl-keyword:%op%))))
+  ;; From https://emacs.readthedocs.io/en/latest/ess__emacs_speaks_statistics.html
+  ;; TODO: find out a way to make settings generic so that I can also set ess-inf-R-font-lock-keywords
+  (setq ess-R-font-lock-keywords
+        '((ess-R-fl-keyword:modifiers  . t)
+          (ess-R-fl-keyword:fun-defs   . t)
+          (ess-R-fl-keyword:keywords   . t)
+          (ess-R-fl-keyword:assign-ops . t)
+          (ess-R-fl-keyword:constants  . t)
+          (ess-fl-keyword:fun-calls    . t)
+          (ess-fl-keyword:numbers      . t)
+          (ess-fl-keyword:operators    . t)
+          (ess-fl-keyword:delimiters) ; don't because of rainbow delimiters
+          (ess-fl-keyword:=            . t)
+          (ess-R-fl-keyword:F&T        . t)
+          (ess-R-fl-keyword:%op%       . t)))
+  )
 
-(setq inferior-ess-r-font-lock-keywords
-      (quote
-       ((ess-S-fl-keyword:prompt . t)
-        (ess-R-fl-keyword:messages . t)
-        (ess-R-fl-keyword:modifiers . t)
-        (ess-R-fl-keyword:fun-defs . t)
-        (ess-R-fl-keyword:fun-defs2 . t)
-        (ess-R-fl-keyword:keywords . t)
-        (ess-R-fl-keyword:assign-ops)
-        (ess-R-fl-keyword:constants . t)
-        (ess-fl-keyword:matrix-labels)
-        (ess-fl-keyword:fun-calls)
-        (ess-fl-keyword:numbers)
-        (ess-fl-keyword:operators)
-        (ess-fl-keyword:delimiters)
-        (ess-fl-keyword:=)
-        (ess-fl-keyword::= . t)
-        (ess-R-fl-keyword:F&T))))
+  ;; ESS buffers should not be cleaned up automatically
+  ;; (add-hook 'inferior-ess-mode-hook #'doom-mark-buffer-as-real-h)
+
+  ;; Open ESS R window to the left iso bottom.
+  ;; (set-popup-rule! "^\\*R.*\\*$" :side 'left :size 0.38 :select nil :ttl nil :quit nil :modeline t))
+
+;; Activate polymode when loading Rmarkdown documents. Also see
+;; https://github.com/MilesMcBain/spacemacs_cfg/blob/master/private/polymode/packages.el
+;; for somewhat outdated hints about a personal Rmd-mode
+(use-package! polymode
+  :commands (R))
+
+(after! markdown-mode
+  ;; Disable trailing whitespace stripping for Markdown mode
+  (add-hook 'markdown-mode-hook #'doom-disable-delete-trailing-whitespace-h)
+  ;; Doom adds extra line spacing in markdown documents
+  (add-hook! 'markdown-mode-hook :append (setq line-spacing nil)))
+
+;; From Tecosaur's configuration
+(add-hook! (gfm-mode markdown-mode) #'mixed-pitch-mode)
+;; (add-hook! (gfm-mode markdown-mode) #'visual-line-mode #'turn-off-auto-fill)
+;; ----------------------------------------------------------------------------
+
+
+;; ----------------------------------------------------------------------------
+;; Material on completing/completion mostly from
+;; https://github.com/tecosaur/emacs-config/blob/master/config.org
+;;
+;; company-show-numbers works with Alt-x.
+;; (after! company
+;;   (setq company-show-numbers t))
+(set-company-backend! '(text-mode
+                        markdown-mode
+                        gfm-mode)
+  '(:seperate company-ispell
+    company-files
+    company-yasnippet))
+;; by default the following also has R-library in there, so this is not needed.
+;; (set-company-backend! 'ess-r-mode '(company-R-args company-R-objects company-dabbrev-code :separate))
+(setq-default history-length 1000)
+(setq-default prescient-history-length 1000)
+
+;; (after! ess
+;;  (map! :localleader
+;;  ;; (:map ess-r-mode-map
+;;   (:prefix ("e" . "Rmd export")
+;;         :desc "next chunk" "n" #'polymode-next-chunk)))
+
+(map! :leader
+      (:prefix-map ("e" . "Extras")
+       (:prefix ("r" . "Rmd")
+        :desc "next chunk" "n" #'polymode-next-chunk
+        :desc "previous chunk" "p" #'polymode-previous-chunk
+        :desc "kill chunk" "k" #'polymode-kill-chunk
+       (:prefix ("e" . "eval")
+        :desc "eval region or chunk" "e" #'polymode-eval-region-or-chunk
+        :desc "eval buffer to point" "b" #'polymode-eval-buffer-from-beg-to-point
+        :desc "eval point to end" "E" #'polymode-eval-buffer-from-point-to-end)
+       (:prefix ("E" . "export")
+        :desc "Export Rmd" "e" #'efs/ess-rmarkdown
+        :desc "xaringan-export" "x" #'efs/ess-xaringan
+        :desc "rshiny-export" "s" #'efs/ess-rshiny
+        :desc "publish-rmd" "p" #'efs/ess-publish
+        :desc "bookdown-export" "b" #'efs/ess-bookdown))))
+
+;; "rl" '(markdown-insert-link :which-key "insert link")
+;; "ri" '(markdown-insert-image :which-key "insert image")
 
 (use-package polymode)
 (use-package poly-R)
@@ -731,3 +734,5 @@
 (setq ispell-dictionary "en-custom")
 
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
+
+(setq writegood-mode nil)
