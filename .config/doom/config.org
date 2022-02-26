@@ -37,55 +37,15 @@ Settings related to fonts within Doom Emacs:
   '(font-lock-keyword-face :slant italic))
   #+end_src
 
-Because we care about how things look let's add a check to make sure we're told
-if the system doesn't have any of those fonts.
-
-#+name: detect-missing-fonts
-#+begin_src emacs-lisp :tangle no
-(defvar required-fonts '("JetBrainsMono.*" "Overpass" "Fira Code" "IBM Plex Mono"))
-
-(defvar available-fonts
-  (delete-dups (or (font-family-list)
-                   (split-string (shell-command-to-string "fc-list : family")
-                                 "[,\n]"))))
-
-(defvar missing-fonts
-  (delq nil (mapcar
-             (lambda (font)
-               (unless (delq nil (mapcar (lambda (f)
-                                           (string-match-p (format "^%s$" font) f))
-                                         available-fonts))
-                 font))
-             required-fonts)))
-
-(if missing-fonts
-    (pp-to-string
-     `(unless noninteractive
-        (add-hook! 'doom-init-ui-hook
-          (run-at-time nil nil
-                       (lambda ()
-                         (message "%s missing the following fonts: %s"
-                                  (propertize "Warning!" 'face '(bold warning))
-                                  (mapconcat (lambda (font)
-                                               (propertize font 'face 'font-lock-variable-name-face))
-                                             ',missing-fonts
-                                             ", "))
-                         (sleep-for 0.5))))))
-  ";; No missing fonts detected")
-#+end_src
-
-#+begin_src emacs-lisp :noweb no-export
-<<detect-missing-fonts()>>
-#+end_src
-
-This way whenever fonts are missing, after Doom's UI has initialised, a warning
-listing the missing fonts should appear for at least half a second.
+** Theme and modeline
 
 #+begin_src emacs-lisp
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'modus-vivendi)
+;; (setq doom-theme 'modus-vivendi) ; theme not loading for some reason
+;; backup theme
+(setq doom-theme 'doom-acario-dark)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -109,6 +69,11 @@ listing the missing fonts should appear for at least half a second.
 ;; they are implemented.
 #+end_src
 
+#+begin_src emacs-lisp
+(after! doom-modeline
+  (setq doom-modeline-enable-word-count t))
+#+end_src
+
 ** Custom key-bindings
 
 #+begin_src emacs-lisp
@@ -123,6 +88,86 @@ listing the missing fonts should appear for at least half a second.
 ;;         :desc "New journal entry" "j" #'org-journal-new-entry
 ;;         :desc "Search journal entry" "s" #'org-journal-search)))
 #+end_src
+
+*** Markdown Improvements
+
+Local leader is already bound to `m` and there are few bindings, this just adds
+more.
+
+#+BEGIN_SRC emacs-lisp
+(map! :localleader
+      :map markdown-mode-map
+      :prefix ("i" . "Insert")
+      :desc "Blockquote"    "q" 'markdown-insert-blockquote
+      :desc "Bold"          "b" 'markdown-insert-bold
+      :desc "Code"          "c" 'markdown-insert-code
+      :desc "Emphasis"      "e" 'markdown-insert-italic
+      :desc "Footnote"      "f" 'markdown-insert-footnote
+      :desc "Code Block"    "s" 'markdown-insert-gfm-code-block
+      :desc "Image"         "i" 'markdown-insert-image
+      :desc "Link"          "l" 'markdown-insert-link
+      :desc "List Item"     "n" 'markdown-insert-list-item
+      :desc "Pre"           "p" 'markdown-insert-pre
+      (:prefix ("h" . "Headings")
+       :desc "One"   "1" 'markdown-insert-atx-1
+       :desc "Two"   "2" 'markdown-insert-atx-2
+       :desc "Three" "3" 'markdown-insert-atx-3
+       :desc "Four"  "4" 'markdown-insert-atx-4
+       :desc "Five"  "5" 'markdown-insert-atx-5
+       :desc "Six"   "6" 'markdown-insert-atx-6))
+#+END_SRC
+
+*** Org Noter
+These bindings should probably be after ~org-noter~ is loaded.
+
+#+BEGIN_SRC emacs-lisp
+(map! :localleader
+      :map (org-mode-map pdf-view-mode-map)
+      (:prefix ("o" . "Org")
+       (:prefix ("n" . "Noter")
+        :desc "Noter" "n" 'org-noter
+        )))
+#+END_SRC
+
+*** Org Mode additions
+
+- Not currently working
+
+Apart from extension specific bindings, here we define useful functions which
+are a part of ~org-mode~.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(after! org (map! :localleader
+                  :map org-mode-map
+                  :desc "Eval Block" "e" 'ober-eval-block-in-repl
+                  (:prefix "o"
+                   :desc "Tags" "t" 'org-set-tags
+                   :desc "Roam Bibtex" "b" 'orb-note-actions
+                   (:prefix ("p" . "Properties")
+                    :desc "Set" "s" 'org-set-property
+                    :desc "Delete" "d" 'org-delete-property
+                    :desc "Actions" "a" 'org-property-action))
+                  (:prefix ("i" . "Insert")
+                   :desc "Link/Image" "l" 'org-insert-link
+                   :desc "Item" "o" 'org-toggle-item
+                   :desc "Citation" "c" 'org-ref-insert-cite-link
+                   :desc "Footnote" "f" 'org-footnote-action
+                   :desc "Table" "t" 'org-table-create-or-convert-from-region
+                   :desc "Screenshot" "s" 'org-download-screenshot
+                   (:prefix ("b" . "Math")
+                    :desc "Bold" "f" 'org-make-bold-math
+                    :desc "Blackboard" "b" 'org-make-blackboard-math
+                    :desc "Remove" "r" 'org-make-symrm-math
+                    :desc "Vert" "v" 'org-make-vert-math)
+                   (:prefix ("h" . "Headings")
+                    :desc "Normal" "h" 'org-insert-heading
+                    :desc "Todo" "t" 'org-insert-todo-heading
+                    (:prefix ("s" . "Subheadings")
+                     :desc "Normal" "s" 'org-insert-subheading
+                     :desc "Todo" "t" 'org-insert-todo-subheading))
+                   (:prefix ("e" . "Exports")
+                    :desc "Dispatch" "d" 'org-export-dispatch))))
+#+END_SRC
 
 ** Better defaults
 
@@ -147,7 +192,8 @@ the following:
 
 (display-time-mode 1)                             ; Enable time in the mode-line
 
-(unless (string-match-p "^Power N/A" (battery))   ; On laptops...
+(unless (equal "Battery status not available"
+               (battery))                         ; On laptops...
   (display-battery-mode 1))                       ; it's nice to know how much power you have
 
 (global-subword-mode 1)                           ; Iterate through CamelCase words
@@ -195,7 +241,6 @@ Then, we’ll pull up a buffer prompt.
 (defadvice! prompt-for-buffer (&rest _)
   :after '(evil-window-split evil-window-vsplit)
   (consult-buffer))
-
 #+end_src
 
 * Dired
@@ -539,11 +584,40 @@ You can add more =src= block templates below by copying one of the lines and cha
           ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: Project")
            :unnarrowed t)
+          ;; ("r" "reference" plain "%?"
+          ;;  :if-new
+          ;;  (file+head "reference/${slug}.org" "#+title: ${title}\n")
+          ;;  :immediate-finish t
+          ;;  :unnarrowed t)
+          ;; below is taken from org-roam-bibtex manual <2022-02-26 Sat>
+          ;; ("r" "bibliography reference" plain
+          ;;  (file "~/Documents/template.org")
+          ;;  :target
+          ;;  (file+head "references/${citekey}.org" "#+title: ${title}\n"))
+          ("s" "standard" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+title: ${title}\n#+filetags: \n\n ")
+           :unnarrowed t)
+          ("d" "definition" plain
+           "%?"
+           :if-new
+           (file+head "${slug}.org" "#+title: ${title}\n#+filetags: definition \n\n* Definition\n\n\n* Examples\n")
+           :unnarrowed t)
           ("r" "reference" plain "%?"
            :if-new
-           (file+head "reference/${slug}.org" "#+title: ${title}\n")
-           :immediate-finish t
+           (file+head "${citekey}.org"
+                      "#+title: ${slug}: ${title}\n
+\n#+filetags: reference ${keywords} \n
+\n* ${title}\n\n
+\n* Summary
+\n\n\n* Rough note space\n")
            :unnarrowed t)
+          ("p" "person" plain "%?"
+           :if-new
+           (file+head "${slug}.org" "%^{relation|some guy|family|friend|colleague}p %^{birthday}p %^{address}p
+,#+title:${slug}\n#+filetags: :person: \n"
+                      :unnarrowed t))
           ("a" "article" plain "%?"
            :if-new
            (file+head "articles/${slug}.org" "#+title: ${title}\n#+filetags: :article:\n")
@@ -610,12 +684,51 @@ You can add more =src= block templates below by copying one of the lines and cha
 
 ** Citations
 
+*** Org-ref
+
 #+begin_src emacs-lisp
-(after! bibtex-completion
-  (setq! bibtex-completion-notes-path org-roam-directory
-         bibtex-completion-bibliography mh/default-bibliography
-         org-cite-global-bibliography mh/default-bibliography
-         bibtex-completion-pdf-field "file"))
+(use-package! org-ref
+  ;;:after org-roam
+  :config
+  (setq
+   org-ref-completion-library 'org-ref-ivy-cite
+   org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+   bibtex-completion-bibliography mh/default-bibliography
+   bibtex-completion-notes "~/Documents/org/references/notes/bibnotes.org"
+   org-ref-note-title-format "* %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+   org-ref-notes-directory "~/Documents/org/references/notes/"
+   org-ref-notes-function 'orb-edit-notes
+   ))
+
+(after! org-ref
+  (setq
+   bibtex-completion-notes-path "~/Documents/org/references/notes/"
+   bibtex-completion-bibliography mh/default-bibliography
+   bibtex-completion-pdf-field "file"
+   bibtex-completion-notes-template-multiple-files
+   (concat
+    "#+TITLE: ${title}\n"
+    "#+ROAM_KEY: cite:${=key=}\n"
+    "* TODO Notes\n"
+    ":PROPERTIES:\n"
+    ":Custom_ID: ${=key=}\n"
+    ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+    ":AUTHOR: ${author-abbrev}\n"
+    ":JOURNAL: ${journaltitle}\n"
+    ":DATE: ${date}\n"
+    ":YEAR: ${year}\n"
+    ":DOI: ${doi}\n"
+    ":URL: ${url}\n"
+    ":END:\n\n"
+    )))
+#+end_src
+
+#+begin_src emacs-lisp
+;; (after! bibtex-completion
+;;   (setq! bibtex-completion-notes-path org-roam-directory
+;;          bibtex-completion-bibliography mh/default-bibliography
+;;          org-cite-global-bibliography mh/default-bibliography
+;;          bibtex-completion-pdf-field "file"))
 
 (after! bibtex-completion
   (after! org-roam
@@ -632,7 +745,67 @@ You can add more =src= block templates below by copying one of the lines and cha
         citar-citeproc-csl-styles-dir org-cite-csl-styles-dir
         citar-citeproc-csl-locales-dir "~/Zotero/locales"
         citar-citeproc-csl-style (org-file-name-concat org-cite-csl-styles-dir "apa.csl")))
+#+end_src
 
+*** Org-roam-bibtex
+
+Package in alpha, maybe leave till full release...
+Documentation is on the GitHub [[https://github.com/org-roam/org-roam-bibtex][here]]
+Maybe helpful forum post [[https://org-roam.discourse.group/t/minimal-setup-for-helm-bibtex-org-roam-v2-org-roam-bibtex/1971][here]]
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-roam-bibtex
+  :after org-roam
+  :hook (org-mode . org-roam-bibtex-mode)
+  :config
+  (require 'org-ref)
+  (setq orb-preformat-keywords
+        '("citekey" "title" "url" "file" "author-or-editor" "keywords" "pdf" "doi" "author" "tags" "year" "author-bbrev")))
+#+end_src
+
+*** Taking notes on PDFs
+
+#+begin_src emacs-lisp
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   ;;org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the rclone mega
+   org-noter-notes-search-path "~/Documents/org/references/notes"))
+
+(use-package! org-pdftools
+  :hook (org-load . org-pdftools-setup-link))
+(use-package! org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
+(after! pdf-view
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-width)
+  ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t
+        pdf-view-resize-factor 1.1)
+  ;; faster motion
+  (map!
+   :map pdf-view-mode-map
+   :n "g g"          #'pdf-view-first-page
+   :n "G"            #'pdf-view-last-page
+   :n "N"            #'pdf-view-next-page-command
+   :n "E"            #'pdf-view-previous-page-command
+   :n "e"            #'evil-collection-pdf-view-previous-line-or-previous-page
+   :n "n"            #'evil-collection-pdf-view-next-line-or-next-page
+   :localleader
+   (:prefix "o"
+    (:prefix "n"
+     :desc "Insert" "i" 'org-noter-insert-note))))
 #+end_src
 
 *** Key-bindings
@@ -926,11 +1099,11 @@ Define some functions for inserting various operators and exporting .Rmd
   (use-package! polymode
     :commands (R))
 
-  (after! markdown-mode
-    ;; Disable trailing whitespace stripping for Markdown mode
-    (add-hook 'markdown-mode-hook #'doom-disable-delete-trailing-whitespace-h)
-    ;; Doom adds extra line spacing in markdown documents
-    (add-hook! 'markdown-mode-hook :append (setq line-spacing nil)))
+  ;; (after! markdown-mode
+  ;;   ;; Disable trailing whitespace stripping for Markdown mode
+  ;;   (add-hook 'markdown-mode-hook #'doom-disable-delete-trailing-whitespace-h)
+  ;;   ;; Doom adds extra line spacing in markdown documents
+  ;;   (add-hook! 'markdown-mode-hook :append (setq line-spacing nil)))
 
   ;; From Tecosaur's configuration
   (add-hook! (gfm-mode markdown-mode) #'mixed-pitch-mode)
@@ -987,7 +1160,28 @@ Define some functions for inserting various operators and exporting .Rmd
 ;; "ri" '(markdown-insert-image :which-key "insert image")
 #+end_src
 
-Old config:
+** R Markdown
+
+#+begin_src emacs-lisp
+;; Load
+(use-package! poly-R
+:config
+(map! (:localleader
+      :map polymode-mode-map
+      :desc "Export"   "e" 'polymode-export
+      :desc "Errors" "$" 'polymode-show-process-buffer
+      :desc "Weave" "w" 'polymode-weave
+      ;; (:prefix ("n" . "Navigation")
+      ;;   :desc "Next" "n" . 'polymode-next-chunk
+      ;;   :desc "Previous" "N" . 'polymode-previous-chunk)
+      ;; (:prefix ("c" . "Chunks")
+      ;;   :desc "Narrow" "n" . 'polymode-toggle-chunk-narrowing
+      ;;   :desc "Kill" "k" . 'polymode-kill-chunk
+      ;;   :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
+      )))
+#+end_src
+
+**** Old config:
 
 #+begin_src emacs-lisp :tangle no
 ;; set up ess
@@ -1207,9 +1401,10 @@ Old config:
      ess-offset-continued 2
      ess-expression-offset 0)
 #+end_src
+
 Combine R and markdown mode in one buffer with polymode
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package polymode)
 (use-package poly-R)
 (use-package poly-markdown

@@ -13,25 +13,12 @@
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
 
-(unless noninteractive
-  (add-hook! 'doom-init-ui-hook
-    (run-at-time nil nil
-		 (lambda nil
-		   (message "%s missing the following fonts: %s"
-			    (propertize "Warning!" 'face
-					'(bold warning))
-			    (mapconcat
-			     (lambda
-			       (font)
-			       (propertize font 'face 'font-lock-variable-name-face))
-			     '("Overpass")
-			     ", "))
-		   (sleep-for 0.5)))))
-
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'modus-vivendi)
+;; (setq doom-theme 'modus-vivendi) ; theme not loading for some reason
+;; backup theme
+(setq doom-theme 'doom-acario-dark)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -54,6 +41,9 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+(after! doom-modeline
+  (setq doom-modeline-enable-word-count t))
+
 (map! :leader
       :desc "Swiper" "b f" #'swiper
       :desc "evil-comment" "b /" #'evilnc-comment-or-uncomment-lines)
@@ -64,6 +54,34 @@
 ;;        (:prefix ("j" . "journal")
 ;;         :desc "New journal entry" "j" #'org-journal-new-entry
 ;;         :desc "Search journal entry" "s" #'org-journal-search)))
+
+(map! :localleader
+      :map markdown-mode-map
+      :prefix ("i" . "Insert")
+      :desc "Blockquote"    "q" 'markdown-insert-blockquote
+      :desc "Bold"          "b" 'markdown-insert-bold
+      :desc "Code"          "c" 'markdown-insert-code
+      :desc "Emphasis"      "e" 'markdown-insert-italic
+      :desc "Footnote"      "f" 'markdown-insert-footnote
+      :desc "Code Block"    "s" 'markdown-insert-gfm-code-block
+      :desc "Image"         "i" 'markdown-insert-image
+      :desc "Link"          "l" 'markdown-insert-link
+      :desc "List Item"     "n" 'markdown-insert-list-item
+      :desc "Pre"           "p" 'markdown-insert-pre
+      (:prefix ("h" . "Headings")
+       :desc "One"   "1" 'markdown-insert-atx-1
+       :desc "Two"   "2" 'markdown-insert-atx-2
+       :desc "Three" "3" 'markdown-insert-atx-3
+       :desc "Four"  "4" 'markdown-insert-atx-4
+       :desc "Five"  "5" 'markdown-insert-atx-5
+       :desc "Six"   "6" 'markdown-insert-atx-6))
+
+(map! :localleader
+      :map (org-mode-map pdf-view-mode-map)
+      (:prefix ("o" . "Org")
+       (:prefix ("n" . "Noter")
+        :desc "Noter" "n" 'org-noter
+        )))
 
 (setq-default
  delete-by-moving-to-trash t                      ; Delete files to trash
@@ -80,7 +98,8 @@
 
 (display-time-mode 1)                             ; Enable time in the mode-line
 
-(unless (string-match-p "^Power N/A" (battery))   ; On laptops...
+(unless (equal "Battery status not available"
+               (battery))                         ; On laptops...
   (display-battery-mode 1))                       ; it's nice to know how much power you have
 
 (global-subword-mode 1)                           ; Iterate through CamelCase words
@@ -345,11 +364,40 @@
           ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: Project")
            :unnarrowed t)
+          ;; ("r" "reference" plain "%?"
+          ;;  :if-new
+          ;;  (file+head "reference/${slug}.org" "#+title: ${title}\n")
+          ;;  :immediate-finish t
+          ;;  :unnarrowed t)
+          ;; below is taken from org-roam-bibtex manual <2022-02-26 Sat>
+          ;; ("r" "bibliography reference" plain
+          ;;  (file "~/Documents/template.org")
+          ;;  :target
+          ;;  (file+head "references/${citekey}.org" "#+title: ${title}\n"))
+          ("s" "standard" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+title: ${title}\n#+filetags: \n\n ")
+           :unnarrowed t)
+          ("d" "definition" plain
+           "%?"
+           :if-new
+           (file+head "${slug}.org" "#+title: ${title}\n#+filetags: definition \n\n* Definition\n\n\n* Examples\n")
+           :unnarrowed t)
           ("r" "reference" plain "%?"
            :if-new
-           (file+head "reference/${slug}.org" "#+title: ${title}\n")
-           :immediate-finish t
+           (file+head "${citekey}.org"
+                      "#+title: ${slug}: ${title}\n
+\n#+filetags: reference ${keywords} \n
+\n* ${title}\n\n
+\n* Summary
+\n\n\n* Rough note space\n")
            :unnarrowed t)
+          ("p" "person" plain "%?"
+           :if-new
+           (file+head "${slug}.org" "%^{relation|some guy|family|friend|colleague}p %^{birthday}p %^{address}p
+#+title:${slug}\n#+filetags: :person: \n"
+                      :unnarrowed t))
           ("a" "article" plain "%?"
            :if-new
            (file+head "articles/${slug}.org" "#+title: ${title}\n#+filetags: :article:\n")
@@ -409,11 +457,46 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
-(after! bibtex-completion
-  (setq! bibtex-completion-notes-path org-roam-directory
-         bibtex-completion-bibliography mh/default-bibliography
-         org-cite-global-bibliography mh/default-bibliography
-         bibtex-completion-pdf-field "file"))
+(use-package! org-ref
+  ;;:after org-roam
+  :config
+  (setq
+   org-ref-completion-library 'org-ref-ivy-cite
+   org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+   bibtex-completion-bibliography mh/default-bibliography
+   bibtex-completion-notes "~/Documents/org/references/notes/bibnotes.org"
+   org-ref-note-title-format "* %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+   org-ref-notes-directory "~/Documents/org/references/notes/"
+   org-ref-notes-function 'orb-edit-notes
+   ))
+
+(after! org-ref
+  (setq
+   bibtex-completion-notes-path "~/Documents/org/references/notes/"
+   bibtex-completion-bibliography mh/default-bibliography
+   bibtex-completion-pdf-field "file"
+   bibtex-completion-notes-template-multiple-files
+   (concat
+    "#+TITLE: ${title}\n"
+    "#+ROAM_KEY: cite:${=key=}\n"
+    "* TODO Notes\n"
+    ":PROPERTIES:\n"
+    ":Custom_ID: ${=key=}\n"
+    ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+    ":AUTHOR: ${author-abbrev}\n"
+    ":JOURNAL: ${journaltitle}\n"
+    ":DATE: ${date}\n"
+    ":YEAR: ${year}\n"
+    ":DOI: ${doi}\n"
+    ":URL: ${url}\n"
+    ":END:\n\n"
+    )))
+
+;; (after! bibtex-completion
+;;   (setq! bibtex-completion-notes-path org-roam-directory
+;;          bibtex-completion-bibliography mh/default-bibliography
+;;          org-cite-global-bibliography mh/default-bibliography
+;;          bibtex-completion-pdf-field "file"))
 
 (after! bibtex-completion
   (after! org-roam
@@ -430,6 +513,55 @@
         citar-citeproc-csl-styles-dir org-cite-csl-styles-dir
         citar-citeproc-csl-locales-dir "~/Zotero/locales"
         citar-citeproc-csl-style (org-file-name-concat org-cite-csl-styles-dir "apa.csl")))
+
+(use-package! org-roam-bibtex
+  :after org-roam
+  :hook (org-mode . org-roam-bibtex-mode)
+  :config
+  (require 'org-ref)
+  (setq orb-preformat-keywords
+        '("citekey" "title" "url" "file" "author-or-editor" "keywords" "pdf" "doi" "author" "tags" "year" "author-bbrev")))
+
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   ;;org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the rclone mega
+   org-noter-notes-search-path "~/Documents/org/references/notes"))
+
+(use-package! org-pdftools
+  :hook (org-load . org-pdftools-setup-link))
+(use-package! org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
+(after! pdf-view
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-width)
+  ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t
+        pdf-view-resize-factor 1.1)
+  ;; faster motion
+  (map!
+   :map pdf-view-mode-map
+   :n "g g"          #'pdf-view-first-page
+   :n "G"            #'pdf-view-last-page
+   :n "N"            #'pdf-view-next-page-command
+   :n "E"            #'pdf-view-previous-page-command
+   :n "e"            #'evil-collection-pdf-view-previous-line-or-previous-page
+   :n "n"            #'evil-collection-pdf-view-next-line-or-next-page
+   :localleader
+   (:prefix "o"
+    (:prefix "n"
+     :desc "Insert" "i" 'org-noter-insert-note))))
 
 (map! :leader
       (:prefix-map ("C" . "citations")
@@ -664,11 +796,11 @@
 (use-package! polymode
   :commands (R))
 
-(after! markdown-mode
-  ;; Disable trailing whitespace stripping for Markdown mode
-  (add-hook 'markdown-mode-hook #'doom-disable-delete-trailing-whitespace-h)
-  ;; Doom adds extra line spacing in markdown documents
-  (add-hook! 'markdown-mode-hook :append (setq line-spacing nil)))
+;; (after! markdown-mode
+;;   ;; Disable trailing whitespace stripping for Markdown mode
+;;   (add-hook 'markdown-mode-hook #'doom-disable-delete-trailing-whitespace-h)
+;;   ;; Doom adds extra line spacing in markdown documents
+;;   (add-hook! 'markdown-mode-hook :append (setq line-spacing nil)))
 
 ;; From Tecosaur's configuration
 (add-hook! (gfm-mode markdown-mode) #'mixed-pitch-mode)
@@ -720,16 +852,22 @@
 ;; "rl" '(markdown-insert-link :which-key "insert link")
 ;; "ri" '(markdown-insert-image :which-key "insert image")
 
-(use-package polymode)
-(use-package poly-R)
-(use-package poly-markdown
-  :config
-  (add-to-list 'auto-mode-alist '("\\.rmd" . poly-markdown+R-mode))
-  )
-(with-eval-after-load "markdown"
-  (use-package poly-markdown))
-;; (with-eval-after-load "org"
-;;   (use-package poly-org))
+;; Load
+(use-package! poly-R
+:config
+(map! (:localleader
+      :map polymode-mode-map
+      :desc "Export"   "e" 'polymode-export
+      :desc "Errors" "$" 'polymode-show-process-buffer
+      :desc "Weave" "w" 'polymode-weave
+      ;; (:prefix ("n" . "Navigation")
+      ;;   :desc "Next" "n" . 'polymode-next-chunk
+      ;;   :desc "Previous" "N" . 'polymode-previous-chunk)
+      ;; (:prefix ("c" . "Chunks")
+      ;;   :desc "Narrow" "n" . 'polymode-toggle-chunk-narrowing
+      ;;   :desc "Kill" "k" . 'polymode-kill-chunk
+      ;;   :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
+      )))
 
 (setq ispell-dictionary "en-custom")
 

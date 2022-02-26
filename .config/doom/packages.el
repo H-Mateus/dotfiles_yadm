@@ -53,8 +53,24 @@
 
 (package! flycheck-aspell)
 
+;; org-roam setup
 (unpin! org-roam)
+;; for that nice graph!
 (package! org-roam-ui)
+
+;; org-roam-bibtex set up from manual
+(package! org-roam-bibtex
+  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
+;; When using org-roam via the `+roam` flag
+;; When using bibtex-completion via the `biblio` module
+(unpin! bibtex-completion helm-bibtex ivy-bibtex)
+
+(package! org-ref)
+(package! org-pdftools)
+(package! org-noter-pdftools)
+
+;; zotero integration
+(package! zotxt)
 
 (package! dired-open)
 (package! dired-subtree)

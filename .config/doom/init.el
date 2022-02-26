@@ -28,7 +28,7 @@
        vertico           ; the search engine of the future
 
        :ui
-       ;;deft              ; notational velocity for Emacs
+       deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
        doom-dashboard    ; a nifty splash screen for Emacs
        doom-quit         ; DOOM quit-message prompts when you quit Emacs
@@ -64,7 +64,7 @@
        ;;parinfer          ; turn lisp into python, sort of
        ;;rotate-text       ; cycle region at point between text candidates
        snippets          ; my elves. They type so I don't have to
-       ;;word-wrap         ; soft wrapping with language-aware indent
+       word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
        (dired +icons)    ; making dired pretty [functional]
@@ -120,7 +120,7 @@
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
        ;;csharp            ; unity, .NET, and mono shenanigans
-       ;;data              ; config/data formats
+       data              ; config/data formats
        ;;(dart +flutter)   ; paint ui and not much else
        ;;dhall
        ;;elixir            ; erlang done right
@@ -153,6 +153,11 @@
        (org                ; organize your plain life in plain text
         +journal           ; enable org journal
         +pretty            ; replace asterisks with pretty org bullets
+        +hugo               ; use Emacs for hugo blogging
+        ;; +ipython         ; So much more asynchronous, overshadowed by jupyter
+        ;; +journal         ; journaling in org
+        +jupyter            ; enable jupyter integration
+        +pandoc             ; pandoc integration into org's exporter
         +publish           ; create static websites with org
         +roam2)            ; org roam v2
        ;;php               ; perl's insecure younger brother
@@ -168,7 +173,7 @@
        (rust +lsp)         ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;(scheme +guile)   ; a fully conniving family of lisps
-       sh                ; she sells {ba,z,fi}sh shells on the C xor
+       (sh +lsp)           ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?
