@@ -78,6 +78,16 @@
 (package! polymode)
 (package! poly-R)
 (package! poly-markdown)
+;; great package for viewing dataframes in emacs
+(package! ess-view-data)
 
 ;; good for a refresher!
 (package! evil-tutor)
+
+;; sql
+(package! sqlup-mode)
+(package! sql-indent)
+
+;; elfeed
+(package! elfeed-goodies)
+;; (package! elfeed-dashboard)

@@ -43,9 +43,9 @@ Settings related to fonts within Doom Emacs:
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-;; (setq doom-theme 'modus-vivendi) ; theme not loading for some reason
+(setq doom-theme 'modus-vivendi)
 ;; backup theme
-(setq doom-theme 'doom-acario-dark)
+;; (setq doom-theme 'doom-acario-dark)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -351,6 +351,20 @@ If peep-dired is enabled, you will get image previews as you go up/down with 'j'
 (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 #+END_SRC
 
+* Dependencies
+
+External dependencies of config
+
+For ArchLinux:
+
+#+begin_src shell :tangle no
+## For web module
+sudo pacman -S tidy stylelint
+paru -S js-beautify
+
+## for python
+pip install -U python-language-server[all] nose pytest
+#+end_src
 
 * Org
 
@@ -376,6 +390,8 @@ Set up the directories
 ;; (setq mh/default-bibliography `(,(expand-file-name "masterLib.bib" org-directory)))
 (setq mh/default-bibliography `("~/Documents/masterLib.bib"))
 #+end_src
+
+** Basic config
 
 This section contains the basic configuration for =org-mode= plus the configuration for Org agendas and capture templates.
 There's a lot to unpack in here so I'd recommend watching the videos for [[https://youtu.be/VcgjTEa0kU4][Part 5]] and [[https://youtu.be/PNE-mgkZ6HM][Part 6]] for a full explanation.
@@ -527,7 +543,6 @@ There's a lot to unpack in here so I'd recommend watching the videos for [[https
       ;; org-clock-auto-clockout-timer (* 10 60))
 #+end_src
 
-
 ** Structure Templates
 
 Org Mode's [[https://orgmode.org/manual/Structure-Templates.html][structure templates]] feature enables you to quickly insert code blocks into your Org files in combination with =org-tempo= by typing =<= followed by the template name like =el= or =py= and then press =TAB=.
@@ -547,7 +562,6 @@ You can add more =src= block templates below by copying one of the lines and cha
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
   (add-to-list 'org-structure-template-alist '("r" . "src R")))
 #+end_src
-
 
 ** Org-roam
 
@@ -606,14 +620,24 @@ You can add more =src= block templates below by copying one of the lines and cha
            :unnarrowed t)
           ("r" "reference" plain "%?"
            :if-new
-           (file+head "${citekey}.org"
-                      "#+title: ${slug}: ${title}\n
+           (file+head "reference/${citekey}.org"
+                      ":PROPERTIES:
+:ID: ${id}
+:ROAM_REFS:
+:DOI: ${doi}
+:AUTHOR: ${author-or-editor}
+:NOTER_DOCUMENT: ${file}
+:NOTER_PAGE:
+:END:
+,#+title: ${title}\n
 \n#+filetags: reference ${keywords} \n
-\n* ${title}\n\n
 \n* Summary
-\n\n\n* Rough note space\n")
+\n\n\n* PDF notes\n
+:PROPERTIES:
+:NOTER_DOCUMENT: ${file}
+:END:")
            :unnarrowed t)
-          ("p" "person" plain "%?"
+          ("P" "person" plain "%?"
            :if-new
            (file+head "${slug}.org" "%^{relation|some guy|family|friend|colleague}p %^{birthday}p %^{address}p
 ,#+title:${slug}\n#+filetags: :person: \n"
@@ -771,9 +795,9 @@ Maybe helpful forum post [[https://org-roam.discourse.group/t/minimal-setup-for-
   :config
   (setq
    ;; The WM can handle splits
-   org-noter-notes-window-location 'other-frame
+   org-noter-notes-window-location 'vertical-split
    ;; Please stop opening frames
-   ;;org-noter-always-create-frame nil
+   org-noter-always-create-frame nil
    ;; I want to see the whole file
    org-noter-hide-other nil
    ;; Everything is relative to the rclone mega
@@ -781,6 +805,7 @@ Maybe helpful forum post [[https://org-roam.discourse.group/t/minimal-setup-for-
 
 (use-package! org-pdftools
   :hook (org-load . org-pdftools-setup-link))
+
 (use-package! org-noter-pdftools
   :after org-noter
   :config
@@ -793,6 +818,7 @@ Maybe helpful forum post [[https://org-roam.discourse.group/t/minimal-setup-for-
   ;; automatically annotate highlights
   (setq pdf-annot-activate-created-annotations t
         pdf-view-resize-factor 1.1)
+  (advice-add 'pdf-view-mouse-set-region :override #'*pdf-view-mouse-set-region)
   ;; faster motion
   (map!
    :map pdf-view-mode-map
@@ -805,7 +831,8 @@ Maybe helpful forum post [[https://org-roam.discourse.group/t/minimal-setup-for-
    :localleader
    (:prefix "o"
     (:prefix "n"
-     :desc "Insert" "i" 'org-noter-insert-note))))
+     :desc "Insert" "i" 'org-noter-insert-note
+     :desc "Create skeleton" "s" 'org-noter-pdftools-create-skeleton))))
 #+end_src
 
 *** Key-bindings
@@ -815,12 +842,118 @@ Maybe helpful forum post [[https://org-roam.discourse.group/t/minimal-setup-for-
       (:prefix-map ("C" . "citations")
        :desc "Citar refresh" "r" #'citar-refresh
        :desc "Insert citation" "i" #'citar-insert-citation
+       ;; :desc "Insert citation" "i" #'org-ref-cite-insert-helm
        :desc "Open notes" "n" #'citar-open-notes
        :desc "Export bib" "e" #'citar-export-local-bib-file
        :desc "Select csl style" "s" #'citar-citeproc-select-csl-style
        (:prefix ("j" . "journal")
         :desc "New journal entry" "j" #'org-journal-new-entry
         :desc "Search journal entry" "s" #'org-journal-search)))
+#+end_src
+
+* Elfeed RSS reader
+
+Setup elfeed mainly for academic papers.
+Most of the config taken from the [[https://github.com/zamansky/dot-emacs][Mike Zamansky]]
+
+#+begin_src emacs-lisp
+(use-package! elfeed-goodies)
+(elfeed-goodies/setup)
+
+;; elfeed-dashboard
+;; (use-package! elfeed-dashboard
+;;   :config
+;;   (setq elfeed-dashboard-file "~/Documents/org-roam/elfeed-dashboard.org")
+;;   ;; update feed counts on elfeed-quit
+;;   (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
+
+;;functions to support syncing .elfeed between machines
+;;makes sure elfeed reads index from disk before launching
+(defun bjm/elfeed-load-db-and-open ()
+  "Wrapper to load the elfeed db from disk before opening"
+  (interactive)
+  (elfeed-db-load)
+  (elfeed)
+  (elfeed-search-update--force))
+
+;;write to disk when quiting
+(defun bjm/elfeed-save-db-and-bury ()
+  "Wrapper to save the elfeed db to disk before burying buffer"
+  (interactive)
+  (elfeed-db-save)
+  (quit-window))
+
+(setq elfeed-db-directory "~/Documents/org-roam/elfeeddb")
+
+(use-package! elfeed
+  :config
+  (map! (:localleader
+         :map elfeed-search-mode-map
+         :desc "quit" "q" 'bjm/elfeed-save-db-and-bury
+         :desc "toggle star" "m" 'elfeed-toggle-star
+         :desc "run elfeed hydra" "j" 'mz/make-and-run-elfeed-hydra))
+  (defalias 'elfeed-toggle-star
+    (elfeed-expose #'elfeed-search-toggle-all 'star)))
+
+;; series of functions to get hyrda to quickly filter feed
+
+;; checks for upper case letter to use for keybinding
+(defun z/hasCap (s) ""
+       (let ((case-fold-search nil))
+         (string-match-p "[[:upper:]]" s)
+         ))
+
+(defun z/get-hydra-option-key (s)
+  "returns single upper case letter (converted to lower) or first"
+  (interactive)
+  (let ( (loc (z/hasCap s)))
+    (if loc
+        (downcase (substring s loc (+ loc 1)))
+      (substring s 0 1)
+      )))
+
+(defun mz/make-elfeed-cats (tags)
+  "Returns a list of lists. Each one is line for the hydra configuratio in the form
+         (c function hint)"
+  (interactive)
+  (mapcar (lambda (tag)
+            (let* (
+                   (tagstring (symbol-name tag))
+                   (c (z/get-hydra-option-key tagstring))
+                   )
+              (list c (append '(elfeed-search-set-filter) (list (format "@6-months-ago +%s" tagstring) ))tagstring  )))
+          tags))
+
+(defmacro mz/make-elfeed-hydra ()
+  `(defhydra mz/hydra-elfeed ()
+     "filter"
+     ;; ,@(mz/make-elfeed-cats (elfeed-db-get-all-tags))
+     ("*" (elfeed-search-set-filter "@6-months-ago +star") "Starred")
+     ("M" elfeed-toggle-star "Mark")
+     ("A" (elfeed-search-set-filter "@6-months-ago") "All")
+     ("a" (elfeed-search-set-filter "@6-months-ago +Academic") "Academic")
+     ("g" (elfeed-search-set-filter "@6-months-ago +general") "General")
+     ("T" (elfeed-search-set-filter "@1-day-ago") "Today")
+     ("Q" bjm/elfeed-save-db-and-bury "Quit Elfeed" :color blue)
+     ("q" nil "quit" :color blue)
+     ))
+
+(defun mz/make-and-run-elfeed-hydra ()
+  ""
+  (interactive)
+  (mz/make-elfeed-hydra)
+  (mz/hydra-elfeed/body))
+
+
+(defun my-elfeed-tag-sort (a b)
+  (let* ((a-tags (format "%s" (elfeed-entry-tags a)))
+         (b-tags (format "%s" (elfeed-entry-tags b))))
+    (if (string= a-tags b-tags)
+        (< (elfeed-entry-date b) (elfeed-entry-date a)))
+    (string< a-tags b-tags)))
+
+
+(setf elfeed-search-sort-function #'my-elfeed-tag-sort)
 #+end_src
 
 * Yasnippet
@@ -1130,7 +1263,7 @@ Define some functions for inserting various operators and exporting .Rmd
   (setq-default prescient-history-length 1000)
 #+end_src
 
-** ESS Keybindings
+**** ESS Keybindings
 
 #+begin_src emacs-lisp
 ;; (after! ess
@@ -1139,282 +1272,166 @@ Define some functions for inserting various operators and exporting .Rmd
 ;;   (:prefix ("e" . "Rmd export")
 ;;         :desc "next chunk" "n" #'polymode-next-chunk)))
 
-(map! :leader
-      (:prefix-map ("e" . "Extras")
-       (:prefix ("r" . "Rmd")
-        :desc "next chunk" "n" #'polymode-next-chunk
-        :desc "previous chunk" "p" #'polymode-previous-chunk
-        :desc "kill chunk" "k" #'polymode-kill-chunk
-       (:prefix ("e" . "eval")
-        :desc "eval region or chunk" "e" #'polymode-eval-region-or-chunk
-        :desc "eval buffer to point" "b" #'polymode-eval-buffer-from-beg-to-point
-        :desc "eval point to end" "E" #'polymode-eval-buffer-from-point-to-end)
+;; (map! :localleader
+;;       :map (org-mode-map pdf-view-mode-map)
+;;       (:prefix ("o" . "Org")
+;;        (:prefix ("n" . "Noter")
+;;         :desc "Noter" "n" 'org-noter
+;;         )))
+
+(map! :localleader
+      :map (ess-r-mode-map)
+      (:prefix ("." . "polymode")
+       :desc "Next chunk" "n" 'polymode-next-chunk
+       :desc "Previous chunk" "p" 'polymode-previous-chunk
+       :desc "Kill chunk" "k" 'polymode-kill-chunk
+       :desc "Eval chunk" "e" 'polymode-eval-region-or-chunk
+       :desc "eval buffer to point" "b" #'polymode-eval-buffer-from-beg-to-point
+       :desc "eval point to end" "B" #'polymode-eval-buffer-from-point-to-end
+       :desc "Narrow chunk" "N" . 'polymode-toggle-chunk-narrowing
+       ;; (:prefix ("c" . "Chunks")
+       ;;   :desc "Kill" "k" . 'polymode-kill-chunk
+       ;;   :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
        (:prefix ("E" . "export")
         :desc "Export Rmd" "e" #'efs/ess-rmarkdown
         :desc "xaringan-export" "x" #'efs/ess-xaringan
         :desc "rshiny-export" "s" #'efs/ess-rshiny
         :desc "publish-rmd" "p" #'efs/ess-publish
-        :desc "bookdown-export" "b" #'efs/ess-bookdown))))
+        :desc "bookdown-export" "b" #'efs/ess-bookdown)))
 
 ;; "rl" '(markdown-insert-link :which-key "insert link")
 ;; "ri" '(markdown-insert-image :which-key "insert image")
 #+end_src
 
-** R Markdown
+**** R Markdown
 
 #+begin_src emacs-lisp
 ;; Load
-(use-package! poly-R
-:config
-(map! (:localleader
-      :map polymode-mode-map
+(use-package! poly-R)
+
+(map! :localleader
+      :map (markdown-mode-map)
       :desc "Export"   "e" 'polymode-export
       :desc "Errors" "$" 'polymode-show-process-buffer
       :desc "Weave" "w" 'polymode-weave
-      ;; (:prefix ("n" . "Navigation")
-      ;;   :desc "Next" "n" . 'polymode-next-chunk
-      ;;   :desc "Previous" "N" . 'polymode-previous-chunk)
-      ;; (:prefix ("c" . "Chunks")
-      ;;   :desc "Narrow" "n" . 'polymode-toggle-chunk-narrowing
-      ;;   :desc "Kill" "k" . 'polymode-kill-chunk
-      ;;   :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
-      )))
+      (:prefix ("E" . "export")
+       :desc "Export Rmd" "e" #'efs/ess-rmarkdown
+       :desc "xaringan-export" "x" #'efs/ess-xaringan
+       :desc "rshiny-export" "s" #'efs/ess-rshiny
+       :desc "publish-rmd" "p" #'efs/ess-publish
+       :desc "bookdown-export" "b" #'efs/ess-bookdown)
+      (:prefix ("n" . "Navigation")
+       :desc "Next chunk" "n" . 'polymode-next-chunk
+       :desc "Previous chunk" "N" . 'polymode-previous-chunk)
+      (:prefix ("c" . "Chunks")
+       :desc "Narrow" "n" . 'polymode-toggle-chunk-narrowing
+       :desc "Kill" "k" . 'polymode-kill-chunk
+       :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
+      )
 #+end_src
 
-**** Old config:
+*** SQL
 
-#+begin_src emacs-lisp :tangle no
-;; set up ess
-(use-package ess
-  ;; :defer t
-  ;; :straight t
-  :init
-  (require 'ess-r-mode)
-  ;;(require 'ess-view-data)
-  ;; (require 'ess-site)
-  ;; (require 'ess-rutils)
-  ;; Auto set width and length options when initiate new Ess processes
+Use the =lsp-execute-code-action= function to get a list of options in a SQL buffer.
+Make sure the connection is correct.
+This can be set with the =lsp-sql-switch-connection=.
+
+#+begin_src emacs-lisp
+(use-package! sql
   :config
-  (add-hook 'ess-post-run-hook 'ess-execute-screen-options)
-  (add-hook 'ess-mode-hook (lambda () (run-hooks 'prog-mode-hook)))
-  (add-hook 'ess-mode-hook ;; truncate lines to make tables easier to view
-            (lambda () (toggle-truncate-lines t)))
-  (add-hook 'ess-mode-hook
-            (lambda () (ess-set-style 'RRR 'quiet)
-              (add-hook 'local-write-file-hooks
-                        (lambda () (ess-nuke-trailing-whitespace)))))
-  (add-hook 'inferior-ess-mode-hook 'ansi-color-for-comint-mode-on)
-  (add-hook 'inferior-ess-mode-hook #'(lambda ()
-                                        (setq-local comint-use-prompt-regexp nil)
-                                        (setq-local inhibit-field-text-motion nil)))
-  (add-hook 'ess-r-mode-hook
-            (lambda()
-              'eglot-ensure
-              (make-local-variable 'company-backends)
-              (delete-dups (push 'company-capf company-backends))
-              (delete-dups (push 'company-files company-backends))))
-  (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-  (show-paren-mode)
-  ;;(setq ess-eval-empty t)               ; don't skip non-code line
-  (setq comint-scroll-to-bottom-on-input 'this)
-  (setq comint-move-point-for-output 'others)
-  ;;(setq ess-ask-for-ess-directory nil)
-  (setq ess-eval-visibly 'nowait)
-  (setq ess-use-flymake nil)
-  ;; (setq ess-r-flymake-linters '("infix_spaces_linter" . "commas_linter"))
-  (setq ess-roxy-fold-examples nil)
-  (setq ess-roxy-fontify-examples t)
-  (setq ess-use-company 'script-only)
-  (setq ess-company-arg-prefix-length 1)
-  ;;(setq ess-blink-region nil)
+  (map! (:localleader
+         :map sql-mode-map
+         "e" '(:ignore e :which-key "eval")
+         "eb" '(sql-send-buffer :which-key "send buffer")
+         "ep" '(sql-send-paragraph :which-key "send paragraph")
+         "el" '(sql-send-line-and-next :which-key "send line and next")
+         "er" '(sql-send-region :which-key "send region")
+         "l" '(sql-list-all :which-key "list all")
+         "f" '(sql-beautify-region-or-buffer :which-key "format region or buffer")
+         "t" '(sql-list-table :which-key "list table"))))
 
-  (setq ess-r-flymake-lintr-cache nil)
-  (setq ess-history-directory "~/.R/")
-  (setq inferior-R-args "--no-restore-history --no-save")
-  (setq ess-offset-arguments 'prev-line)
+;; default login params
+(setq sql-postgres-login-params
+      '((user :default "mateus")
+        (database :default "postgres")
+        (server :default "localhost")
+        (port :default 5432)))
 
-  (setq ess-indent-with-fancy-comments nil)
+;; hooks
+(add-hook 'sql-interactive-mode-hook
+          (lambda ()
+            (toggle-truncate-lines t)))
+;; (add-hook 'sql-interactive-mode-hook 'lsp-deferred)
+(add-hook 'sql-mode-hook 'lsp)
+;; (add-hook 'sql-mode-hook #'lsp-deferred)
+(setq lsp-sqls-workspace-config-path nil)
 
-  ;; fix assignment key
-  (ess-toggle-underscore nil)
-  (setq ess-insert-assign (car ess-assign-list))
-  (setq ess-assign-list '(" = "))
-  (bind-key "M--" 'ess-insert-assign)
+;; add sqls path
+(setq lsp-sqls-server (concat (getenv "HOME") "/go/bin/sqls"))
 
-  (setq ess-eldoc-show-on-symbol nil)
-  ;; This may cause massive slow downs?
-  (setq ess-eldoc-abbreviation-style nil)
-  ;;(setq ess-use-eldoc nil)
-  (setq comint-scroll-to-bottom-on-output t)
-  :general
-  (global-leader
-   :major-modes
-   '(ess-r-mode inferior-ess-r-mode t)
-   :keymaps
-   '(ess-r-mode-map inferior-ess-r-mode-map)
-   "e" '(:ignore e :which-key "eval")
-   "eb" '(ess-eval-buffer :which-key "buffer")
-   "ed" '(eval-buffer-from-beg-to-here :which-key "buffer from beg")
-   "ee" '(eval-buffer-from-here-to-end :which-key "buffer to end")
-   "el" '(ess-eval-region-or-line-and-step :which-key "line or region")
-   "ef" '(ess-eval-function-or-paragraph-and-step :which-key "function or paragraph")
-   "er" '(polymode-eval-region-or-chunk :which-key "Rmd region or chunk")
-   "eB" '(polymode-eval-buffer-from-beg-to-point :which-key "Rmd chunks from beg to point")
-   "eE" '(polymode-eval-buffer-from-point-to-end :which-key "Rmd chunks from point to end")
-   "r" '(:ignore r :which-key "Rmd")
-   "rb" '(efs/ess-bookdown :which-key "bookdown-export")
-   "rx" '(efs/ess-xaringan :which-key "xaringan-export")
-   "re" '(efs/ess-rmarkdown :which-key "Rmd-export")
-   "rs" '(efs/ess-rshiny :which-key "shiny-export")
-   "rd" '(efs/ess-publish-rmd :which-key "publish Rmd")
-   "rn" '(polymode-next-chunk :which-key "next chunk")
-   "rp" '(polymode-previous-chunk :which-key "previous chunk")
-   "rk" '(polymode-kill-chunk :which-key "kill chunk")
-   "rl" '(markdown-insert-link :which-key "insert link")
-   "ri" '(markdown-insert-image :which-key "insert image")
-   "d" '(ess-doc-map :which-key "docs")
-   ;;"c" '(ess-r-mode-map :which-key "ess r map") ; doesn't work - maybe command?
-   "i" '(:ignore i :which-key "insert")
-   "ii" '(efs/insert-r-in :which-key "%in%")
-   "id" '(efs/insert_double_assign_operator :which-key "<<-")
-   ";" '(ess-insert-assign :which-key "<-")
-   "p" '(efs/insert-r-pipe :which-key "insert %>%")
-   "v" '(ess-rdired :which-key "rdired")
-   "w" '(ess-set-working-directory :which-key "set wd")))
-;; :bind (:map ess-r-mode-map
-;;             ("C-c C-w w" . ess-r-package-use-dir)
-;;             ("C-c C-w C-w" . ess-r-package-use-dir)
-;;             ("<C-M-return>" . ess-eval-region-or-function-or-paragraph-and-step)
-;;             ("<C-S-return>" . ess-eval-buffer)
-;;             ("C-M-;" . comment-line)
-;;             ("C-S-<f10>" . inferior-ess-reload)
-;;             ("<f5>" . ess-display-help-on-object)
-;;             ("<C-return>" . ess-eval-region-or-function-or-paragraph))
-;; :bind (:map inferior-ess-mode-map
-;;             ("C-S-<f10>" . inferior-ess-reload)))
+(setq lsp-sqls-connections
+      '(((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=mateus dbname=postgres sslmode=disable"))
+        ((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=mateus dbname=ad_phenotype_db sslmode=disable"))))
 
-;; An example of window configuration:
-(setq display-buffer-alist
-      '(("*R Dired"
-         (display-buffer-reuse-window display-buffer-at-bottom)
-         (window-width . 0.5)
-         (window-height . 0.25)
-         (reusable-frames . nil))
-        ("*R"
-         (display-buffer-reuse-window display-buffer-in-side-window)
-         (side . right)
-         (slot . -1)
-         (window-width . 0.5)
-         (reusable-frames . nil))
-        ("*Help"
-         (display-buffer-reuse-window display-buffer-in-side-window)
-         (side . right)
-         (slot . 1)
-         (window-width . 0.5)
-         (reusable-frames . nil))))
-;; syntax highlight
-(setq ess-R-font-lock-keywords
-      (quote
-       ((ess-R-fl-keyword:modifiers . t)
-        (ess-R-fl-keyword:fun-defs . t)
-        (ess-R-fl-keyword:fun-defs2 . t)
-        (ess-R-fl-keyword:keywords . t)
-        (ess-R-fl-keyword:assign-ops)
-        (ess-R-fl-keyword:constants . t)
-        (ess-fl-keyword:fun-calls . t)
-        (ess-fl-keyword:numbers . t)
-        (ess-fl-keyword:operators)
-        (ess-fl-keyword:delimiters)
-        (ess-fl-keyword:=)
-        (ess-fl-keyword::= . t)
-        (ess-R-fl-keyword:F&T)
-        (ess-R-fl-keyword:%op%))))
+;; (setq lsp-sqls-connections
+;;     '(((driver . "mysql") (dataSourceName . "yyoncho:local@tcp(localhost:3306)/foo"))
+;;       ((driver . "mssql") (dataSourceName . "Server=localhost;Database=sammy;User Id=yyoncho;Password=hunter2;"))
+;;       ((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=yyoncho password=local dbname=sammy sslmode=disable"))))
 
-(setq inferior-ess-r-font-lock-keywords
-      (quote
-       ((ess-S-fl-keyword:prompt . t)
-        (ess-R-fl-keyword:messages . t)
-        (ess-R-fl-keyword:modifiers . t)
-        (ess-R-fl-keyword:fun-defs . t)
-        (ess-R-fl-keyword:fun-defs2 . t)
-        (ess-R-fl-keyword:keywords . t)
-        (ess-R-fl-keyword:assign-ops)
-        (ess-R-fl-keyword:constants . t)
-        (ess-fl-keyword:matrix-labels)
-        (ess-fl-keyword:fun-calls)
-        (ess-fl-keyword:numbers)
-        (ess-fl-keyword:operators)
-        (ess-fl-keyword:delimiters)
-        (ess-fl-keyword:=)
-        (ess-fl-keyword::= . t)
-        (ess-R-fl-keyword:F&T))))
+(setq sql-connection-alist
+      '((pool-a
+         (sql-product 'postgresql)
+         (sql-server "1.2.3.4")
+         (sql-user "mateus")
+         (sql-database "postgres")
+         (sql-port 5432))))
 
-#+end_src
-#+begin_src emacs-lisp :tangle no
-(with-eval-after-load "ess"
-  (require 'ess-site)
-  (require 'ess-mode)
-  ;;   (define-key evil-normal-state-map (kbd "<SPC-e>") 'ess-execute))
+;; (setq sql-connection-alist
+;;       '((pool-a
+;;          (sql-product 'mysql)
+;;          (sql-server "1.2.3.4")
+;;          (sql-user "me")
+;;          (sql-password "mypassword")
+;;          (sql-database "thedb")
+;; (sql-port 3306))))
 
-  ;; Set ESS options
-  (setq
-   ess-auto-width 'window
-   ess-use-auto-complete nil
-   ess-use-company 't
-   ;; ess-r-package-auto-set-evaluation-env nil
-   inferior-ess-same-window 't
-   ess-indent-with-fancy-comments nil ; don't indent comments
-   ess-eval-visibly t                 ; enable echoing input
-   ;; ess-eval-visibly 'nowait   ;; Stop R repl eval from blocking emacs.
-   ess-eval-empty t                   ; don't skip non-code lines.
-   ess-ask-for-ess-directory nil) ; start R in the working directory by default
+;; prevent tripup from databases with underscores in their name - rom emacs wiki
+;; (sql-set-product-feature 'postgres :prompt-regexp "^[-[:alnum:]_]*=[#>] ")
+;; (sql-set-product-feature 'postgres :prompt-cont-regexp
+;;                          "^[-[:alnum:]_]*[-(][#>] ")
 
-  (after! ess
-    ;; (require 'ess-site)
-    ;; (require 'ess-mode)
-    ;; (require 'ess-r-mode)
-    (setq ;ess-ask-for-ess-directory nil        ; start R in the working directory by default
-     ;; ess-use-flymake nil    ; let lsp manage lintr?
-     ess-ask-for-ess-directory t
-     ess-local-process-name "R"
-     ansi-color-for-comint-mode 'filter
-     comint-scroll-to-bottom-on-input t
-     comint-scroll-to-bottom-on-output t
-     comint-move-point-for-output t
-     )
-    (set-company-backend! 'ess-r-mode
-      '(
-        ;;company-capf ;;not sure if needed or autoloaded
-        ;;company-yasnippet
-        company-R-args
-        company-R-objects
-        company-ess
-        company-dabbrev-code
-        company-files
-        :separate))
-
-
-    ;; Code indentation copied from my old config.
-    ;; Follow Hadley Wickham's R style guide
-    (setq
-     ess-style 'RStudio
-     ess-offset-continued 2
-     ess-expression-offset 0)
-#+end_src
-
-Combine R and markdown mode in one buffer with polymode
-
-#+begin_src emacs-lisp :tangle no
-(use-package polymode)
-(use-package poly-R)
-(use-package poly-markdown
+;; package to make SQL keywords uppercase whilst typing
+(use-package! sqlup-mode
   :config
-  (add-to-list 'auto-mode-alist '("\\.rmd" . poly-markdown+R-mode))
-  )
-(with-eval-after-load "markdown"
-  (use-package poly-markdown))
-;; (with-eval-after-load "org"
-;;   (use-package poly-org))
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+  (add-hook 'redis-mode-hook 'sqlup-mode))
+;; auto-indent
+(use-package! sql-indent
+  :config
+  (add-hook 'sql-mode-hook 'sqlind-minor-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlind-minor-mode)
+  (add-hook 'redis-mode-hook 'sqlind-minor-mode))
+;; functions to use sqlbeautify to format code in region or buffer
+(defun sql-beautify-region (beg end)
+  "Beautify SQL in region between beg and END."
+  (interactive "r")
+  (save-excursion
+    (shell-command-on-region beg end "anbt-sql-formatter" nil t)))
+;; change sqlbeautify to anbt-sql-formatter if you
+;;ended up using the ruby gem
+
+(defun sql-beautify-buffer ()
+  "Beautify SQL in buffer."
+  (interactive)
+  (sql-beautify-region (point-min) (point-max)))
+
+(defun sql-beautify-region-or-buffer ()
+  "Beautify SQL for the entire buffer or the marked region between beg and end"
+  (interactive)
+  (if (use-region-p)
+      (sql-beautify-region (region-beginning) (region-end))
+    (sql-beautify-buffer)))
 #+end_src
 
 * Spelling

@@ -16,9 +16,9 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-;; (setq doom-theme 'modus-vivendi) ; theme not loading for some reason
+(setq doom-theme 'modus-vivendi)
 ;; backup theme
-(setq doom-theme 'doom-acario-dark)
+;; (setq doom-theme 'doom-acario-dark)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -386,14 +386,24 @@
            :unnarrowed t)
           ("r" "reference" plain "%?"
            :if-new
-           (file+head "${citekey}.org"
-                      "#+title: ${slug}: ${title}\n
+           (file+head "reference/${citekey}.org"
+                      ":PROPERTIES:
+:ID: ${id}
+:ROAM_REFS:
+:DOI: ${doi}
+:AUTHOR: ${author-or-editor}
+:NOTER_DOCUMENT: ${file}
+:NOTER_PAGE:
+:END:
+#+title: ${title}\n
 \n#+filetags: reference ${keywords} \n
-\n* ${title}\n\n
 \n* Summary
-\n\n\n* Rough note space\n")
+\n\n\n* PDF notes\n
+:PROPERTIES:
+:NOTER_DOCUMENT: ${file}
+:END:")
            :unnarrowed t)
-          ("p" "person" plain "%?"
+          ("P" "person" plain "%?"
            :if-new
            (file+head "${slug}.org" "%^{relation|some guy|family|friend|colleague}p %^{birthday}p %^{address}p
 #+title:${slug}\n#+filetags: :person: \n"
@@ -527,9 +537,9 @@
   :config
   (setq
    ;; The WM can handle splits
-   org-noter-notes-window-location 'other-frame
+   org-noter-notes-window-location 'vertical-split
    ;; Please stop opening frames
-   ;;org-noter-always-create-frame nil
+   org-noter-always-create-frame nil
    ;; I want to see the whole file
    org-noter-hide-other nil
    ;; Everything is relative to the rclone mega
@@ -537,6 +547,7 @@
 
 (use-package! org-pdftools
   :hook (org-load . org-pdftools-setup-link))
+
 (use-package! org-noter-pdftools
   :after org-noter
   :config
@@ -549,6 +560,7 @@
   ;; automatically annotate highlights
   (setq pdf-annot-activate-created-annotations t
         pdf-view-resize-factor 1.1)
+  (advice-add 'pdf-view-mouse-set-region :override #'*pdf-view-mouse-set-region)
   ;; faster motion
   (map!
    :map pdf-view-mode-map
@@ -561,18 +573,118 @@
    :localleader
    (:prefix "o"
     (:prefix "n"
-     :desc "Insert" "i" 'org-noter-insert-note))))
+     :desc "Insert" "i" 'org-noter-insert-note
+     :desc "Create skeleton" "s" 'org-noter-pdftools-create-skeleton))))
 
 (map! :leader
       (:prefix-map ("C" . "citations")
        :desc "Citar refresh" "r" #'citar-refresh
        :desc "Insert citation" "i" #'citar-insert-citation
+       ;; :desc "Insert citation" "i" #'org-ref-cite-insert-helm
        :desc "Open notes" "n" #'citar-open-notes
        :desc "Export bib" "e" #'citar-export-local-bib-file
        :desc "Select csl style" "s" #'citar-citeproc-select-csl-style
        (:prefix ("j" . "journal")
         :desc "New journal entry" "j" #'org-journal-new-entry
         :desc "Search journal entry" "s" #'org-journal-search)))
+
+(use-package! elfeed-goodies)
+(elfeed-goodies/setup)
+
+;; elfeed-dashboard
+;; (use-package! elfeed-dashboard
+;;   :config
+;;   (setq elfeed-dashboard-file "~/Documents/org-roam/elfeed-dashboard.org")
+;;   ;; update feed counts on elfeed-quit
+;;   (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
+
+;;functions to support syncing .elfeed between machines
+;;makes sure elfeed reads index from disk before launching
+(defun bjm/elfeed-load-db-and-open ()
+  "Wrapper to load the elfeed db from disk before opening"
+  (interactive)
+  (elfeed-db-load)
+  (elfeed)
+  (elfeed-search-update--force))
+
+;;write to disk when quiting
+(defun bjm/elfeed-save-db-and-bury ()
+  "Wrapper to save the elfeed db to disk before burying buffer"
+  (interactive)
+  (elfeed-db-save)
+  (quit-window))
+
+(setq elfeed-db-directory "~/Documents/org-roam/elfeeddb")
+
+(use-package! elfeed
+  :config
+  (map! (:localleader
+         :map elfeed-search-mode-map
+         :desc "quit" "q" 'bjm/elfeed-save-db-and-bury
+         :desc "toggle star" "m" 'elfeed-toggle-star
+         :desc "run elfeed hydra" "j" 'mz/make-and-run-elfeed-hydra))
+  (defalias 'elfeed-toggle-star
+    (elfeed-expose #'elfeed-search-toggle-all 'star)))
+
+;; series of functions to get hyrda to quickly filter feed
+
+;; checks for upper case letter to use for keybinding
+(defun z/hasCap (s) ""
+       (let ((case-fold-search nil))
+         (string-match-p "[[:upper:]]" s)
+         ))
+
+(defun z/get-hydra-option-key (s)
+  "returns single upper case letter (converted to lower) or first"
+  (interactive)
+  (let ( (loc (z/hasCap s)))
+    (if loc
+        (downcase (substring s loc (+ loc 1)))
+      (substring s 0 1)
+      )))
+
+(defun mz/make-elfeed-cats (tags)
+  "Returns a list of lists. Each one is line for the hydra configuratio in the form
+         (c function hint)"
+  (interactive)
+  (mapcar (lambda (tag)
+            (let* (
+                   (tagstring (symbol-name tag))
+                   (c (z/get-hydra-option-key tagstring))
+                   )
+              (list c (append '(elfeed-search-set-filter) (list (format "@6-months-ago +%s" tagstring) ))tagstring  )))
+          tags))
+
+(defmacro mz/make-elfeed-hydra ()
+  `(defhydra mz/hydra-elfeed ()
+     "filter"
+     ;; ,@(mz/make-elfeed-cats (elfeed-db-get-all-tags))
+     ("*" (elfeed-search-set-filter "@6-months-ago +star") "Starred")
+     ("M" elfeed-toggle-star "Mark")
+     ("A" (elfeed-search-set-filter "@6-months-ago") "All")
+     ("a" (elfeed-search-set-filter "@6-months-ago +Academic") "Academic")
+     ("g" (elfeed-search-set-filter "@6-months-ago +general") "General")
+     ("T" (elfeed-search-set-filter "@1-day-ago") "Today")
+     ("Q" bjm/elfeed-save-db-and-bury "Quit Elfeed" :color blue)
+     ("q" nil "quit" :color blue)
+     ))
+
+(defun mz/make-and-run-elfeed-hydra ()
+  ""
+  (interactive)
+  (mz/make-elfeed-hydra)
+  (mz/hydra-elfeed/body))
+
+
+(defun my-elfeed-tag-sort (a b)
+  (let* ((a-tags (format "%s" (elfeed-entry-tags a)))
+         (b-tags (format "%s" (elfeed-entry-tags b))))
+    (if (string= a-tags b-tags)
+        (< (elfeed-entry-date b) (elfeed-entry-date a)))
+    (string< a-tags b-tags)))
+
+
+(setf elfeed-search-sort-function #'my-elfeed-tag-sort)
 
 (use-package yasnippet
   :init
@@ -832,42 +944,154 @@
 ;;   (:prefix ("e" . "Rmd export")
 ;;         :desc "next chunk" "n" #'polymode-next-chunk)))
 
-(map! :leader
-      (:prefix-map ("e" . "Extras")
-       (:prefix ("r" . "Rmd")
-        :desc "next chunk" "n" #'polymode-next-chunk
-        :desc "previous chunk" "p" #'polymode-previous-chunk
-        :desc "kill chunk" "k" #'polymode-kill-chunk
-       (:prefix ("e" . "eval")
-        :desc "eval region or chunk" "e" #'polymode-eval-region-or-chunk
-        :desc "eval buffer to point" "b" #'polymode-eval-buffer-from-beg-to-point
-        :desc "eval point to end" "E" #'polymode-eval-buffer-from-point-to-end)
+;; (map! :localleader
+;;       :map (org-mode-map pdf-view-mode-map)
+;;       (:prefix ("o" . "Org")
+;;        (:prefix ("n" . "Noter")
+;;         :desc "Noter" "n" 'org-noter
+;;         )))
+
+(map! :localleader
+      :map (ess-r-mode-map)
+      (:prefix ("." . "polymode")
+       :desc "Next chunk" "n" 'polymode-next-chunk
+       :desc "Previous chunk" "p" 'polymode-previous-chunk
+       :desc "Kill chunk" "k" 'polymode-kill-chunk
+       :desc "Eval chunk" "e" 'polymode-eval-region-or-chunk
+       :desc "eval buffer to point" "b" #'polymode-eval-buffer-from-beg-to-point
+       :desc "eval point to end" "B" #'polymode-eval-buffer-from-point-to-end
+       :desc "Narrow chunk" "N" . 'polymode-toggle-chunk-narrowing
+       ;; (:prefix ("c" . "Chunks")
+       ;;   :desc "Kill" "k" . 'polymode-kill-chunk
+       ;;   :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
        (:prefix ("E" . "export")
         :desc "Export Rmd" "e" #'efs/ess-rmarkdown
         :desc "xaringan-export" "x" #'efs/ess-xaringan
         :desc "rshiny-export" "s" #'efs/ess-rshiny
         :desc "publish-rmd" "p" #'efs/ess-publish
-        :desc "bookdown-export" "b" #'efs/ess-bookdown))))
+        :desc "bookdown-export" "b" #'efs/ess-bookdown)))
 
 ;; "rl" '(markdown-insert-link :which-key "insert link")
 ;; "ri" '(markdown-insert-image :which-key "insert image")
 
 ;; Load
-(use-package! poly-R
-:config
-(map! (:localleader
-      :map polymode-mode-map
+(use-package! poly-R)
+
+(map! :localleader
+      :map (markdown-mode-map)
       :desc "Export"   "e" 'polymode-export
       :desc "Errors" "$" 'polymode-show-process-buffer
       :desc "Weave" "w" 'polymode-weave
-      ;; (:prefix ("n" . "Navigation")
-      ;;   :desc "Next" "n" . 'polymode-next-chunk
-      ;;   :desc "Previous" "N" . 'polymode-previous-chunk)
-      ;; (:prefix ("c" . "Chunks")
-      ;;   :desc "Narrow" "n" . 'polymode-toggle-chunk-narrowing
-      ;;   :desc "Kill" "k" . 'polymode-kill-chunk
-      ;;   :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
-      )))
+      (:prefix ("E" . "export")
+       :desc "Export Rmd" "e" #'efs/ess-rmarkdown
+       :desc "xaringan-export" "x" #'efs/ess-xaringan
+       :desc "rshiny-export" "s" #'efs/ess-rshiny
+       :desc "publish-rmd" "p" #'efs/ess-publish
+       :desc "bookdown-export" "b" #'efs/ess-bookdown)
+      (:prefix ("n" . "Navigation")
+       :desc "Next chunk" "n" . 'polymode-next-chunk
+       :desc "Previous chunk" "N" . 'polymode-previous-chunk)
+      (:prefix ("c" . "Chunks")
+       :desc "Narrow" "n" . 'polymode-toggle-chunk-narrowing
+       :desc "Kill" "k" . 'polymode-kill-chunk
+       :desc "Mark-Extend" "m" . 'polymode-mark-or-extend-chunk)
+      )
+
+(use-package! sql
+  :config
+  (map! (:localleader
+         :map sql-mode-map
+         "e" '(:ignore e :which-key "eval")
+         "eb" '(sql-send-buffer :which-key "send buffer")
+         "ep" '(sql-send-paragraph :which-key "send paragraph")
+         "el" '(sql-send-line-and-next :which-key "send line and next")
+         "er" '(sql-send-region :which-key "send region")
+         "l" '(sql-list-all :which-key "list all")
+         "f" '(sql-beautify-region-or-buffer :which-key "format region or buffer")
+         "t" '(sql-list-table :which-key "list table"))))
+
+;; default login params
+(setq sql-postgres-login-params
+      '((user :default "mateus")
+        (database :default "postgres")
+        (server :default "localhost")
+        (port :default 5432)))
+
+;; hooks
+(add-hook 'sql-interactive-mode-hook
+          (lambda ()
+            (toggle-truncate-lines t)))
+;; (add-hook 'sql-interactive-mode-hook 'lsp-deferred)
+(add-hook 'sql-mode-hook 'lsp)
+;; (add-hook 'sql-mode-hook #'lsp-deferred)
+(setq lsp-sqls-workspace-config-path nil)
+
+;; add sqls path
+(setq lsp-sqls-server (concat (getenv "HOME") "/go/bin/sqls"))
+
+(setq lsp-sqls-connections
+      '(((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=mateus dbname=postgres sslmode=disable"))
+        ((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=mateus dbname=ad_phenotype_db sslmode=disable"))))
+
+;; (setq lsp-sqls-connections
+;;     '(((driver . "mysql") (dataSourceName . "yyoncho:local@tcp(localhost:3306)/foo"))
+;;       ((driver . "mssql") (dataSourceName . "Server=localhost;Database=sammy;User Id=yyoncho;Password=hunter2;"))
+;;       ((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=yyoncho password=local dbname=sammy sslmode=disable"))))
+
+(setq sql-connection-alist
+      '((pool-a
+         (sql-product 'postgresql)
+         (sql-server "1.2.3.4")
+         (sql-user "mateus")
+         (sql-database "postgres")
+         (sql-port 5432))))
+
+;; (setq sql-connection-alist
+;;       '((pool-a
+;;          (sql-product 'mysql)
+;;          (sql-server "1.2.3.4")
+;;          (sql-user "me")
+;;          (sql-password "mypassword")
+;;          (sql-database "thedb")
+;; (sql-port 3306))))
+
+;; prevent tripup from databases with underscores in their name - rom emacs wiki
+;; (sql-set-product-feature 'postgres :prompt-regexp "^[-[:alnum:]_]*=[#>] ")
+;; (sql-set-product-feature 'postgres :prompt-cont-regexp
+;;                          "^[-[:alnum:]_]*[-(][#>] ")
+
+;; package to make SQL keywords uppercase whilst typing
+(use-package! sqlup-mode
+  :config
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+  (add-hook 'redis-mode-hook 'sqlup-mode))
+;; auto-indent
+(use-package! sql-indent
+  :config
+  (add-hook 'sql-mode-hook 'sqlind-minor-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlind-minor-mode)
+  (add-hook 'redis-mode-hook 'sqlind-minor-mode))
+;; functions to use sqlbeautify to format code in region or buffer
+(defun sql-beautify-region (beg end)
+  "Beautify SQL in region between beg and END."
+  (interactive "r")
+  (save-excursion
+    (shell-command-on-region beg end "anbt-sql-formatter" nil t)))
+;; change sqlbeautify to anbt-sql-formatter if you
+;;ended up using the ruby gem
+
+(defun sql-beautify-buffer ()
+  "Beautify SQL in buffer."
+  (interactive)
+  (sql-beautify-region (point-min) (point-max)))
+
+(defun sql-beautify-region-or-buffer ()
+  "Beautify SQL for the entire buffer or the marked region between beg and end"
+  (interactive)
+  (if (use-region-p)
+      (sql-beautify-region (region-beginning) (region-end))
+    (sql-beautify-buffer)))
 
 (setq ispell-dictionary "en-custom")
 
